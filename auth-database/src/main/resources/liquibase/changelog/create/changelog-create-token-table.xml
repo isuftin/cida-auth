@@ -1,0 +1,27 @@
+<databaseChangeLog
+	xmlns="http://www.liquibase.org/xml/ns/dbchangelog"
+	xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+	xsi:schemaLocation="http://www.liquibase.org/xml/ns/dbchangelog
+         http://www.liquibase.org/xml/ns/dbchangelog/dbchangelog-2.0.xsd">
+
+	<changeSet author="${runasusername}" id="create-token-table">
+		<createTable 
+			remarks="Holds active tokens, expiration times and associated metadata"
+			tableName="auth_token">
+			<column name="auth_token" type="varchar(256)"/>
+			<column name="username" type="varchar(64)"/>
+			<column name="issued" type="datetime"/>
+			<column name="expires" type="datetime"/>
+			<column name="last_access" type="datetime"/>
+		</createTable>
+    
+		<sql>Grant Select On ${schemaname}.auth_token To app_auth_server;</sql>
+		<sql>Grant Insert On ${schemaname}.auth_token To app_auth_server;</sql>
+		<sql>Grant Delete On ${schemaname}.auth_token To app_auth_server;</sql>
+		<sql>Grant Update On ${schemaname}.auth_token To app_auth_server;</sql>
+    
+		<rollback>
+			drop table ${schemaname}.auth_token;
+		</rollback>
+	</changeSet>
+</databaseChangeLog>
