@@ -21,6 +21,26 @@
 			<artifactId>liquibase-core</artifactId>
 			<version>${version.liquibase-maven-plugin}</version>
 		</dependency>
+		
+		<!-- Logging -->
+		<dependency>
+			<artifactId>slf4j-api</artifactId>
+			<groupId>org.slf4j</groupId>
+			<version>1.7.6</version>
+			<scope>compile</scope>
+		</dependency>
+		<dependency>
+			<groupId>ch.qos.logback</groupId>
+			<artifactId>logback-classic</artifactId>
+			<version>1.1.1</version>
+			<scope>compile</scope>
+		</dependency>
+		<!-- Database -->
+		<dependency>
+			<groupId>org.postgresql</groupId>
+			<artifactId>postgresql</artifactId>
+			<version>9.3-1102-jdbc41</version>
+		</dependency>
 		<dependency>
 			<groupId>com.oracle</groupId>
 			<artifactId>ojdbc6</artifactId>
@@ -39,11 +59,22 @@
 		<profile>
 			<id>in-mem-etl-test</id>
 			<properties>
-				<schemaname>PUBLIC</schemaname>
-				<runasusername>app_auth_server</runasusername>
-				<runaspassword>app_auth_server</runaspassword>
+				<db.auth.schemaname>PUBLIC</db.auth.schemaname>
+				<db.auth.runasusername>app_auth_server</db.auth.runasusername>
+				<db.auth.user>app_auth_server</db.auth.user>
+				<db.auth.pass>app_auth_server</db.auth.pass>
 			</properties>
+
 			<build>
+				<testResources>
+					<testResource>
+						<directory>src/main/resources</directory>
+						<filtering>true</filtering>
+						<includes>
+							<include>mybatis-config.xml</include>
+						</includes>
+					</testResource>
+				</testResources>
 				<plugins>
 					<plugin>
 						<groupId>org.codehaus.mojo</groupId>
@@ -58,7 +89,7 @@
 								<phase>process-resources</phase>
 								<configuration>
 									<portNames>
-										<portName>auth.integration-test.port</portName>
+										<portName>db.auth.integration-test.port</portName>
 									</portNames>
 								</configuration>
 							</execution>
@@ -76,8 +107,9 @@
 								</goals>
 								<configuration>
 									<systemPropertyVariables>
-										<schemaname>${schemaname}</schemaname>
-										<runasusername>${runasusername}</runasusername>
+										<db.auth.schemaname>${db.auth.schemaname}</db.auth.schemaname>
+										<db.auth.user>${db.auth.user}</db.auth.user>
+										<runasusername>${db.auth.runasusername}</runasusername>
 									</systemPropertyVariables>
 								</configuration>
 							</execution>
@@ -88,7 +120,7 @@
 						<artifactId>inmemdb-maven-plugin</artifactId>
 						<version>1.4.3</version>
 						<configuration>
-							<monitorPort>${auth.integration-test.port}</monitorPort>
+							<monitorPort>${db.auth.integration-test.port}</monitorPort>
 							<monitorKey>inmemdb</monitorKey>
 						</configuration>
 						<executions>
@@ -101,9 +133,9 @@
 								<configuration>
 									<daemon>true</daemon>
 									<type>h2</type>
-									<database>${schemaname}</database>
-									<username>${runasusername}</username>
-									<password>${runaspassword}</password>
+									<database>${db.auth.schemaname}</database>
+									<username>${db.auth.user}</username>
+									<password>${db.auth.pass}</password>
 								</configuration>
 							</execution>
 							<execution>
@@ -128,20 +160,24 @@
 								<configuration>
 									<changeLogFile>src/main/resources/liquibase/changelog/etl/create-tables.xml</changeLogFile>
 									<driver>org.h2.Driver</driver>
-									<url>jdbc:h2:tcp//127.0.0.1:${auth.integration-test.port}/${schemaname}</url>
-									<username>${runasusername}</username>
-									<password>${runaspassword}</password>
+									<url>jdbc:h2:tcp//127.0.0.1:${db.auth.integration-test.port}/${db.auth.schemaname}</url>
+									<username>${db.auth.user}</username>
+									<password>${db.auth.pass}</password>
 									<liquibase.logging>debug</liquibase.logging>
 									<verbose>true</verbose>
 									<promptOnNonLocalDatabase>false</promptOnNonLocalDatabase>
 									<expressionVars>
 										<property>
-											<name>schemaname</name>
-											<value>${schemaname}</value>
+											<name>db.auth.schemaname</name>
+											<value>${db.auth.schemaname}</value>
+										</property>
+										<property>
+											<name>db.auth.user</name>
+											<value>${db.auth.user}</value>
 										</property>
 										<property>
 											<name>runasusername</name>
-											<value>${runasusername}</value>
+											<value>${db.auth.runasusername}</value>
 										</property>
 									</expressionVars>			
 								</configuration>

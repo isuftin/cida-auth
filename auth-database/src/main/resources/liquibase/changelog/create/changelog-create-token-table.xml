@@ -15,13 +15,13 @@
 			<column name="last_access" type="datetime"/>
 		</createTable>
     
-		<sql>Grant Select On ${schemaname}.auth_token To app_auth_server;</sql>
-		<sql>Grant Insert On ${schemaname}.auth_token To app_auth_server;</sql>
-		<sql>Grant Delete On ${schemaname}.auth_token To app_auth_server;</sql>
-		<sql>Grant Update On ${schemaname}.auth_token To app_auth_server;</sql>
+		<sql>Grant Select On ${db.auth.schemaname}.auth_token To ${db.auth.user};</sql>
+		<sql>Grant Insert On ${db.auth.schemaname}.auth_token To ${db.auth.user};</sql>
+		<sql>Grant Delete On ${db.auth.schemaname}.auth_token To ${db.auth.user};</sql>
+		<sql>Grant Update On ${db.auth.schemaname}.auth_token To ${db.auth.user};</sql>
     
 		<rollback>
-			drop table ${schemaname}.auth_token;
+			drop table ${db.auth.schemaname}.auth_token;
 		</rollback>
 	</changeSet>
 </databaseChangeLog>
