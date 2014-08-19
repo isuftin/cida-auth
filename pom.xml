@@ -10,6 +10,10 @@
 		<project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
 	</properties>
 	
+	<modules>
+		<module>auth-database</module>
+	</modules>
+	
 	<url>https://github.com/USGS-CIDA/cida-auth</url>
 	
 	<inceptionYear>2014</inceptionYear>
@@ -83,4 +87,5 @@
 			</plugins>
 		</pluginManagement>
 	</build>
+
 </project>
