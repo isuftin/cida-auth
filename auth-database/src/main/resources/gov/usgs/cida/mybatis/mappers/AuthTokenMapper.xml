@@ -24,4 +24,39 @@
 			AUTH_TOKEN
     </select>
 	
+	<select 
+        id="getByTokenId" 
+        parameterType="String" 
+        resultMap="tokenResultMap">
+        SELECT
+			TOKEN_ID,
+			USERNAME,
+			ISSUED,
+			EXPIRES,
+			LAST_ACCESS
+        FROM 
+			AUTH_TOKEN
+        WHERE
+			TOKEN_ID = #{id}
+    </select>
+	
+	<delete 
+        id="deleteTokenUsingId" 
+        parameterType="String" 
+		flushCache="true"
+		statementType="PREPARED">
+        DELETE FROM AUTH_TOKEN
+		WHERE TOKEN_ID = #{id}
+    </delete>
+	
+	<insert
+		id="insertToken"
+		flushCache="true"
+		statementType="PREPARED"
+		useGeneratedKeys="true"
+		keyColumn="ID"
+		>
+		INSERT INTO AUTH_TOKEN (TOKEN_ID,USERNAME,ISSUED,EXPIRES,LAST_ACCESS)
+		VALUES (#{tokenId}, #{username}, #{issued}, #{expires}, #{lastAccess})
+	</insert>
 </mapper>
