@@ -12,3 +12,4 @@
 hs_err_pid*
 /auth-database/target/
 /auth-database/nb-configuration.xml
+/auth-database/nbactions-auth-in-mem-etl-test.xml
