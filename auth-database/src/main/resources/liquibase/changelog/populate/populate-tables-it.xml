@@ -18,7 +18,15 @@
 			file="liquibase/changelog/data/auth_token.csv"
 			quotchar="&quot;"
 			separator=",">
+			
+			<column header="TOKEN_ID" name="TOKEN_ID" type="STRING" />
+			<column header="USERNAME" name="USERNAME" type="STRING" />
+			<column header="ISSUED" name="ISSUED" type="java.sql.Types.TIMESTAMP" defaultValueComputed="CURRENT_TIMESTAMP" />
+			<column header="EXPIRES" name="EXPIRES" type="java.sql.Types.TIMESTAMP" />
+			<column header="LAST_ACCESS" name="LAST_ACCESS" type="java.sql.Types.TIMESTAMP" />
+			
 		</loadData>
+
 		<rollback>
 			<comment>No rollback</comment>
 		</rollback>
