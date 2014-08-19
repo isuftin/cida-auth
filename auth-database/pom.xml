@@ -44,14 +44,7 @@
 				<runaspassword>app_auth_server</runaspassword>
 			</properties>
 			<build>
-				<testResources>
-					<testResource>
-						<directory>src/test/resources/</directory>
-						<filtering>true</filtering>
-					</testResource>
-				</testResources>
 				<plugins>
-					
 					<plugin>
 						<groupId>org.codehaus.mojo</groupId>
 						<artifactId>build-helper-maven-plugin</artifactId>
@@ -111,11 +104,6 @@
 									<database>${schemaname}</database>
 									<username>${runasusername}</username>
 									<password>${runaspassword}</password>
-									<sources>
-										<script>
-											<sourceFile>${project.build.directory}/test-classes/create_schema.sql</sourceFile>
-										</script>
-									</sources>
 								</configuration>
 							</execution>
 							<execution>
