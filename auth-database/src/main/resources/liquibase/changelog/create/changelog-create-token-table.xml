@@ -10,27 +10,27 @@
 		<createTable 
 			remarks="Holds active tokens, expiration times and associated metadata"
 			tableName="AUTH_TOKEN">
-			<column name="TOKEN_ID" type="BIGINT" autoIncrement="true" >
+			<column name="ID" type="BIGINT" autoIncrement="true" >
 				<constraints 
 					nullable="false" 
 					primaryKey="true" 
-					primaryKeyName="pk_EVENT_ID" 
+					primaryKeyName="pk_ID" 
 				/>
 			</column>
-			<column name="AUTH_TOKEN" type="java.sql.Types.VARCHAR(256)" />
+			<column name="TOKEN_ID" type="java.sql.Types.VARCHAR(256)" />
 			<column name="USERNAME" type="java.sql.Types.VARCHAR(64)" />
 			<column name="ISSUED" type="java.sql.Types.TIMESTAMP" defaultValueComputed="CURRENT_TIMESTAMP" />
 			<column name="EXPIRES" type="java.sql.Types.TIMESTAMP" />
 			<column name="LAST_ACCESS" type="java.sql.Types.TIMESTAMP" />
 		</createTable>
     
-		<sql>Grant Select On ${db.auth.schemaname}.auth_token To ${db.auth.user};</sql>
-		<sql>Grant Insert On ${db.auth.schemaname}.auth_token To ${db.auth.user};</sql>
-		<sql>Grant Delete On ${db.auth.schemaname}.auth_token To ${db.auth.user};</sql>
-		<sql>Grant Update On ${db.auth.schemaname}.auth_token To ${db.auth.user};</sql>
+		<sql>Grant Select On ${db.auth.schemaname}.AUTH_TOKEN To ${db.auth.user};</sql>
+		<sql>Grant Insert On ${db.auth.schemaname}.AUTH_TOKEN To ${db.auth.user};</sql>
+		<sql>Grant Delete On ${db.auth.schemaname}.AUTH_TOKEN To ${db.auth.user};</sql>
+		<sql>Grant Update On ${db.auth.schemaname}.AUTH_TOKEN To ${db.auth.user};</sql>
     
 		<rollback>
-			drop table ${db.auth.schemaname}.auth_token;
+			drop table ${db.auth.schemaname}.AUTH_TOKEN;
 		</rollback>
 	</changeSet>
 </databaseChangeLog>

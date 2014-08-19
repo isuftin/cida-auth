@@ -4,6 +4,7 @@
   'http://mybatis.org/dtd/mybatis-3-config.dtd'>
 <configuration>
 	<typeAliases>
+		<typeAlias type='gov.usgs.cida.auth.model.AuthToken' alias='AuthToken'></typeAlias>
 	</typeAliases>
 	<environments default='container'>
 		<environment id='container'>
@@ -32,5 +33,6 @@
 		</environment>
 	</environments>
 	<mappers>
+		 <mapper resource='gov/usgs/cida/mybatis/mappers/AuthTokenMapper.xml' />
 	</mappers>
 </configuration>

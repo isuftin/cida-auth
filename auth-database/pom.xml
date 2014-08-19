@@ -13,6 +13,7 @@
 	<properties>
 		<version.liquibase-maven-plugin>3.2.2</version.liquibase-maven-plugin>
 		<version.maven.failsafe.plugin>2.17</version.maven.failsafe.plugin>
+		<version.maven.surefire.plugin>2.17</version.maven.surefire.plugin>
 	</properties>
 	
 	<dependencies>
@@ -36,6 +37,11 @@
 			<scope>compile</scope>
 		</dependency>
 		<!-- Database -->
+		<dependency>
+			<groupId>org.mybatis</groupId>
+			<artifactId>mybatis</artifactId>
+			<version>3.2.7</version>
+		</dependency>
 		<dependency>
 			<groupId>org.postgresql</groupId>
 			<artifactId>postgresql</artifactId>
@@ -97,23 +103,21 @@
 					</plugin>
 					<plugin>
 						<groupId>org.apache.maven.plugins</groupId>
-						<artifactId>maven-failsafe-plugin</artifactId>
-						<version>${version.maven.failsafe.plugin}</version>
-						<executions>
-							<execution>
-								<id>integration-test</id>
-								<goals>
-									<goal>integration-test</goal>
-								</goals>
-								<configuration>
-									<systemPropertyVariables>
-										<db.auth.schemaname>${db.auth.schemaname}</db.auth.schemaname>
-										<db.auth.user>${db.auth.user}</db.auth.user>
-										<runasusername>${db.auth.runasusername}</runasusername>
-									</systemPropertyVariables>
-								</configuration>
-							</execution>
-						</executions>
+						<artifactId>maven-surefire-plugin</artifactId>
+						<version>${version.maven.surefire.plugin}</version>
+						<dependencies>
+							<dependency>
+								<groupId>org.apache.maven.surefire</groupId>
+								<artifactId>surefire-junit47</artifactId>
+								<version>${version.maven.surefire.plugin}</version>
+							</dependency>
+						</dependencies>
+						<configuration>
+							<includes>
+								<include>**/*.class</include>
+							</includes>
+							<excludedGroups>gov.usgs.cida.auth.dao.IntegrationTests</excludedGroups>
+						</configuration>
 					</plugin>
 					<plugin>
 						<groupId>com.btmatthews.maven.plugins.inmemdb</groupId>
@@ -180,6 +184,39 @@
 											<value>${db.auth.runasusername}</value>
 										</property>
 									</expressionVars>			
+								</configuration>
+							</execution>
+						</executions>
+					</plugin>
+					<plugin>
+						<groupId>org.apache.maven.plugins</groupId>
+						<artifactId>maven-failsafe-plugin</artifactId>
+						<version>${version.maven.failsafe.plugin}</version>
+						<dependencies>
+							<dependency>
+								<groupId>org.apache.maven.surefire</groupId>
+								<artifactId>surefire-junit47</artifactId>
+								<version>${version.maven.failsafe.plugin}</version>
+							</dependency>
+						</dependencies>
+						<configuration>
+							<groups>gov.usgs.cida.auth.dao.IntegrationTests</groups>
+						</configuration>
+						<executions>
+							<execution>
+								<id>integration-test</id>
+								<goals>
+									<goal>integration-test</goal>
+								</goals>
+								<configuration>
+									<systemPropertyVariables>
+										<db.auth.schemaname>${db.auth.schemaname}</db.auth.schemaname>
+										<db.auth.user>${db.auth.user}</db.auth.user>
+										<runasusername>${db.auth.runasusername}</runasusername>
+									</systemPropertyVariables>
+									<includes>
+										<include>**/*.class</include>
+									</includes>
 								</configuration>
 							</execution>
 						</executions>
