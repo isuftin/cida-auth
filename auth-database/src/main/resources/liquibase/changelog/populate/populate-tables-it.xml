@@ -1,0 +1,27 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<databaseChangeLog
+	xmlns="http://www.liquibase.org/xml/ns/dbchangelog"
+	xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+	xmlns:ext="http://www.liquibase.org/xml/ns/dbchangelog-ext"
+	xsi:schemaLocation="http://www.liquibase.org/xml/ns/dbchangelog http://www.liquibase.org/xml/ns/dbchangelog/dbchangelog-3.1.xsd
+    http://www.liquibase.org/xml/ns/dbchangelog-ext http://www.liquibase.org/xml/ns/dbchangelog/dbchangelog-ext.xsd">
+	
+	<changeSet id="load-data-for-integration-tests" author="Ivan Suftin">
+		<preConditions onFail="MARK_RAN">
+			<dbms type="h2" />
+			<sqlCheck expectedResult="0">SELECT COUNT(*) FROM ${db.auth.schemaname}.AUTH_TOKEN</sqlCheck>
+		</preConditions>
+		<loadData 
+			encoding="UTF-8"
+			schemaName="${db.auth.schemaname}" 
+			tableName="AUTH_TOKEN"
+			file="liquibase/changelog/data/auth_token.csv"
+			quotchar="&quot;"
+			separator=",">
+		</loadData>
+		<rollback>
+			<comment>No rollback</comment>
+		</rollback>
+	</changeSet>
+	
+</databaseChangeLog> 

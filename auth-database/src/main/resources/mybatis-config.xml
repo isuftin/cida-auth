@@ -1,0 +1,36 @@
+<?xml version='1.0' encoding='UTF-8' ?>
+<!DOCTYPE configuration
+  PUBLIC '-//mybatis.org//DTD Config 3.0//EN'
+  'http://mybatis.org/dtd/mybatis-3-config.dtd'>
+<configuration>
+	<typeAliases>
+	</typeAliases>
+	<environments default='container'>
+		<environment id='container'>
+			<transactionManager type="JDBC"/>
+			<dataSource type="JNDI">
+				<property name="data_source" value="java:comp/env/jdbc/cidaAuthDS"/>
+			</dataSource>
+		</environment>
+		<environment id='development'>
+			<transactionManager type="JDBC"/>
+			<dataSource type='POOLED'>    
+				<property name='driver' value='org.postgresql.Driver'/>
+				<property name='url' value='${db.auth.development.url}'/>
+				<property name='username' value='${db.auth.development.username}'/>
+				<property name='password' value='${db.auth.development.password}'/>
+			</dataSource>
+		</environment>
+		<environment id='integration-test'>
+			<transactionManager type="JDBC"/>
+			<dataSource type='POOLED'>    
+				<property name='driver' value='org.h2.Driver'/>
+				<property name='url' value='jdbc:h2:tcp//127.0.0.1:${db.auth.integration-test.port}/${db.auth.schemaname}'/>
+				<property name='username' value='${db.auth.user}'/>
+				<property name='password' value='${db.auth.pass}'/>
+			</dataSource>
+		</environment>
+	</environments>
+	<mappers>
+	</mappers>
+</configuration>

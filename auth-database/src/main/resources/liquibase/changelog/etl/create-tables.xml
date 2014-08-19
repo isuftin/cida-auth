@@ -1,14 +1,12 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<databaseChangeLog xmlns="http://www.liquibase.org/xml/ns/dbchangelog/1.9"
-				   xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
-				   xsi:schemaLocation="http://www.liquibase.org/xml/ns/dbchangelog/1.9
-                      http://www.liquibase.org/xml/ns/dbchangelog/dbchangelog-1.9.xsd">
-	<!-- NOTE the schema name has to be in capital letters or preconditions 
-	will fail, the preconditions are case sensitive on schema name, table names 
-	do not seem to be case sensitive. Now passed in from maven as java properties: 
-	<property name="schemaname" value="NATDB"/> <property name="runasusername" 
-	value="jenkins"/> -->
-	
-	<!-- Create Report Meta Data Tables -->
-	<include file="../create/changelog-create-token-table.xml" relativeToChangelogFile="true"/>
+<databaseChangeLog
+	xmlns="http://www.liquibase.org/xml/ns/dbchangelog"
+	xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+	xmlns:ext="http://www.liquibase.org/xml/ns/dbchangelog-ext"
+	xsi:schemaLocation="http://www.liquibase.org/xml/ns/dbchangelog http://www.liquibase.org/xml/ns/dbchangelog/dbchangelog-3.1.xsd
+    http://www.liquibase.org/xml/ns/dbchangelog-ext http://www.liquibase.org/xml/ns/dbchangelog/dbchangelog-ext.xsd">
+
+	<include file="../create/changelog-create-token-table.xml" relativeToChangelogFile="true" />
+	<include file="../populate/populate-tables-it.xml" relativeToChangelogFile="true" />
+
 </databaseChangeLog> 
