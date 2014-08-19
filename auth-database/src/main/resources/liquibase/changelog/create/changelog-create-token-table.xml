@@ -1,18 +1,27 @@
+<?xml version="1.0" encoding="UTF-8"?>
 <databaseChangeLog
 	xmlns="http://www.liquibase.org/xml/ns/dbchangelog"
 	xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
-	xsi:schemaLocation="http://www.liquibase.org/xml/ns/dbchangelog
-         http://www.liquibase.org/xml/ns/dbchangelog/dbchangelog-2.0.xsd">
+	xmlns:ext="http://www.liquibase.org/xml/ns/dbchangelog-ext"
+	xsi:schemaLocation="http://www.liquibase.org/xml/ns/dbchangelog http://www.liquibase.org/xml/ns/dbchangelog/dbchangelog-3.1.xsd
+    http://www.liquibase.org/xml/ns/dbchangelog-ext http://www.liquibase.org/xml/ns/dbchangelog/dbchangelog-ext.xsd">
 
 	<changeSet author="${runasusername}" id="create-token-table">
 		<createTable 
 			remarks="Holds active tokens, expiration times and associated metadata"
-			tableName="auth_token">
-			<column name="auth_token" type="varchar(256)"/>
-			<column name="username" type="varchar(64)"/>
-			<column name="issued" type="datetime"/>
-			<column name="expires" type="datetime"/>
-			<column name="last_access" type="datetime"/>
+			tableName="AUTH_TOKEN">
+			<column name="TOKEN_ID" type="BIGINT" autoIncrement="true" >
+				<constraints 
+					nullable="false" 
+					primaryKey="true" 
+					primaryKeyName="pk_EVENT_ID" 
+				/>
+			</column>
+			<column name="AUTH_TOKEN" type="java.sql.Types.VARCHAR(256)" />
+			<column name="USERNAME" type="java.sql.Types.VARCHAR(64)" />
+			<column name="ISSUED" type="java.sql.Types.TIMESTAMP" defaultValueComputed="CURRENT_TIMESTAMP" />
+			<column name="EXPIRES" type="java.sql.Types.TIMESTAMP" />
+			<column name="LAST_ACCESS" type="java.sql.Types.TIMESTAMP" />
 		</createTable>
     
 		<sql>Grant Select On ${db.auth.schemaname}.auth_token To ${db.auth.user};</sql>
