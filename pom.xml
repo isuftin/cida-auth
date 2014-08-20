@@ -13,6 +13,7 @@
 	<modules>
 		<module>auth-database</module>
 		<module>cida-auth-webservice</module>
+		<module>cida-auth-commons</module>
 	</modules>
 	
 	<url>https://github.com/USGS-CIDA/cida-auth</url>
@@ -111,6 +112,20 @@
 				<artifactId>junit</artifactId>
 				<version>4.11</version>
 				<scope>test</scope>
+			</dependency>
+			
+			<!-- Other -->
+			<dependency>
+				<groupId>org.apache.commons</groupId>
+				<artifactId>commons-lang3</artifactId>
+				<version>3.3</version>
+			</dependency>
+			
+			<!-- inter-module deps -->
+			<dependency>
+				<groupId>${project.groupId}</groupId>
+				<artifactId>auth-database</artifactId>
+				<version>${project.version}</version>
 			</dependency>
 		</dependencies>
 	</dependencyManagement>

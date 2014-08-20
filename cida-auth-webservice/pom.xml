@@ -29,6 +29,12 @@
 	</dependencyManagement>
 	
 	<dependencies>
+		<!-- Inter-Module -->
+		<dependency>
+			<groupId>gov.usgs.cida.auth</groupId>
+			<artifactId>auth-database</artifactId>
+		</dependency>
+		
 		<!-- Jersey -->
 		<dependency>
 			<groupId>org.glassfish.jersey.containers</groupId>
@@ -68,10 +74,17 @@
 			<artifactId>junit</artifactId>
 			<scope>test</scope>
 		</dependency>
+		
+		<!-- Other -->
 		<dependency>
-			<groupId>gov.usgs.cida.security</groupId>
-			<artifactId>auth-database</artifactId>
-			<version>${project.parent.version}</version>
+			<groupId>gov.usgs.cida</groupId>
+			<artifactId>dynamicProperties</artifactId>
+			<version>1.0.2</version>
+		</dependency>
+		<dependency>
+			<groupId>org.apache.commons</groupId>
+			<artifactId>commons-lang3</artifactId>
+			<version>3.3</version>
 		</dependency>
 	</dependencies>
 	
