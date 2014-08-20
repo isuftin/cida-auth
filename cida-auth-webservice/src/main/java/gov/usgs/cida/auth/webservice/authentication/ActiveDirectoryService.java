@@ -4,6 +4,7 @@ import gov.usgs.cida.auth.dao.AuthTokenDAO;
 import gov.usgs.cida.auth.model.AuthToken;
 import gov.usgs.cida.auth.model.User;
 import gov.usgs.cida.auth.service.authentication.LDAPService;
+import gov.usgs.cida.auth.util.AuthTokenFactory;
 import javax.ws.rs.Consumes;
 import javax.ws.rs.FormParam;
 import javax.ws.rs.POST;
@@ -32,7 +33,7 @@ public class ActiveDirectoryService {
 		
 		if (user.isAuthenticated()) {
 			LOG.debug("User {} has authenticated", username);
-			AuthToken token = new AuthToken();
+			AuthToken token = AuthTokenFactory.create(username);
 			AuthTokenDAO dao = new AuthTokenDAO();
 			String tokenId = token.getTokenId();
 			
