@@ -2,7 +2,6 @@ package gov.usgs.cida.auth.dao;
 
 import gov.usgs.cida.auth.model.AuthToken;
 import gov.usgs.cida.auth.util.MyBatisConnectionFactory;
-import java.math.BigInteger;
 import java.util.List;
 import org.apache.ibatis.session.SqlSession;
 import org.apache.ibatis.session.SqlSessionFactory;
