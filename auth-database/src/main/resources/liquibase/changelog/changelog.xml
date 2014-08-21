@@ -6,7 +6,7 @@
 	xsi:schemaLocation="http://www.liquibase.org/xml/ns/dbchangelog http://www.liquibase.org/xml/ns/dbchangelog/dbchangelog-3.1.xsd
     http://www.liquibase.org/xml/ns/dbchangelog-ext http://www.liquibase.org/xml/ns/dbchangelog/dbchangelog-ext.xsd">
 
-	<include file="../create/changelog-create-token-table.xml" relativeToChangelogFile="true" />
-	<include file="../populate/populate-tables-it.xml" relativeToChangelogFile="true" />
+	<include file="create/changelog-create-token-table.xml" relativeToChangelogFile="true" />
+	<include file="populate/populate-tables-it.xml" relativeToChangelogFile="true" />
 
 </databaseChangeLog> 
