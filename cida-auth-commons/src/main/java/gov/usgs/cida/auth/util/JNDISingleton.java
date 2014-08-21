@@ -1,10 +1,6 @@
 package gov.usgs.cida.auth.util;
 
 import gov.usgs.cida.config.DynamicReadOnlyProperties;
-import java.io.File;
-import java.io.IOException;
-import java.net.URISyntaxException;
-import java.net.URL;
 import javax.naming.NamingException;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -22,14 +18,9 @@ public class JNDISingleton {
     public static DynamicReadOnlyProperties getInstance() {
         if (null == props) {
             try {
-                URL propertiesFile = JNDISingleton.class.getClassLoader().getResource("application.properties");
-                props = new DynamicReadOnlyProperties(new File(propertiesFile.toURI())).addJNDIContexts();
+                props = new DynamicReadOnlyProperties().addJNDIContexts();
             } catch (NamingException e) {
                 LOG.warn("Error occured during initProps()", e);
-            } catch (IOException e) {
-                LOG.warn("Could not get properties file");
-            } catch (URISyntaxException e) {
-                LOG.warn("URI for properties file invalid");
             } 
         }
         return new DynamicReadOnlyProperties(props);
