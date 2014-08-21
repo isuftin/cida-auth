@@ -34,6 +34,10 @@
 			<groupId>gov.usgs.cida.auth</groupId>
 			<artifactId>auth-database</artifactId>
 		</dependency>
+		<dependency>
+			<groupId>gov.usgs.cida.auth</groupId>
+			<artifactId>auth-commons</artifactId>
+		</dependency>
 		
 		<!-- Jersey -->
 		<dependency>

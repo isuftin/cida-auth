@@ -1,15 +1,17 @@
 package gov.usgs.cida.auth.service.authentication;
 
 import gov.usgs.cida.auth.model.User;
+import gov.usgs.cida.config.DynamicReadOnlyProperties;
+import java.text.MessageFormat;
 import java.util.Properties;
 import javax.naming.Context;
-import javax.naming.InitialContext;
 import javax.naming.NamingEnumeration;
 import javax.naming.NamingException;
 import javax.naming.directory.Attributes;
 import javax.naming.directory.InitialDirContext;
 import javax.naming.directory.SearchControls;
 import javax.naming.directory.SearchResult;
+import org.apache.commons.lang3.StringUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -22,24 +24,24 @@ public class LDAPService {
 
 	private static final Logger LOG = LoggerFactory.getLogger(LDAPService.class);
 
-	private static final String JNDI_LDAP_URL_PARAM_NAME = "auth/ldap/url";
-	private static final String JNDI_LDAP_DOMAIN_PARAM_NAME = "auth/ldap/domain";
+	private static final String JNDI_LDAP_URL_PARAM_NAME = "auth.ldap.url";
+	private static final String JNDI_LDAP_DOMAIN_PARAM_NAME = "auth.ldap.domain";
 
 	private LDAPService() {
 		// Utility class, should not be instantiated
 	}
 
-	public static User authenticate(String username, char[] password) {
+	public static User authenticate(String username, char[] password) throws NamingException {
 		User user = new User();
 		user.setAuthenticated(false);
-
-		try {
-			Context initCtx = new InitialContext();
-			String url = (String) initCtx.lookup("java:comp/env/" + JNDI_LDAP_URL_PARAM_NAME);
-			String domain = (String) initCtx.lookup("java:comp/env/" + JNDI_LDAP_DOMAIN_PARAM_NAME);
+		
+		DynamicReadOnlyProperties props = new DynamicReadOnlyProperties().addJNDIContexts();
+		String url = props.getProperty(JNDI_LDAP_URL_PARAM_NAME);
+		String domain = props.getProperty(JNDI_LDAP_DOMAIN_PARAM_NAME);
+		if (StringUtils.isBlank(url) || StringUtils.isBlank(domain)) {
+			LOG.error("Error authenticating against LDAP. Check that JNDI parameters are configured.");
+		} else {
 			user = authenticate(username, password, url, domain);
-		} catch (NamingException e) {
-			LOG.error("Error authenticating against LDAP. Check that JNDI parameters are configured", e);
 		}
 
 		return user;
@@ -92,7 +94,7 @@ public class LDAPService {
 				user.setDirContext(context);
 			}
 		} catch (NamingException ex) {
-			LOG.debug("unable to authenticate user", ex);
+			LOG.debug(MessageFormat.format("Unable to authenticate user {0)}", username), ex);
 		} finally {
 			props.put(Context.SECURITY_CREDENTIALS, new char[0]);
 		}

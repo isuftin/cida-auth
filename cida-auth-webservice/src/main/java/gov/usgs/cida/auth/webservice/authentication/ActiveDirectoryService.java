@@ -5,7 +5,9 @@ import gov.usgs.cida.auth.model.AuthToken;
 import gov.usgs.cida.auth.model.User;
 import gov.usgs.cida.auth.service.authentication.LDAPService;
 import gov.usgs.cida.auth.util.AuthTokenFactory;
+import javax.naming.NamingException;
 import javax.ws.rs.Consumes;
+import javax.ws.rs.DefaultValue;
 import javax.ws.rs.FormParam;
 import javax.ws.rs.POST;
 import javax.ws.rs.Path;
@@ -25,7 +27,10 @@ public class ActiveDirectoryService {
 	@Path("/token")
 	@Consumes("application/x-www-form-urlencoded")
 	@Produces(MediaType.APPLICATION_JSON)
-	public Response authenticate(@FormParam("username") String username, @FormParam("password") String password) {
+	public Response authenticate(
+			@FormParam("username") String username, 
+			@FormParam("password") 
+			@DefaultValue("")  String password) throws NamingException {
 		LOG.trace("User {} is attempting to authenticate", username);
 		
 		Response response;
