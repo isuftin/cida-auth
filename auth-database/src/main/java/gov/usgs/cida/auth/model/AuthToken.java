@@ -1,5 +1,6 @@
 package gov.usgs.cida.auth.model;
 
+import com.google.gson.Gson;
 import java.math.BigInteger;
 import java.sql.Timestamp;
 
@@ -15,6 +16,25 @@ public class AuthToken {
 	private Timestamp expires;
 	private Timestamp lastAccess;
 
+	/**
+	 * Serializes AuthToken to JSON 	 * 
+	 * @return 
+	 */
+	public String toJSON() {
+        Gson gson = new Gson();
+        return gson.toJson(this);
+    }
+	
+	/**
+	 * Deserializes JSON to AuthToken
+	 * @param json
+	 * @return 
+	 */
+	public static AuthToken fromJSON(String json) {
+		Gson gson = new Gson();
+		return gson.fromJson(json, AuthToken.class);
+	}
+	
 	/**
 	 * @return the id
 	 */

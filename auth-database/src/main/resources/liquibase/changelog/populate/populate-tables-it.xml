@@ -7,6 +7,7 @@
     http://www.liquibase.org/xml/ns/dbchangelog-ext http://www.liquibase.org/xml/ns/dbchangelog/dbchangelog-ext.xsd">
 	
 	<changeSet id="load-data-for-integration-tests" author="Ivan Suftin">
+		<!-- This only gets executed during integration tests on an in-memory database -->
 		<preConditions onFail="MARK_RAN">
 			<dbms type="h2" />
 			<sqlCheck expectedResult="0">SELECT COUNT(*) FROM ${db.auth.schemaname}.AUTH_TOKEN</sqlCheck>

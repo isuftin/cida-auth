@@ -12,3 +12,8 @@
 hs_err_pid*
 /auth-database/target/
 /auth-database/nb-configuration.xml
+/auth-database/nbactions-auth-in-mem-etl-test.xml
+/cida-auth-webservice/target/
+/cida-auth-webservice/src/main/webapp/META-INF/
+/cida-auth-webservice/nb-configuration.xml
+/cida-auth-commons/target/
