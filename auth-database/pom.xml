@@ -20,11 +20,16 @@
 	</properties>
 	
 	<dependencies>
+		<dependency>
+			<groupId>gov.usgs.cida.auth</groupId>
+			<artifactId>auth-commons</artifactId>
+			<version>${project.version}</version>
+		</dependency>
+		
 		<!-- Item/JSON -->
 		<dependency>
 			<groupId>com.google.code.gson</groupId>
 			<artifactId>gson</artifactId>
-			<version>2.3</version>
 		</dependency>
 		
 		<!-- Logging -->
