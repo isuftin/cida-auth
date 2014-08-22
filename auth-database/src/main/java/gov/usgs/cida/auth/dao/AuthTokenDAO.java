@@ -71,5 +71,14 @@ public class AuthTokenDAO {
 		} 
 		return result;
 	}
+
+	public int updateTokenLastAccess(AuthToken token) {
+		int result;
+		try (SqlSession session = sqlSessionFactory.openSession()) {
+			result = session.update("gov.usgs.cida.mybatis.mappers.AuthTokenMapper.updateTokenLastAccess", token);
+			session.commit();
+		} 
+		return result;
+	}
 	
 }

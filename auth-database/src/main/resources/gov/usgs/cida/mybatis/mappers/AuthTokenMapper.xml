@@ -65,11 +65,21 @@
 	<update
 		id="updateTokenExpiration"
 		flushCache="true"
-		statementType="PREPARED"
-		parameterType="TIMESTAMP">
+		statementType="PREPARED">
 		UPDATE AUTH_TOKEN
 		SET
 			EXPIRES = #{expires}
+		WHERE 
+			TOKEN_ID = #{tokenId}
+	</update>
+	
+	<update
+		id="updateTokenLastAccess"
+		flushCache="true"
+		statementType="PREPARED">
+		UPDATE AUTH_TOKEN
+		SET
+			LAST_ACCESS = #{lastAccess}
 		WHERE 
 			TOKEN_ID = #{tokenId}
 	</update>
