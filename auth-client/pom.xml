@@ -33,7 +33,6 @@
 		<dependency>
 			<groupId>gov.usgs.cida.auth</groupId>
 			<artifactId>auth-commons</artifactId>
-			<version>${project.version}</version>
 		</dependency>
 	</dependencies>
 </project>
