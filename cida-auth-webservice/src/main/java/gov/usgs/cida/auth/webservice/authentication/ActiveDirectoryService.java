@@ -17,15 +17,13 @@ import javax.ws.rs.core.Response;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-@Path(ActiveDirectoryService.AUTHENTICATION_PATH)
+@Path("ad")
 public class ActiveDirectoryService {
-
-	public static final String AUTHENTICATION_PATH = "ad";
 	private final static Logger LOG = LoggerFactory.getLogger(ActiveDirectoryService.class);
 
 	@POST
 	@Path("/token")
-	@Consumes("application/x-www-form-urlencoded")
+	@Consumes(MediaType.APPLICATION_FORM_URLENCODED)
 	@Produces(MediaType.APPLICATION_JSON)
 	public Response authenticate(
 			@FormParam("username") String username, 

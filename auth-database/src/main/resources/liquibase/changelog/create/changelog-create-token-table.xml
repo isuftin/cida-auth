@@ -23,7 +23,7 @@
 			<column name="EXPIRES" type="java.sql.Types.TIMESTAMP" />
 			<column name="LAST_ACCESS" type="java.sql.Types.TIMESTAMP" />
 		</createTable>
-    
+	
 		<sql>Grant Select On ${db.auth.schemaname}.AUTH_TOKEN To ${db.auth.user};</sql>
 		<sql>Grant Insert On ${db.auth.schemaname}.AUTH_TOKEN To ${db.auth.user};</sql>
 		<sql>Grant Delete On ${db.auth.schemaname}.AUTH_TOKEN To ${db.auth.user};</sql>

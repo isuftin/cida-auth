@@ -3,6 +3,7 @@ package gov.usgs.cida.auth.util;
 import java.io.IOException;
 import java.io.InputStream;
 import liquibase.util.StreamUtil;
+import org.apache.commons.io.IOUtils;
 import org.apache.ibatis.io.Resources;
 import org.apache.ibatis.session.SqlSessionFactory;
 import org.apache.ibatis.session.SqlSessionFactoryBuilder;
@@ -19,12 +20,14 @@ public class MyBatisConnectionFactory {
 	private final static String RESOURCE = "mybatis-config.xml";
 
 	static {
-		try (InputStream inputStream = Resources.getResourceAsStream(RESOURCE)) {
-			log.debug(StreamUtil.getStreamContents(inputStream));
+		InputStream inputStream = null;
+		try {
+			inputStream = Resources.getResourceAsStream(RESOURCE);
 			sqlSessionFactory = new SqlSessionFactoryBuilder().build(inputStream);
-			log.debug("Created a new SqlSessionFactory");
 		} catch (IOException ex) {
 			log.error("Error initializing SqlSessionFactoryBuilder", ex);
+		} finally {
+			IOUtils.closeQuietly(inputStream);
 		}
 	}
 

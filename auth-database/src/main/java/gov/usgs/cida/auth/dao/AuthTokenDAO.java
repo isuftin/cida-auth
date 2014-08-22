@@ -59,7 +59,7 @@ public class AuthTokenDAO {
 		try (SqlSession session = sqlSessionFactory.openSession()) {
 			result = session.insert("gov.usgs.cida.mybatis.mappers.AuthTokenMapper.insertToken", token);
 			session.commit();
-		}
+		} 
 		return result;
 	}
 	
