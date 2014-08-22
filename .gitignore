@@ -17,3 +17,7 @@ hs_err_pid*
 /cida-auth-webservice/src/main/webapp/META-INF/
 /cida-auth-webservice/nb-configuration.xml
 /cida-auth-commons/target/
+/auth-client/target/
+.settings
+.project
+.classpath
