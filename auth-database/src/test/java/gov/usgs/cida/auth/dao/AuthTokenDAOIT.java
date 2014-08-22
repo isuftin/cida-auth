@@ -125,7 +125,42 @@ public class AuthTokenDAOIT {
 		assertThat(result.getIssued().getTime(), is(equalTo(now)));
 		assertThat(result.getExpires().getTime(), is(equalTo(tomorrow)));
 		assertThat(result.getLastAccess().getTime(), is(equalTo(now)));
+	}
+	
+	
+	@Test
+	public void testGetExpiredTokens() {
+		System.out.println("testGetExpiredTokens");
+		
+		// I want to update the expiration date on all tokens in the database
+		List<AuthToken> results = dao.getExpiredTokens();
+		for (AuthToken result : results) {
+			result.updateLastAccess();
+			result.extendExpiration();
+			dao.updateToken(result);
+		}
+		
+		Calendar cal = Calendar.getInstance();
+		Date dt = new Date();
+		long now = dt.getTime();
 
+		cal.setTime(dt);
+		cal.add(Calendar.DATE, -1);
+		long yesterday = cal.getTimeInMillis();
+
+		AuthToken token = new AuthToken();
+		String tokenId = "TEST-TOKEN-ID2";
+		String username = "isuftin@usgs.gov";
+
+		token.setTokenId(tokenId);
+		token.setUsername(username);
+		token.setIssued(new Timestamp(now));
+		token.setExpires(new Timestamp(yesterday));
+		token.setLastAccess(new Timestamp(now));
+		dao.insertToken(token);
+		
+		results = dao.getExpiredTokens();
+		assertThat(results.size(), is(equalTo(1)));
 	}
 
 }

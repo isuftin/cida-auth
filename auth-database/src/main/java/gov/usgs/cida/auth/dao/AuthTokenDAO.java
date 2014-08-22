@@ -54,6 +54,16 @@ public class AuthTokenDAO {
 		return result;
 	}
 
+	public List<AuthToken> getExpiredTokens() {
+		List<AuthToken> result;
+
+		try (SqlSession session = sqlSessionFactory.openSession()) {
+			result = session.selectList(TOKEN_MAPPER_PACKAGE + ".getExpiredTokens");
+		}
+
+		return result;
+	}
+
 	/**
 	 * Deletes a token based on a token ID
 	 *
@@ -92,7 +102,7 @@ public class AuthTokenDAO {
 		}
 		return result;
 	}
-	
+
 	/**
 	 * Updates AuthToken expiration based on the expiration field in the token
 	 *
