@@ -17,11 +17,20 @@
 					primaryKeyName="pk_ID" 
 				/>
 			</column>
-			<column name="TOKEN_ID" type="java.sql.Types.VARCHAR(256)" />
-			<column name="USERNAME" type="java.sql.Types.VARCHAR(64)" />
+			<column name="TOKEN_ID" type="java.sql.Types.VARCHAR(256)">
+				<constraints 
+					nullable="false"
+					unique="true"
+				/>
+			</column>
+			<column name="USERNAME" type="java.sql.Types.VARCHAR(64)">
+				<constraints 
+					nullable="false"
+				/>
+			</column>
 			<column name="ISSUED" type="java.sql.Types.TIMESTAMP" defaultValueComputed="CURRENT_TIMESTAMP" />
 			<column name="EXPIRES" type="java.sql.Types.TIMESTAMP" />
-			<column name="LAST_ACCESS" type="java.sql.Types.TIMESTAMP" />
+			<column name="LAST_ACCESS" type="java.sql.Types.TIMESTAMP" defaultValueComputed="CURRENT_TIMESTAMP" />
 		</createTable>
 	
 		<sql>Grant Select On ${db.auth.schemaname}.AUTH_TOKEN To ${db.auth.user};</sql>
