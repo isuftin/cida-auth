@@ -4,6 +4,7 @@ import com.google.gson.Gson;
 import java.math.BigInteger;
 import java.sql.Timestamp;
 import java.util.Calendar;
+import java.util.Date;
 
 /**
  * Represents an authentication token issued to calling clients
@@ -125,5 +126,9 @@ public class AuthToken {
 		cal.setTime(this.expires);
 		cal.add(Calendar.SECOND, seconds);
 		this.expires = new Timestamp(cal.getTimeInMillis());
+	}
+
+	public void updateLastAccess() {
+		this.lastAccess = new Timestamp(new Date().getTime());
 	}
 }

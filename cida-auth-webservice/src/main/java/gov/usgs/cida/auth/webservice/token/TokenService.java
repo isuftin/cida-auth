@@ -21,8 +21,9 @@ import org.slf4j.LoggerFactory;
  */
 @Path("/")
 public class TokenService {
+
 	private final static Logger LOG = LoggerFactory.getLogger(TokenService.class);
-	private final static String ONE_DAY_IN_SECONDS_PARAM = "86400";
+
 	/**
 	 *
 	 * @param tokenId
@@ -31,21 +32,30 @@ public class TokenService {
 	@GET
 	@Path("{tokenId}")
 	@Produces(MediaType.APPLICATION_JSON)
-	public Response getToken(@PathParam("tokenId") @DefaultValue("no token provided")String tokenId) {
+	public Response getToken(@PathParam("tokenId") @DefaultValue("no token provided") String tokenId) {
 		LOG.trace("Attempting to retrieve token {}", tokenId);
 		Response response;
 		AuthTokenDAO dao = new AuthTokenDAO();
 		AuthToken token = dao.getByTokenId(tokenId);
-		
+
 		if (token != null) {
+
 			response = Response.ok(token.toJSON(), MediaType.APPLICATION_JSON_TYPE).build();
+
+			try {
+				token.updateLastAccess();
+				dao.updateTokenLastAccess(token);
+			} catch (Exception e) {
+				LOG.warn("Could not update last access for token {}", tokenId);
+			}
+
 		} else {
 			response = Response.status(Response.Status.NOT_FOUND).build();
 		}
-		
+
 		return response;
 	}
-	
+
 	@PUT
 	@Path("/extend/{tokenId}/{seconds}")
 	@Produces(MediaType.APPLICATION_JSON)
@@ -56,19 +66,28 @@ public class TokenService {
 		Response response;
 		AuthTokenDAO dao = new AuthTokenDAO();
 		AuthToken token = dao.getByTokenId(tokenId);
-		
+
 		if (token != null) {
 			token.extendExpiration(seconds);
+
 			int updated = dao.updateTokenExpiration(token);
 			if (updated == 0) {
 				response = Response.serverError().build();
+
+				try {
+					token.updateLastAccess();
+					dao.updateTokenLastAccess(token);
+				} catch (Exception e) {
+					LOG.warn("Could not update last access for token {}", tokenId);
+				}
+
 			} else {
 				response = Response.ok(token.toJSON(), MediaType.APPLICATION_JSON_TYPE).build();
 			}
 		} else {
 			response = Response.status(Response.Status.NOT_FOUND).build();
 		}
-		
+
 		return response;
 	}
 }

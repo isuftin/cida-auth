@@ -69,6 +69,23 @@ public class AuthTokenDAOIT {
 		assertThat(result, is(notNullValue()));
 		assertThat(result.getUsername(), is(equalTo("lobortis@diam.com")));
 	}
+	
+	@Test
+	public void testUpdateExpiration() {
+		System.out.println("testUpdateExpiration");
+		AuthToken token = dao.getByTokenId("88AD43FE-58FA-12E8-41C1-72F0E20D9F1F");
+		assertThat(token, is(notNullValue()));
+		
+		long originalExpiration = token.getExpires().getTime();
+		int seconds = 600;
+		long updatedSeconds = seconds * 1000l;
+		token.extendExpiration(seconds);
+		dao.updateTokenExpiration(token);
+		
+		AuthToken result = dao.getByTokenId("88AD43FE-58FA-12E8-41C1-72F0E20D9F1F");
+		assertThat(result, is(notNullValue()));
+		assertThat(result.getExpires().getTime() - originalExpiration, is(equalTo(updatedSeconds)));
+	}
 
 	@Test
 	public void testDeleteTokenUsingId() {
