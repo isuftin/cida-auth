@@ -8,9 +8,11 @@ import java.util.Date;
 
 /**
  * Represents an authentication token issued to calling clients
+ *
  * @author isuftin
  */
 public class AuthToken {
+
 	private BigInteger id;
 	private String tokenId;
 	private String username;
@@ -19,24 +21,27 @@ public class AuthToken {
 	private Timestamp lastAccess;
 
 	/**
-	 * Serializes AuthToken to JSON 	 * 
-	 * @return 
+	 * Serializes AuthToken to JSON
+	 *
+	 *
+	 * @return
 	 */
 	public String toJSON() {
-        Gson gson = new Gson();
-        return gson.toJson(this);
-    }
-	
+		Gson gson = new Gson();
+		return gson.toJson(this);
+	}
+
 	/**
 	 * Deserializes JSON to AuthToken
+	 *
 	 * @param json
-	 * @return 
+	 * @return
 	 */
 	public static AuthToken fromJSON(String json) {
 		Gson gson = new Gson();
 		return gson.fromJson(json, AuthToken.class);
 	}
-	
+
 	/**
 	 * @return the id
 	 */
@@ -121,6 +126,21 @@ public class AuthToken {
 		this.lastAccess = lastAccess;
 	}
 
+	/**
+	 * Extends the expiration date for this token to a day after its last accessed 
+	 * date
+	 */
+	public void extendExpiration() {
+		Calendar cal = Calendar.getInstance();
+		cal.setTime(this.lastAccess);
+		cal.add(Calendar.HOUR, 24);
+		this.expires = new Timestamp(cal.getTimeInMillis());
+	}
+
+	/**
+	 * Extends the token expiration date
+	 * @param seconds amount of seconds to extend the expiration date by
+	 */
 	public void extendExpiration(int seconds) {
 		Calendar cal = Calendar.getInstance();
 		cal.setTime(this.expires);
@@ -128,7 +148,14 @@ public class AuthToken {
 		this.expires = new Timestamp(cal.getTimeInMillis());
 	}
 
+	/**
+	 * Sets the last access timestamp of the token to now
+	 */
 	public void updateLastAccess() {
 		this.lastAccess = new Timestamp(new Date().getTime());
+	}
+	
+	public boolean isExpired() {
+		return this.expires.before(new Date());
 	}
 }

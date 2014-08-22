@@ -2,11 +2,8 @@ package gov.usgs.cida.auth.webservice.token;
 
 import gov.usgs.cida.auth.dao.AuthTokenDAO;
 import gov.usgs.cida.auth.model.AuthToken;
-import gov.usgs.cida.auth.util.AuthTokenFactory;
-import java.util.Calendar;
 import javax.ws.rs.DefaultValue;
 import javax.ws.rs.GET;
-import javax.ws.rs.PUT;
 import javax.ws.rs.Path;
 import javax.ws.rs.PathParam;
 import javax.ws.rs.Produces;
@@ -37,51 +34,22 @@ public class TokenService {
 		Response response;
 		AuthTokenDAO dao = new AuthTokenDAO();
 		AuthToken token = dao.getByTokenId(tokenId);
-
+		
 		if (token != null) {
-
-			response = Response.ok(token.toJSON(), MediaType.APPLICATION_JSON_TYPE).build();
-
-			try {
-				token.updateLastAccess();
-				dao.updateTokenLastAccess(token);
-			} catch (Exception e) {
-				LOG.warn("Could not update last access for token {}", tokenId);
-			}
-
-		} else {
-			response = Response.status(Response.Status.NOT_FOUND).build();
-		}
-
-		return response;
-	}
-
-	@PUT
-	@Path("/extend/{tokenId}/{seconds}")
-	@Produces(MediaType.APPLICATION_JSON)
-	public Response extendToken(
-			@PathParam("tokenId") @DefaultValue("no token provided") String tokenId,
-			@PathParam("seconds") int seconds) {
-		LOG.trace("Attempting to extent token {}", tokenId);
-		Response response;
-		AuthTokenDAO dao = new AuthTokenDAO();
-		AuthToken token = dao.getByTokenId(tokenId);
-
-		if (token != null) {
-			token.extendExpiration(seconds);
-
-			int updated = dao.updateTokenExpiration(token);
-			if (updated == 0) {
-				response = Response.serverError().build();
-
+			LOG.trace("Token {} retrieved", tokenId);
+			if (token.isExpired()) {
+				LOG.info("Token {} expired, will be deleted", tokenId);
+				dao.deleteTokenUsingId(tokenId);
+				response = Response.status(Response.Status.NOT_FOUND).build();
+			} else {
 				try {
 					token.updateLastAccess();
-					dao.updateTokenLastAccess(token);
+					token.extendExpiration();
+					dao.updateToken(token);
 				} catch (Exception e) {
 					LOG.warn("Could not update last access for token {}", tokenId);
 				}
-
-			} else {
+				
 				response = Response.ok(token.toJSON(), MediaType.APPLICATION_JSON_TYPE).build();
 			}
 		} else {

@@ -83,4 +83,16 @@
 		WHERE 
 			TOKEN_ID = #{tokenId}
 	</update>
+	
+		<update
+		id="updateToken"
+		flushCache="true"
+		statementType="PREPARED">
+		UPDATE AUTH_TOKEN
+		SET
+			EXPIRES = #{expires},
+			LAST_ACCESS = #{lastAccess}
+		WHERE 
+			TOKEN_ID = #{tokenId}
+	</update>
 </mapper>

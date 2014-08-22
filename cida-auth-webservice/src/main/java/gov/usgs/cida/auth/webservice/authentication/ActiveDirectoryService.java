@@ -19,6 +19,7 @@ import org.slf4j.LoggerFactory;
 
 @Path("ad")
 public class ActiveDirectoryService {
+
 	private final static Logger LOG = LoggerFactory.getLogger(ActiveDirectoryService.class);
 
 	@POST
@@ -26,20 +27,20 @@ public class ActiveDirectoryService {
 	@Consumes(MediaType.APPLICATION_FORM_URLENCODED)
 	@Produces(MediaType.APPLICATION_JSON)
 	public Response authenticate(
-			@FormParam("username") String username, 
-			@FormParam("password") 
-			@DefaultValue("")  String password) throws NamingException {
+			@FormParam("username") String username,
+			@FormParam("password")
+			@DefaultValue("") String password) throws NamingException {
 		LOG.trace("User {} is attempting to authenticate", username);
-		
+
 		Response response;
 		User user = LDAPService.authenticate(username, password.toCharArray());
-		
+
 		if (user.isAuthenticated()) {
 			LOG.debug("User {} has authenticated", username);
 			AuthToken token = AuthTokenFactory.create(username);
 			AuthTokenDAO dao = new AuthTokenDAO();
 			String tokenId = token.getTokenId();
-			
+
 			if (dao.insertToken(token) == 1) {
 				LOG.trace("Added token {} to database", tokenId);
 				token = dao.getByTokenId(token.getTokenId());

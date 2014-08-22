@@ -14,6 +14,7 @@ import org.apache.ibatis.session.SqlSessionFactory;
 public class AuthTokenDAO {
 
 	private final SqlSessionFactory sqlSessionFactory;
+	final static String TOKEN_MAPPER_PACKAGE = "gov.usgs.cida.mybatis.mappers.AuthTokenMapper";
 
 	public AuthTokenDAO() {
 		sqlSessionFactory = MyBatisConnectionFactory.getSqlSessionFactory();
@@ -33,7 +34,7 @@ public class AuthTokenDAO {
 		List<AuthToken> result;
 
 		try (SqlSession session = sqlSessionFactory.openSession()) {
-			result = session.selectList("gov.usgs.cida.mybatis.mappers.AuthTokenMapper.getAll");
+			result = session.selectList(TOKEN_MAPPER_PACKAGE + ".getAll");
 		}
 
 		return result;
@@ -48,7 +49,7 @@ public class AuthTokenDAO {
 	public AuthToken getByTokenId(String id) {
 		AuthToken result;
 		try (SqlSession session = sqlSessionFactory.openSession()) {
-			result = session.selectOne("gov.usgs.cida.mybatis.mappers.AuthTokenMapper.getByTokenId", id);
+			result = session.selectOne(TOKEN_MAPPER_PACKAGE + ".getByTokenId", id);
 		}
 		return result;
 	}
@@ -62,7 +63,7 @@ public class AuthTokenDAO {
 	public int deleteTokenUsingId(String id) {
 		int result;
 		try (SqlSession session = sqlSessionFactory.openSession()) {
-			result = session.delete("gov.usgs.cida.mybatis.mappers.AuthTokenMapper.deleteTokenUsingId", id);
+			result = session.delete(TOKEN_MAPPER_PACKAGE + ".deleteTokenUsingId", id);
 			session.commit();
 		}
 		return result;
@@ -77,12 +78,21 @@ public class AuthTokenDAO {
 	public int insertToken(AuthToken token) {
 		int result;
 		try (SqlSession session = sqlSessionFactory.openSession()) {
-			result = session.insert("gov.usgs.cida.mybatis.mappers.AuthTokenMapper.insertToken", token);
+			result = session.insert(TOKEN_MAPPER_PACKAGE + ".insertToken", token);
 			session.commit();
 		}
 		return result;
 	}
 
+	public int updateToken(AuthToken token) {
+		int result;
+		try (SqlSession session = sqlSessionFactory.openSession()) {
+			result = session.update(TOKEN_MAPPER_PACKAGE + ".updateToken", token);
+			session.commit();
+		}
+		return result;
+	}
+	
 	/**
 	 * Updates AuthToken expiration based on the expiration field in the token
 	 *
@@ -92,7 +102,7 @@ public class AuthTokenDAO {
 	public int updateTokenExpiration(AuthToken token) {
 		int result;
 		try (SqlSession session = sqlSessionFactory.openSession()) {
-			result = session.update("gov.usgs.cida.mybatis.mappers.AuthTokenMapper.updateTokenExpiration", token);
+			result = session.update(TOKEN_MAPPER_PACKAGE + ".updateTokenExpiration", token);
 			session.commit();
 		}
 		return result;
@@ -108,7 +118,7 @@ public class AuthTokenDAO {
 	public int updateTokenLastAccess(AuthToken token) {
 		int result;
 		try (SqlSession session = sqlSessionFactory.openSession()) {
-			result = session.update("gov.usgs.cida.mybatis.mappers.AuthTokenMapper.updateTokenLastAccess", token);
+			result = session.update(TOKEN_MAPPER_PACKAGE + ".updateTokenLastAccess", token);
 			session.commit();
 		}
 		return result;
