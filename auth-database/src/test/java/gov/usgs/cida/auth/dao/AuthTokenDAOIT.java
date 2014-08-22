@@ -28,7 +28,7 @@ public class AuthTokenDAOIT {
 
 	private static SqlSessionFactory sqlSessionFactory;
 	private AuthTokenDAO dao;
-	
+
 	public AuthTokenDAOIT() {
 	}
 
@@ -69,38 +69,38 @@ public class AuthTokenDAOIT {
 		assertThat(result, is(notNullValue()));
 		assertThat(result.getUsername(), is(equalTo("lobortis@diam.com")));
 	}
-	
+
 	@Test
 	public void testDeleteTokenUsingId() {
 		System.out.println("deleteTokenUsingId");
 		int result = dao.deleteTokenUsingId("BCFCAA99-18D7-5833-FD50-AFE27E7AF1ED");
 		assertThat(result, is(equalTo(1)));
 	}
-	
+
 	@Test
 	public void testInsertToken() {
 		System.out.println("insertToken");
 		Calendar cal = Calendar.getInstance();
 		Date dt = new Date();
 		long now = dt.getTime();
-		
+
 		cal.setTime(dt);
 		cal.add(Calendar.DATE, 1);
 		long tomorrow = cal.getTimeInMillis();
-		
+
 		AuthToken token = new AuthToken();
 		String tokenId = "TEST-TOKEN-ID";
 		String username = "isuftin@usgs.gov";
-		
+
 		token.setTokenId(tokenId);
 		token.setUsername(username);
 		token.setIssued(new Timestamp(now));
 		token.setExpires(new Timestamp(tomorrow));
 		token.setLastAccess(new Timestamp(now));
-		
+
 		int insertCount = dao.insertToken(token);
 		assertThat(insertCount, is(equalTo(1)));
-		
+
 		AuthToken result = dao.getByTokenId(tokenId);
 		assertThat(result, is(notNullValue()));
 		assertThat(result.getTokenId(), is(equalTo(tokenId)));
@@ -108,8 +108,7 @@ public class AuthTokenDAOIT {
 		assertThat(result.getIssued().getTime(), is(equalTo(now)));
 		assertThat(result.getExpires().getTime(), is(equalTo(tomorrow)));
 		assertThat(result.getLastAccess().getTime(), is(equalTo(now)));
-		
+
 	}
-	
 
 }

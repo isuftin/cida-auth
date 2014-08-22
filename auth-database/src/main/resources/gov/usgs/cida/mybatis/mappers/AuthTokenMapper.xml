@@ -61,4 +61,16 @@
 		INSERT INTO AUTH_TOKEN (TOKEN_ID,USERNAME,ISSUED,EXPIRES,LAST_ACCESS)
 		VALUES (#{tokenId}, #{username}, #{issued}, #{expires}, #{lastAccess})
 	</insert>
+	
+	<update
+		id="updateTokenExpiration"
+		flushCache="true"
+		statementType="PREPARED"
+		parameterType="String">
+		UPDATE AUTH_TOKEN
+		SET
+			EXPIRES = #{expires}
+		WHERE 
+			TOKEN_ID = #{tokenId}
+	</update>
 </mapper>
