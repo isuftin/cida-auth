@@ -54,6 +54,11 @@ public class AuthTokenDAO {
 		return result;
 	}
 
+	/**
+	 * Gets all tokens that have passed their expiration date
+	 *
+	 * @return
+	 */
 	public List<AuthToken> getExpiredTokens() {
 		List<AuthToken> result;
 
