@@ -15,6 +15,7 @@
 	
 	<select id="getAll" resultMap="tokenResultMap" useCache="false">
         SELECT
+			ID,
 			TOKEN_ID,
 			USERNAME,
 			ISSUED,
@@ -29,6 +30,7 @@
         parameterType="String" 
         resultMap="tokenResultMap">
         SELECT
+			ID,
 			TOKEN_ID,
 			USERNAME,
 			ISSUED,
@@ -54,9 +56,21 @@
 		flushCache="true"
 		statementType="PREPARED"
 		useGeneratedKeys="true"
-		keyColumn="ID"
+		keyColumn="id"
 		>
 		INSERT INTO AUTH_TOKEN (TOKEN_ID,USERNAME,ISSUED,EXPIRES,LAST_ACCESS)
 		VALUES (#{tokenId}, #{username}, #{issued}, #{expires}, #{lastAccess})
 	</insert>
+	
+	<update
+		id="updateTokenExpiration"
+		flushCache="true"
+		statementType="PREPARED"
+		parameterType="TIMESTAMP">
+		UPDATE AUTH_TOKEN
+		SET
+			EXPIRES = #{expires}
+		WHERE 
+			TOKEN_ID = #{tokenId}
+	</update>
 </mapper>

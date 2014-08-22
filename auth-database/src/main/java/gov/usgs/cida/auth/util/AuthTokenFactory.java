@@ -14,7 +14,7 @@ import org.apache.commons.lang3.StringUtils;
  */
 public class AuthTokenFactory {
 
-	protected static final int ONE_DAY_IN_SECONDS = 86_400;
+	public static final int ONE_DAY_IN_SECONDS = 86_400;
 
 	private AuthTokenFactory() {
 		// No instantiation

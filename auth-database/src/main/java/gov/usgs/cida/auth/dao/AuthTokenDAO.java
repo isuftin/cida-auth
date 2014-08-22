@@ -59,7 +59,16 @@ public class AuthTokenDAO {
 		try (SqlSession session = sqlSessionFactory.openSession()) {
 			result = session.insert("gov.usgs.cida.mybatis.mappers.AuthTokenMapper.insertToken", token);
 			session.commit();
-		}
+		} 
+		return result;
+	}
+	
+	public int updateTokenExpiration(AuthToken token) {
+		int result;
+		try (SqlSession session = sqlSessionFactory.openSession()) {
+			result = session.update("gov.usgs.cida.mybatis.mappers.AuthTokenMapper.updateTokenExpiration", token);
+			session.commit();
+		} 
 		return result;
 	}
 	

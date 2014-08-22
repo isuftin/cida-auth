@@ -3,6 +3,7 @@ package gov.usgs.cida.auth.model;
 import com.google.gson.Gson;
 import java.math.BigInteger;
 import java.sql.Timestamp;
+import java.util.Calendar;
 
 /**
  * Represents an authentication token issued to calling clients
@@ -117,5 +118,12 @@ public class AuthToken {
 	 */
 	public void setLastAccess(Timestamp lastAccess) {
 		this.lastAccess = lastAccess;
+	}
+
+	public void extendExpiration(int seconds) {
+		Calendar cal = Calendar.getInstance();
+		cal.setTime(this.expires);
+		cal.add(Calendar.SECOND, seconds);
+		this.expires = new Timestamp(cal.getTimeInMillis());
 	}
 }
