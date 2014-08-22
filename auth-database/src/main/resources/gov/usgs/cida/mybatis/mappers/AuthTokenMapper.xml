@@ -42,6 +42,22 @@
 			TOKEN_ID = #{id}
     </select>
 	
+	<select
+		id="getExpiredTokens"
+		resultMap="tokenResultMap">
+		SELECT
+			ID,
+			TOKEN_ID,
+			USERNAME,
+			ISSUED,
+			EXPIRES,
+			LAST_ACCESS
+		FROM 
+			AUTH_TOKEN
+		WHERE
+			EXPIRES &lt; CURRENT_TIMESTAMP
+	</select>
+	
 	<delete 
         id="deleteTokenUsingId" 
         parameterType="String" 
@@ -79,6 +95,18 @@
 		statementType="PREPARED">
 		UPDATE AUTH_TOKEN
 		SET
+			LAST_ACCESS = #{lastAccess}
+		WHERE 
+			TOKEN_ID = #{tokenId}
+	</update>
+	
+	<update
+		id="updateToken"
+		flushCache="true"
+		statementType="PREPARED">
+		UPDATE AUTH_TOKEN
+		SET
+			EXPIRES = #{expires},
 			LAST_ACCESS = #{lastAccess}
 		WHERE 
 			TOKEN_ID = #{tokenId}
