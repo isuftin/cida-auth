@@ -12,8 +12,8 @@
 	
 	<modules>
 		<module>auth-database</module>
-		<module>cida-auth-webservice</module>
-		<module>cida-auth-commons</module>
+		<module>auth-webservice</module>
+		<module>auth-commons</module>
 		<module>auth-client</module>
 	</modules>
 	
