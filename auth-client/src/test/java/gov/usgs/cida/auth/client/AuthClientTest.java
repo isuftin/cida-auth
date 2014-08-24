@@ -74,7 +74,6 @@ public class AuthClientTest {
 	@After
 	public void tearDown() {
 		mockServer.dumpToLog();
-
 	}
 
 	@Test
@@ -82,7 +81,7 @@ public class AuthClientTest {
 		System.out.println("getNewToken");
 		String username = "testuser";
 		String password = "testpassword";
-		AuthClient instance = new AuthClient(host + serverPort + appName);
+		AuthClient instance = new AuthClient(authUrl);
 		AuthToken result = instance.getNewToken(username, password);
 		assertNotNull(result);
 		assertThat(result.getTokenId(), is(equalTo("fda34827-f5d7-44d7-b46f-db6603accb7c")));
@@ -91,9 +90,18 @@ public class AuthClientTest {
 	@Test
 	public void testGetToken() throws URISyntaxException {
 		System.out.println("getToken");
-		AuthClient instance = new AuthClient(host + serverPort + appName);
+		AuthClient instance = new AuthClient(authUrl);
 		AuthToken result = instance.getToken(tokenId);
 		assertNotNull(result);
+		assertThat(result.getTokenId(), is(equalTo("fda34827-f5d7-44d7-b46f-db6603accb7c")));
+	}
+
+	@Test
+	public void testGetWrongToken() throws URISyntaxException {
+		System.out.println("testGetWrongToken");
+		AuthClient instance = new AuthClient(authUrl);
+		AuthToken result = instance.getToken(tokenId + '-');
+		assertNull(result);
 	}
 
 }

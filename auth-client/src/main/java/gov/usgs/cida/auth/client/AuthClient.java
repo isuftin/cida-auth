@@ -16,6 +16,7 @@ import org.apache.http.NameValuePair;
 import org.apache.http.StatusLine;
 import org.apache.http.client.entity.UrlEncodedFormEntity;
 import org.apache.http.client.methods.CloseableHttpResponse;
+import org.apache.http.client.methods.HttpDelete;
 import org.apache.http.client.methods.HttpGet;
 import org.apache.http.client.methods.HttpPost;
 import org.apache.http.client.utils.URIBuilder;
@@ -64,7 +65,6 @@ public class AuthClient implements IAuthClient {
 	 */
 	@Override
 	public AuthToken getNewToken(String username, String password) {
-		CloseableHttpClient httpclient = HttpClients.createDefault();
 		HttpPost post = new HttpPost(getNewTokenPath);
 		AuthToken result = null;
 		List<NameValuePair> nvps = new ArrayList<>();
@@ -72,7 +72,8 @@ public class AuthClient implements IAuthClient {
 		nvps.add(new BasicNameValuePair("password", password));
 		post.setEntity(new UrlEncodedFormEntity(nvps, Charset.defaultCharset()));
 
-		try (CloseableHttpResponse response = httpclient.execute(post)) {
+		try (CloseableHttpClient httpclient = HttpClients.createDefault();
+				CloseableHttpResponse response = httpclient.execute(post)) {
 			HttpEntity responseEntity = response.getEntity();
 			StatusLine statusLine = response.getStatusLine();
 			int statusCode = statusLine.getStatusCode();
@@ -92,18 +93,19 @@ public class AuthClient implements IAuthClient {
 
 	@Override
 	public AuthToken getToken(String tokenId) {
-		CloseableHttpClient httpclient = HttpClients.createDefault();
 		AuthToken result = null;
 		URI tokenPath = null;
+
 		try {
-			tokenPath = new URIBuilder(this.getTokenPath.toASCIIString() + "/" + tokenId).build();
+			tokenPath = new URIBuilder(String.format("%s/%s", this.getTokenPath.toASCIIString(), tokenId)).build();
 		} catch (URISyntaxException ex) {
 			LOG.warn("Could not create proper URI from token path", ex);
 		}
 
 		if (tokenPath != null) {
 			HttpGet get = new HttpGet(tokenPath);
-			try (CloseableHttpResponse response = httpclient.execute(get)) {
+			try (CloseableHttpClient httpclient = HttpClients.createDefault();
+					CloseableHttpResponse response = httpclient.execute(get)) {
 				HttpEntity responseEntity = response.getEntity();
 				StatusLine statusLine = response.getStatusLine();
 				int statusCode = statusLine.getStatusCode();
@@ -119,7 +121,7 @@ public class AuthClient implements IAuthClient {
 				LOG.warn(MessageFormat.format("An error occurred while trying to get token {0}", tokenId), ex);
 			}
 		}
-		
+
 		return result;
 	}
 
@@ -128,44 +130,71 @@ public class AuthClient implements IAuthClient {
 	 */
 	@Override
 	public boolean isValidToken(String tokenId) {
-		boolean isValid = false;
-		AuthToken token = getToken(tokenId);
-		if (token != null) {
+		boolean isValid;
+
+		if (StringUtils.isBlank(tokenId)) {
+			isValid = false;
+		} else {
+			AuthToken token = getToken(tokenId);
 			isValid = isValidToken(token);
 		}
 		return isValid;
 	}
 
-	
 	/**
 	 * {@inheritDoc}
 	 */
 	@Override
 	public boolean isValidToken(AuthToken token) {
 		boolean isValid = true;
-		// For now, just check if the token is expired
-		if (token.isExpired()) {
+
+		if (token == null) {
+			isValid = false;
+		} else if (token.isExpired()) {
 			isValid = false;
 		}
-		return false;
+
+		return isValid;
 	}
 
-	@Override
 	/**
 	 * {@inheritDoc}
 	 */
+	@Override
 	public boolean invalidateToken(AuthToken token) {
-		// TODO Auto-generated method stub
-		return false;
+		return invalidateToken(token.getTokenId());
 	}
 
-	@Override
 	/**
 	 * {@inheritDoc}
 	 */
-	public boolean invalidateToken(String token) {
-		// TODO Auto-generated method stub
-		return false;
+	@Override
+	public boolean invalidateToken(String tokenId) {
+		URI tokenPath = null;
+		boolean deleted = false;
+
+		try {
+			tokenPath = new URIBuilder(String.format("%s/%s", this.getTokenPath.toASCIIString(), tokenId)).build();
+		} catch (URISyntaxException ex) {
+			LOG.warn("Could not create proper URI from token path", ex);
+		}
+		if (tokenPath != null) {
+			HttpDelete delete = new HttpDelete(tokenPath);
+			try (CloseableHttpClient httpclient = HttpClients.createDefault();
+					CloseableHttpResponse response = httpclient.execute(delete)) {
+				StatusLine statusLine = response.getStatusLine();
+				int statusCode = statusLine.getStatusCode();
+				if (statusCode == 200) {
+					LOG.info("Invalidated token {}", tokenId);
+					deleted = true;
+				} else {
+					LOG.info("Could not invalidate token {}. Error Code: {}, Reason: {}", tokenId, statusCode, statusLine.getReasonPhrase());
+				}
+			} catch (IOException ex) {
+				LOG.warn(String.format("An error occurred while trying to delete token %s", tokenId), ex);
+			}
+		}
+		return deleted;
 	}
 
 }
