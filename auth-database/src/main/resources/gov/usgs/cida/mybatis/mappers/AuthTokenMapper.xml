@@ -8,9 +8,9 @@
 		<id property="id" column="ID" />
 		<result property="tokenId" column="TOKEN_ID" />
 		<result property="username" column="USERNAME" />
-		<result property="issued" column="ISSUED" />
-		<result property="expires" column="EXPIRES" />
-		<result property="lastAccess" column="LAST_ACCESS" />
+		<result property="issued" column="ISSUED" javaType="java.sql.Timestamp"/>
+		<result property="expires" column="EXPIRES" javaType="java.sql.Timestamp"/>
+		<result property="lastAccess" column="LAST_ACCESS" javaType="java.sql.Timestamp"/>
 	</resultMap>
 	
 	<select id="getAll" resultMap="tokenResultMap" useCache="false">
@@ -26,7 +26,7 @@
     </select>
 	
 	<select 
-        id="getByTokenId" 
+        id="getByTokenById" 
         parameterType="String" 
         resultMap="tokenResultMap">
         SELECT

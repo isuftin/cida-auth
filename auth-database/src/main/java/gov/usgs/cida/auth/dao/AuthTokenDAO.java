@@ -47,10 +47,10 @@ public class AuthTokenDAO {
 	 * @param id
 	 * @return
 	 */
-	public AuthToken getByTokenId(String id) {
+	public AuthToken getByTokenById(String id) {
 		AuthToken result;
 		try (SqlSession session = sqlSessionFactory.openSession()) {
-			result = session.selectOne(TOKEN_MAPPER_PACKAGE + ".getByTokenId", id);
+			result = session.selectOne(TOKEN_MAPPER_PACKAGE + ".getByTokenById", id);
 		}
 		return result;
 	}
@@ -149,7 +149,7 @@ public class AuthTokenDAO {
 	public AuthToken create(String username) {
 		AuthToken token = AuthTokenFactory.create(username);
 		insertToken(token);
-		return getByTokenId(token.getTokenId());
+		return getByTokenById(token.getTokenId());
 	}
 
 	/**
