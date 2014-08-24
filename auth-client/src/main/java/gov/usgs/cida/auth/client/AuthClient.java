@@ -60,7 +60,7 @@ public class AuthClient implements IAuthClient {
 				path(ServicePaths.AUTHENTICATION).
 				path(ServicePaths.AD).
 				path(ServicePaths.TOKEN);
-
+		
 		try {
 			Entity<Form> postEntity = Entity.entity(form, MediaType.APPLICATION_FORM_URLENCODED_TYPE);
 			result = target.
