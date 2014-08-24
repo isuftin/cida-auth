@@ -68,6 +68,11 @@
 			<name>CIDA Nexus</name>
 			<url>http://cida.usgs.gov/maven/cida-public/</url>
 		</repository>
+		<repository>
+			<id>cida-thirdparty</id>
+			<name>CIDA Public Nexus</name>
+			<url>http://internal.cida.usgs.gov/maven/content/repositories/cida-thirdparty</url>
+		</repository>
 	</repositories>
 	
 	<distributionManagement>
