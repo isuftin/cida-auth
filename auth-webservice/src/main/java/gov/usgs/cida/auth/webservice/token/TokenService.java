@@ -79,7 +79,7 @@ public class TokenService {
 		AuthToken token = null;
 		
 		if (StringUtils.isNotBlank(tokenId)) {
-			token = dao.getByTokenId(tokenId);
+			token = dao.getByTokenById(tokenId);
 		}
 
 		if (token != null) {

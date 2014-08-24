@@ -6,16 +6,10 @@
 
 package gov.usgs.cida.auth.model;
 
-import java.math.BigInteger;
 import java.sql.Timestamp;
 import java.util.Calendar;
 import java.util.Date;
-import org.junit.After;
-import org.junit.AfterClass;
-import static org.junit.Assert.*;
-import org.junit.Before;
-import org.junit.BeforeClass;
-import org.junit.Ignore;
+import static org.junit.Assert.assertEquals;
 import org.junit.Test;
 
 /**
@@ -47,7 +41,7 @@ public class AuthTokenTest {
 		token.setExpires(new Timestamp(tomorrow));
 		token.setLastAccess(new Timestamp(now));
 		
-		String expResult = "{\"tokenId\":\"TEST-TOKEN-ID\",\"username\":\"isuftin@usgs.gov\",\"issued\":\"Aug 20, 2014 9:04:35 AM\",\"expires\":\"Aug 21, 2014 9:04:35 AM\",\"lastAccess\":\"Aug 20, 2014 9:04:35 AM\"}";
+		String expResult = "{\"tokenId\":\"TEST-TOKEN-ID\",\"username\":\"isuftin@usgs.gov\",\"issued\":\"2014-08-20 09:04:35.0\",\"expires\":\"2014-08-21 09:04:35.0\",\"lastAccess\":\"2014-08-20 09:04:35.0\"}";
 		String result = token.toJSON();
 		assertEquals(expResult, result);
 	}
@@ -55,7 +49,7 @@ public class AuthTokenTest {
 	@Test
 	public void testFromJSON() {
 		System.out.println("fromJSON");
-		String json = "{\"tokenId\":\"TEST-TOKEN-ID\",\"username\":\"isuftin@usgs.gov\",\"issued\":\"Aug 20, 2014 9:04:35 AM\",\"expires\":\"Aug 21, 2014 9:04:35 AM\",\"lastAccess\":\"Aug 20, 2014 9:04:35 AM\"}";
+		String json = "{\"tokenId\":\"TEST-TOKEN-ID\",\"username\":\"isuftin@usgs.gov\",\"issued\":\"2014-08-20 09:04:35.0\",\"expires\":\"2014-08-21 09:04:35.0\",\"lastAccess\":\"2014-08-20 09:04:35.0\"}";
 		AuthToken result = AuthToken.fromJSON(json);
 		assertEquals("TEST-TOKEN-ID", result.getTokenId());
 		assertEquals("isuftin@usgs.gov", result.getUsername());

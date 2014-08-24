@@ -1,10 +1,11 @@
 package gov.usgs.cida.auth.model;
 
-import com.google.gson.Gson;
+import com.google.gson.GsonBuilder;
 import java.math.BigInteger;
 import java.sql.Timestamp;
 import java.util.Calendar;
 import java.util.Date;
+import javax.xml.bind.annotation.adapters.XmlJavaTypeAdapter;
 
 /**
  * Represents an authentication token issued to calling clients
@@ -12,12 +13,15 @@ import java.util.Date;
  * @author isuftin
  */
 public class AuthToken {
-
+	private final static String dateFormat = "yyyy-MM-dd HH:mm:ss.S";
 	private BigInteger id;
 	private String tokenId;
 	private String username;
+	@XmlJavaTypeAdapter(TimestampAdapter.class)
 	private Timestamp issued;
+	@XmlJavaTypeAdapter(TimestampAdapter.class)
 	private Timestamp expires;
+	@XmlJavaTypeAdapter(TimestampAdapter.class)
 	private Timestamp lastAccess;
 
 	/**
@@ -27,8 +31,7 @@ public class AuthToken {
 	 * @return
 	 */
 	public String toJSON() {
-		Gson gson = new Gson();
-		return gson.toJson(this);
+		return new GsonBuilder().setDateFormat(dateFormat).create().toJson(this);
 	}
 
 	/**
@@ -38,8 +41,7 @@ public class AuthToken {
 	 * @return
 	 */
 	public static AuthToken fromJSON(String json) {
-		Gson gson = new Gson();
-		return gson.fromJson(json, AuthToken.class);
+		return new GsonBuilder().setDateFormat(dateFormat).create().fromJson(json, AuthToken.class);
 	}
 
 	/**
@@ -127,8 +129,8 @@ public class AuthToken {
 	}
 
 	/**
-	 * Extends the expiration date for this token to a day after its last accessed 
-	 * date
+	 * Extends the expiration date for this token to a day after its last
+	 * accessed date
 	 */
 	public void extendExpiration() {
 		Calendar cal = Calendar.getInstance();
@@ -139,6 +141,7 @@ public class AuthToken {
 
 	/**
 	 * Extends the token expiration date
+	 *
 	 * @param seconds amount of seconds to extend the expiration date by
 	 */
 	public void extendExpiration(int seconds) {
@@ -154,7 +157,7 @@ public class AuthToken {
 	public void updateLastAccess() {
 		this.lastAccess = new Timestamp(new Date().getTime());
 	}
-	
+
 	public boolean isExpired() {
 		return this.expires.before(new Date());
 	}

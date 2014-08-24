@@ -65,7 +65,7 @@ public class AuthTokenDAOIT {
 	@Test
 	public void testGetByTokenId() {
 		System.out.println("getByTokenId");
-		AuthToken result = dao.getByTokenId("88AD43FE-58FA-12E8-41C1-72F0E20D9F1F");
+		AuthToken result = dao.getByTokenById("88AD43FE-58FA-12E8-41C1-72F0E20D9F1F");
 		assertThat(result, is(notNullValue()));
 		assertThat(result.getUsername(), is(equalTo("lobortis@diam.com")));
 	}
@@ -73,7 +73,7 @@ public class AuthTokenDAOIT {
 	@Test
 	public void testUpdateExpiration() {
 		System.out.println("testUpdateExpiration");
-		AuthToken token = dao.getByTokenId("88AD43FE-58FA-12E8-41C1-72F0E20D9F1F");
+		AuthToken token = dao.getByTokenById("88AD43FE-58FA-12E8-41C1-72F0E20D9F1F");
 		assertThat(token, is(notNullValue()));
 		
 		long originalExpiration = token.getExpires().getTime();
@@ -82,7 +82,7 @@ public class AuthTokenDAOIT {
 		token.extendExpiration(seconds);
 		dao.updateTokenExpiration(token);
 		
-		AuthToken result = dao.getByTokenId("88AD43FE-58FA-12E8-41C1-72F0E20D9F1F");
+		AuthToken result = dao.getByTokenById("88AD43FE-58FA-12E8-41C1-72F0E20D9F1F");
 		assertThat(result, is(notNullValue()));
 		assertThat(result.getExpires().getTime() - originalExpiration, is(equalTo(updatedSeconds)));
 	}
@@ -101,7 +101,7 @@ public class AuthTokenDAOIT {
 		AuthToken token = dao.create("test-user");
 		assertThat(token, is(notNullValue()));
 		
-		token = dao.getByTokenId(token.getTokenId());
+		token = dao.getByTokenById(token.getTokenId());
 		assertThat(token, is(notNullValue()));
 	}
 	
@@ -136,7 +136,7 @@ public class AuthTokenDAOIT {
 		int insertCount = dao.insertToken(token);
 		assertThat(insertCount, is(equalTo(1)));
 
-		AuthToken result = dao.getByTokenId(tokenId);
+		AuthToken result = dao.getByTokenById(tokenId);
 		assertThat(result, is(notNullValue()));
 		assertThat(result.getTokenId(), is(equalTo(tokenId)));
 		assertThat(result.getUsername(), is(equalTo(username)));

@@ -98,6 +98,9 @@ public class AuthClientTest {
 		AuthToken result = instance.getNewToken(username, password);
 		assertNotNull(result);
 		assertThat(result.getTokenId(), is(equalTo("fda34827-f5d7-44d7-b46f-db6603accb7c")));
+		assertThat(result.getExpires(), is(notNullValue()));
+		assertThat(result.getIssued(), is(notNullValue()));
+		assertThat(result.getLastAccess(), is(notNullValue()));
 	}
 
 	@Test
@@ -130,6 +133,9 @@ public class AuthClientTest {
 		AuthToken result = instance.getToken(tokenId);
 		assertNotNull(result);
 		assertThat(result.getTokenId(), is(equalTo("fda34827-f5d7-44d7-b46f-db6603accb7c")));
+		assertThat(result.getExpires(), is(notNullValue()));
+		assertThat(result.getIssued(), is(notNullValue()));
+		assertThat(result.getLastAccess(), is(notNullValue()));
 	}
 
 	@Test
