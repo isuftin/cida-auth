@@ -2,9 +2,7 @@ package gov.usgs.cida.auth.service.authentication;
 
 import gov.usgs.cida.auth.model.User;
 import gov.usgs.cida.config.DynamicReadOnlyProperties;
-import java.text.MessageFormat;
 import java.util.Properties;
-import java.util.logging.Level;
 import javax.naming.Context;
 import javax.naming.NamingEnumeration;
 import javax.naming.NamingException;
@@ -101,7 +99,7 @@ public class LDAPService {
 				user.setDirContext(context);
 			}
 		} catch (NamingException ex) {
-			LOG.debug(MessageFormat.format("Unable to authenticate user {0)}", username), ex);
+			LOG.error(String.format("Unable to authenticate user %s", username), ex);
 		} finally {
 			props.put(Context.SECURITY_CREDENTIALS, new char[0]);
 		}
