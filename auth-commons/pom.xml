@@ -40,5 +40,17 @@
 			<artifactId>dynamicProperties</artifactId>
 			<version>1.0.2</version>
 		</dependency>
+		
+		<!-- Testing -->
+		<dependency>
+			<groupId>org.hamcrest</groupId>
+			<artifactId>hamcrest-all</artifactId>
+			<scope>test</scope>
+		</dependency>
+		<dependency>
+			<groupId>junit</groupId>
+			<artifactId>junit</artifactId>
+			<scope>test</scope>
+		</dependency>
 	</dependencies>
 </project>
