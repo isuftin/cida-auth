@@ -18,12 +18,19 @@ public interface IAuthClient {
 	public AuthToken getNewToken(String username, String password);
 
 	/**
+	 * Returns a token that has the provided ID
+	 * @param tokenId
+	 * @return 
+	 */
+	public AuthToken getToken(String tokenId);
+	
+	/**
 	 * Checks to see if a token is currently valid.
 	 * 
-	 * @param token
+	 * @param tokenId
 	 * @return AuthToken
 	 */
-	public boolean isValidToken(String token);
+	public boolean isValidToken(String tokenId);
 	
 	/**
 	 * Checks to see if a token is currently valid.
@@ -44,9 +51,9 @@ public interface IAuthClient {
 	/**
 	 * Invalidates the token on the auth server.
 	 * 
-	 * @param token
+	 * @param tokenId
 	 * @return AuthToken
 	 */
-	public boolean invalidateToken(String token);
+	public boolean invalidateToken(String tokenId);
 
 }
