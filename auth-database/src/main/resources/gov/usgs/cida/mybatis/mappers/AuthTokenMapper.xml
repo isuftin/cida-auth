@@ -43,6 +43,18 @@
     </select>
 	
 	<select
+		id="getCountForId"
+		parameterType="String"
+		resultType="int">
+		SELECT 
+			COUNT(TOKEN_ID)
+		FROM
+			AUTH_TOKEN
+		WHERE
+			TOKEN_ID = #{id}
+	</select>
+	
+	<select
 		id="getExpiredTokens"
 		resultMap="tokenResultMap">
 		SELECT

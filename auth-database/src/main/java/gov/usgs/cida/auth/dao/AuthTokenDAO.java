@@ -142,13 +142,31 @@ public class AuthTokenDAO {
 
 	/**
 	 * Creates a default token given a username and inserts it into the database
-	 * @param username 
+	 *
+	 * @param username
 	 * @return token created and inserted into database
 	 */
 	public AuthToken create(String username) {
 		AuthToken token = AuthTokenFactory.create(username);
 		insertToken(token);
 		return getByTokenId(token.getTokenId());
+	}
+
+	/**
+	 * Do a cheap check if a token exists
+	 *
+	 * @param tokenId
+	 * @return
+	 */
+	public boolean exists(String tokenId) {
+		boolean exists = false;
+		try (SqlSession session = sqlSessionFactory.openSession()) {
+			int count = session.selectOne(TOKEN_MAPPER_PACKAGE + ".getCountForId", tokenId);
+			if (count > 0) {
+				exists = true;
+			}
+		}
+		return exists;
 	}
 
 }
