@@ -113,6 +113,7 @@ public class AuthClient implements IAuthClient {
 				if (statusCode == 200) {
 					String authTokenString = IOUtils.toString(responseEntity.getContent());
 					result = AuthToken.fromJSON(authTokenString);
+					LOG.debug("Retrieved token {} from server.", tokenId);
 				} else {
 					LOG.info("Could not get token {}. Error Code: {}, Reason: {}", tokenId, statusCode, statusLine.getReasonPhrase());
 				}
@@ -133,10 +134,19 @@ public class AuthClient implements IAuthClient {
 		boolean isValid;
 
 		if (StringUtils.isBlank(tokenId)) {
+			LOG.trace("Token id was blank or null when checking for validity.");
 			isValid = false;
 		} else {
+			LOG.trace("Attempting to get token {} from server to check for validity.", tokenId);
 			AuthToken token = getToken(tokenId);
-			isValid = isValidToken(token);
+
+			if (token != null) {
+				LOG.trace("Token {} found on server. Checking for validity.", tokenId);
+				isValid = isValidToken(token);
+			} else {
+				LOG.trace("Token {} not found on server.", tokenId);
+				isValid = false;
+			}
 		}
 		return isValid;
 	}
@@ -149,8 +159,10 @@ public class AuthClient implements IAuthClient {
 		boolean isValid = true;
 
 		if (token == null) {
+			LOG.trace("Token was null when checking for validity.");
 			isValid = false;
 		} else if (token.isExpired()) {
+			LOG.trace("Token {} has expired.", token.getTokenId());
 			isValid = false;
 		}
 
