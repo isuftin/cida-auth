@@ -35,7 +35,7 @@ public class AuthClientTest {
 	private static final String appName = "/cida-auth-app/";
 	private static final String host = "http://localhost:";
 	private static final String tokenId = "fda34827-f5d7-44d7-b46f-db6603accb7c";
-
+	private AuthClient instance = null;
 	public AuthClientTest() {
 	}
 
@@ -56,7 +56,7 @@ public class AuthClientTest {
 	}
 
 	@Before
-	public void setUp() {
+	public void setUp() throws URISyntaxException {
 		mockServer.reset();
 		mockServer.
 				when(request().withPath(appName + ServicePaths.AUTHENTICATION + "/" + ServicePaths.AD + "/" + ServicePaths.TOKEN)).
@@ -67,16 +67,22 @@ public class AuthClientTest {
 		mockServer.
 				when(request().withPath(appName + ServicePaths.AUTHENTICATION + "/" + ServicePaths.AD + "/" + ServicePaths.TOKEN)).
 				respond(response().withStatusCode(401));
-		
+
 		mockServer.
 				when(request().withMethod("GET").withPath(appName + ServicePaths.TOKEN + "/" + tokenId)).
 				respond(response().
 						withHeaders(new Header("Content-Type", "application/json")).
 						withBody(getAuthTokenValidResponse));
-		
+
 		mockServer.
 				when(request().withMethod("DELETE").withPath(appName + ServicePaths.TOKEN + "/" + tokenId)).
 				respond(response().withStatusCode(200));
+
+		mockServer.
+				when(request().withMethod("DELETE").withPath(appName + ServicePaths.TOKEN + "/" + tokenId + "invalid")).
+				respond(response().withStatusCode(404));
+		
+		instance = new AuthClient(authUrl);
 	}
 
 	@After
@@ -89,7 +95,6 @@ public class AuthClientTest {
 		System.out.println("getNewToken");
 		String username = "testuser";
 		String password = "testpassword";
-		AuthClient instance = new AuthClient(authUrl);
 		AuthToken result = instance.getNewToken(username, password);
 		assertNotNull(result);
 		assertThat(result.getTokenId(), is(equalTo("fda34827-f5d7-44d7-b46f-db6603accb7c")));
@@ -100,23 +105,28 @@ public class AuthClientTest {
 		System.out.println("testGetNewTokenGetting401");
 		String username = "testuser";
 		String password = "testpassword";
-		AuthClient instance = new AuthClient(authUrl + "invalid");
+		instance = new AuthClient(authUrl + "invalid");
 		AuthToken result = instance.getNewToken(username, password);
 		assertNull(result);
 	}
-	
+
 	@Test
 	public void testInvalidateToken() throws URISyntaxException {
 		System.out.println("testInvalidateToken");
-		AuthClient instance = new AuthClient(authUrl);
 		boolean deleted = instance.invalidateToken(tokenId);
 		assertThat(deleted, is(true));
 	}
 
 	@Test
+	public void testInvalidateTokenWithInvalidTokenID() throws URISyntaxException {
+		System.out.println("testInvalidateTokenWithInvalidTokenID");
+		boolean deleted = instance.invalidateToken(tokenId + "invalid");
+		assertThat(deleted, is(false));
+	}
+
+	@Test
 	public void testGetToken() throws URISyntaxException {
 		System.out.println("getToken");
-		AuthClient instance = new AuthClient(authUrl);
 		AuthToken result = instance.getToken(tokenId);
 		assertNotNull(result);
 		assertThat(result.getTokenId(), is(equalTo("fda34827-f5d7-44d7-b46f-db6603accb7c")));
@@ -125,7 +135,6 @@ public class AuthClientTest {
 	@Test
 	public void testGetWrongToken() throws URISyntaxException {
 		System.out.println("testGetWrongToken");
-		AuthClient instance = new AuthClient(authUrl);
 		AuthToken result = instance.getToken(tokenId + '-');
 		assertNull(result);
 	}
