@@ -50,12 +50,14 @@ public class AuthTokenFactory {
 				
 		long now = nowDate.getTime();
 		long expires = cal.getTimeInMillis();
+		Timestamp nowTs = new Timestamp(now);
+		Timestamp expiresTs = new Timestamp(expires);
 		
 		result.setTokenId(UUID.randomUUID().toString());
 		result.setUsername(username);
-		result.setIssued(new Timestamp(now));
-		result.setLastAccess(null);
-		result.setExpires(new Timestamp(expires));
+		result.setIssued(nowTs);
+		result.setLastAccess(nowTs);
+		result.setExpires(expiresTs);
 		
 		return result;
 	}
