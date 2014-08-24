@@ -2,7 +2,6 @@ package gov.usgs.cida.auth.service.authentication;
 
 import gov.usgs.cida.auth.model.User;
 import gov.usgs.cida.config.DynamicReadOnlyProperties;
-import java.text.MessageFormat;
 import java.util.Properties;
 import javax.naming.Context;
 import javax.naming.NamingEnumeration;
@@ -31,11 +30,17 @@ public class LDAPService {
 		// Utility class, should not be instantiated
 	}
 
-	public static User authenticate(String username, char[] password) throws NamingException {
+	public static User authenticate(String username, char[] password) {
 		User user = new User();
 		user.setAuthenticated(false);
 		
-		DynamicReadOnlyProperties props = new DynamicReadOnlyProperties().addJNDIContexts();
+		DynamicReadOnlyProperties props = new DynamicReadOnlyProperties();
+		try {
+			props.addJNDIContexts();
+		} catch (NamingException ex) {
+			LOG.error("Error attempting to read JNDI properties.", ex);
+		}
+		
 		String url = props.getProperty(JNDI_LDAP_URL_PARAM_NAME);
 		String domain = props.getProperty(JNDI_LDAP_DOMAIN_PARAM_NAME);
 		if (StringUtils.isBlank(url) || StringUtils.isBlank(domain)) {
@@ -94,7 +99,7 @@ public class LDAPService {
 				user.setDirContext(context);
 			}
 		} catch (NamingException ex) {
-			LOG.debug(MessageFormat.format("Unable to authenticate user {0)}", username), ex);
+			LOG.error(String.format("Unable to authenticate user %s", username), ex);
 		} finally {
 			props.put(Context.SECURITY_CREDENTIALS, new char[0]);
 		}

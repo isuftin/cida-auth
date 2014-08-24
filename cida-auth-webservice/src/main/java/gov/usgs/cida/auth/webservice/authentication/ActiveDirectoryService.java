@@ -4,7 +4,6 @@ import gov.usgs.cida.auth.dao.AuthTokenDAO;
 import gov.usgs.cida.auth.model.AuthToken;
 import gov.usgs.cida.auth.model.User;
 import gov.usgs.cida.auth.service.authentication.LDAPService;
-import gov.usgs.cida.auth.util.AuthTokenFactory;
 import javax.naming.NamingException;
 import javax.ws.rs.Consumes;
 import javax.ws.rs.DefaultValue;
@@ -26,30 +25,33 @@ public class ActiveDirectoryService {
 	@Path("/token")
 	@Consumes(MediaType.APPLICATION_FORM_URLENCODED)
 	@Produces(MediaType.APPLICATION_JSON)
-	public Response authenticate(
+	public Response doAuth(
 			@FormParam("username") String username,
 			@FormParam("password")
 			@DefaultValue("") String password) throws NamingException {
 		LOG.trace("User {} is attempting to authenticate", username);
+		return getResponse(username, password.toCharArray());
+	}
 
+	/**
+	 * Authenticates, creates token, generates proper Response
+	 *
+	 * @param username
+	 * @param password
+	 * @return
+	 */
+	protected Response getResponse(String username, char[] password) {
 		Response response;
-		User user = LDAPService.authenticate(username, password.toCharArray());
+		User user = LDAPService.authenticate(username, password);
 
 		if (user.isAuthenticated()) {
-			LOG.debug("User {} has authenticated", username);
-			AuthToken token = AuthTokenFactory.create(username);
-			AuthTokenDAO dao = new AuthTokenDAO();
-			String tokenId = token.getTokenId();
+			String name = user.getUsername();
+			LOG.debug("User {} has authenticated", name);
+			AuthToken token = new AuthTokenDAO().create(name);
 
-			if (dao.insertToken(token) == 1) {
-				LOG.trace("Added token {} to database", tokenId);
-				token = dao.getByTokenId(token.getTokenId());
-				if (token != null) {
-					response = Response.ok(token.toJSON(), MediaType.APPLICATION_JSON_TYPE).build();
-				} else {
-					LOG.warn("Could not retrieve token {} from database", tokenId);
-					response = Response.status(Response.Status.INTERNAL_SERVER_ERROR).build();
-				}
+			if (token != null) {
+				LOG.trace("Added token {} to database", token.getTokenId());
+				response = Response.ok(token.toJSON(), MediaType.APPLICATION_JSON_TYPE).build();
 			} else {
 				LOG.warn("Unable to add token to database");
 				response = Response.status(Response.Status.INTERNAL_SERVER_ERROR).build();

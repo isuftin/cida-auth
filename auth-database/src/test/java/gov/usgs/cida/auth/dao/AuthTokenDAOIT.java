@@ -93,6 +93,24 @@ public class AuthTokenDAOIT {
 		int result = dao.deleteTokenUsingId("BCFCAA99-18D7-5833-FD50-AFE27E7AF1ED");
 		assertThat(result, is(equalTo(1)));
 	}
+	
+	@Test
+	public void testCreate() {
+		System.out.println("testCreate");
+		
+		AuthToken token = dao.create("test-user");
+		assertThat(token, is(notNullValue()));
+		
+		token = dao.getByTokenId(token.getTokenId());
+		assertThat(token, is(notNullValue()));
+	}
+	
+	@Test
+	public void testExists() {
+		System.out.println("testExists");
+		assertThat(dao.exists("88AD43FE-58FA-12E8-41C1-72F0E20D9F1F"), is(true));
+		
+	}
 
 	@Test
 	public void testInsertToken() {

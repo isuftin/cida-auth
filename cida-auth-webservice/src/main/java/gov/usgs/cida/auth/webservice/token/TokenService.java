@@ -9,6 +9,7 @@ import javax.ws.rs.PathParam;
 import javax.ws.rs.Produces;
 import javax.ws.rs.core.MediaType;
 import javax.ws.rs.core.Response;
+import org.apache.commons.lang3.StringUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -29,12 +30,25 @@ public class TokenService {
 	@GET
 	@Path("{tokenId}")
 	@Produces(MediaType.APPLICATION_JSON)
-	public Response getToken(@PathParam("tokenId") @DefaultValue("no token provided") String tokenId) {
-		LOG.trace("Attempting to retrieve token {}", tokenId);
+	public Response getToken(@PathParam("tokenId") @DefaultValue("") String tokenId) {
+		LOG.trace("Attempting to retrieve token by id '{}'", tokenId);
+		return getResponse(tokenId);
+	}
+
+	/**
+	 * Using a tokenID, 
+	 * @param tokenId
+	 * @return 
+	 */
+	protected Response getResponse(String tokenId) {
 		Response response;
 		AuthTokenDAO dao = new AuthTokenDAO();
-		AuthToken token = dao.getByTokenId(tokenId);
+		AuthToken token = null;
 		
+		if (StringUtils.isNotBlank(tokenId)) {
+			token = dao.getByTokenId(tokenId);
+		}
+
 		if (token != null) {
 			LOG.trace("Token {} retrieved", tokenId);
 			if (token.isExpired()) {
@@ -49,7 +63,7 @@ public class TokenService {
 				} catch (Exception e) {
 					LOG.warn("Could not update last access for token {}", tokenId);
 				}
-				
+
 				response = Response.ok(token.toJSON(), MediaType.APPLICATION_JSON_TYPE).build();
 			}
 		} else {

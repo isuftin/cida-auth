@@ -1,6 +1,7 @@
 package gov.usgs.cida.auth.dao;
 
 import gov.usgs.cida.auth.model.AuthToken;
+import gov.usgs.cida.auth.util.AuthTokenFactory;
 import gov.usgs.cida.auth.util.MyBatisConnectionFactory;
 import java.util.List;
 import org.apache.ibatis.session.SqlSession;
@@ -137,6 +138,35 @@ public class AuthTokenDAO {
 			session.commit();
 		}
 		return result;
+	}
+
+	/**
+	 * Creates a default token given a username and inserts it into the database
+	 *
+	 * @param username
+	 * @return token created and inserted into database
+	 */
+	public AuthToken create(String username) {
+		AuthToken token = AuthTokenFactory.create(username);
+		insertToken(token);
+		return getByTokenId(token.getTokenId());
+	}
+
+	/**
+	 * Do a cheap check if a token exists
+	 *
+	 * @param tokenId
+	 * @return
+	 */
+	public boolean exists(String tokenId) {
+		boolean exists = false;
+		try (SqlSession session = sqlSessionFactory.openSession()) {
+			int count = session.selectOne(TOKEN_MAPPER_PACKAGE + ".getCountForId", tokenId);
+			if (count > 0) {
+				exists = true;
+			}
+		}
+		return exists;
 	}
 
 }
