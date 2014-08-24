@@ -65,10 +65,18 @@ public class AuthClientTest {
 						withBody(getAuthTokenValidResponse));
 
 		mockServer.
-				when(request().withPath(appName + ServicePaths.TOKEN + "/" + tokenId)).
+				when(request().withPath(appName + ServicePaths.AUTHENTICATION + "/" + ServicePaths.AD + "/" + ServicePaths.TOKEN)).
+				respond(response().withStatusCode(401));
+		
+		mockServer.
+				when(request().withMethod("GET").withPath(appName + ServicePaths.TOKEN + "/" + tokenId)).
 				respond(response().
 						withHeaders(new Header("Content-Type", "application/json")).
 						withBody(getAuthTokenValidResponse));
+		
+		mockServer.
+				when(request().withMethod("DELETE").withPath(appName + ServicePaths.TOKEN + "/" + tokenId)).
+				respond(response().withStatusCode(200));
 	}
 
 	@After
@@ -85,6 +93,24 @@ public class AuthClientTest {
 		AuthToken result = instance.getNewToken(username, password);
 		assertNotNull(result);
 		assertThat(result.getTokenId(), is(equalTo("fda34827-f5d7-44d7-b46f-db6603accb7c")));
+	}
+
+	@Test
+	public void testGetNewTokenWithErrorCode() throws URISyntaxException {
+		System.out.println("testGetNewTokenGetting401");
+		String username = "testuser";
+		String password = "testpassword";
+		AuthClient instance = new AuthClient(authUrl + "invalid");
+		AuthToken result = instance.getNewToken(username, password);
+		assertNull(result);
+	}
+	
+	@Test
+	public void testInvalidateToken() throws URISyntaxException {
+		System.out.println("testInvalidateToken");
+		AuthClient instance = new AuthClient(authUrl);
+		boolean deleted = instance.invalidateToken(tokenId);
+		assertThat(deleted, is(true));
 	}
 
 	@Test
