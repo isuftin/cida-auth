@@ -7,10 +7,17 @@
     http://www.liquibase.org/xml/ns/dbchangelog-ext http://www.liquibase.org/xml/ns/dbchangelog/dbchangelog-ext.xsd">
 
 	<changeSet author="${runasusername}" id="create-token-table">
+		<createSequence 
+            cycle="false"
+            incrementBy="1"
+            schemaName="${db.auth.schemaname}"
+            sequenceName="seq_auth_token_id"
+            startValue="1"/>
+		
 		<createTable 
 			remarks="Holds active tokens, expiration times and associated metadata"
 			tableName="AUTH_TOKEN">
-			<column name="ID" type="BIGINT" autoIncrement="true" >
+			<column name="ID" type="BIGINT" defaultValueComputed="NEXTVAL('seq_auth_token_id')" >
 				<constraints 
 					nullable="false" 
 					primaryKey="true" 

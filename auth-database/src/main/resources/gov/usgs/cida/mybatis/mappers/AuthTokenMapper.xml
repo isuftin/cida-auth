@@ -89,7 +89,6 @@
 		id="insertToken"
 		flushCache="true"
 		statementType="PREPARED"
-		useGeneratedKeys="true"
 		keyColumn="id"
 		>
 		INSERT INTO AUTH_TOKEN (TOKEN_ID,USERNAME,ISSUED,EXPIRES,LAST_ACCESS)
