@@ -46,12 +46,18 @@
 		id="getCountForId"
 		parameterType="String"
 		resultType="int">
-		SELECT 
-			COUNT(TOKEN_ID)
-		FROM
-			AUTH_TOKEN
-		WHERE
-			TOKEN_ID = #{id}
+		SELECT CT FROM (
+			SELECT 
+				COUNT(TOKEN_ID) AS CT, EXPIRES
+			FROM
+				AUTH_TOKEN
+			WHERE
+				TOKEN_ID = #{id}
+			AND
+				EXPIRES &gt; CURRENT_TIMESTAMP
+			GROUP BY
+				EXPIRES
+		) S
 	</select>
 	
 	<select

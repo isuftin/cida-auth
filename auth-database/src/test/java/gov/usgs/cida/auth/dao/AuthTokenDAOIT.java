@@ -1,6 +1,7 @@
 package gov.usgs.cida.auth.dao;
 
 import gov.usgs.cida.auth.model.AuthToken;
+import gov.usgs.cida.auth.util.AuthTokenFactory;
 import java.io.IOException;
 import java.io.InputStream;
 import java.sql.Timestamp;
@@ -69,19 +70,19 @@ public class AuthTokenDAOIT {
 		assertThat(result, is(notNullValue()));
 		assertThat(result.getUsername(), is(equalTo("lobortis@diam.com")));
 	}
-	
+
 	@Test
 	public void testUpdateExpiration() {
 		System.out.println("testUpdateExpiration");
 		AuthToken token = dao.getByTokenById("88AD43FE-58FA-12E8-41C1-72F0E20D9F1F");
 		assertThat(token, is(notNullValue()));
-		
+
 		long originalExpiration = token.getExpires().getTime();
 		int seconds = 600;
 		long updatedSeconds = seconds * 1000l;
 		token.extendExpiration(seconds);
 		dao.updateTokenExpiration(token);
-		
+
 		AuthToken result = dao.getByTokenById("88AD43FE-58FA-12E8-41C1-72F0E20D9F1F");
 		assertThat(result, is(notNullValue()));
 		assertThat(result.getExpires().getTime() - originalExpiration, is(equalTo(updatedSeconds)));
@@ -93,23 +94,16 @@ public class AuthTokenDAOIT {
 		int result = dao.deleteTokenUsingId("BCFCAA99-18D7-5833-FD50-AFE27E7AF1ED");
 		assertThat(result, is(equalTo(1)));
 	}
-	
+
 	@Test
 	public void testCreate() {
 		System.out.println("testCreate");
-		
+
 		AuthToken token = dao.create("test-user");
 		assertThat(token, is(notNullValue()));
-		
+
 		token = dao.getByTokenById(token.getTokenId());
 		assertThat(token, is(notNullValue()));
-	}
-	
-	@Test
-	public void testExists() {
-		System.out.println("testExists");
-		assertThat(dao.exists("88AD43FE-58FA-12E8-41C1-72F0E20D9F1F"), is(true));
-		
 	}
 
 	@Test
@@ -144,12 +138,21 @@ public class AuthTokenDAOIT {
 		assertThat(result.getExpires().getTime(), is(equalTo(tomorrow)));
 		assertThat(result.getLastAccess().getTime(), is(equalTo(now)));
 	}
-	
-	
+
+	@Test
+	public void testExists() {
+		System.out.println("testExists");
+		
+		AuthToken token = AuthTokenFactory.create("testuser", 600);
+		dao.insertToken(token);
+		
+		assertThat(dao.exists(token.getTokenId()), is(true));
+	}
+
 	@Test
 	public void testGetExpiredTokens() {
 		System.out.println("testGetExpiredTokens");
-		
+
 		// I want to update the expiration date on all tokens in the database
 		List<AuthToken> results = dao.getExpiredTokens();
 		for (AuthToken result : results) {
@@ -157,7 +160,7 @@ public class AuthTokenDAOIT {
 			result.extendExpiration();
 			dao.updateToken(result);
 		}
-		
+
 		Calendar cal = Calendar.getInstance();
 		Date dt = new Date();
 		long now = dt.getTime();
@@ -176,7 +179,7 @@ public class AuthTokenDAOIT {
 		token.setExpires(new Timestamp(yesterday));
 		token.setLastAccess(new Timestamp(now));
 		dao.insertToken(token);
-		
+
 		results = dao.getExpiredTokens();
 		assertThat(results.size(), is(equalTo(1)));
 	}
