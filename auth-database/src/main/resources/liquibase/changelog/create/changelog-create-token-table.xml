@@ -1,23 +1,31 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <databaseChangeLog
-    xmlns="http://www.liquibase.org/xml/ns/dbchangelog"
-    xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
-    xmlns:ext="http://www.liquibase.org/xml/ns/dbchangelog-ext"
-    xsi:schemaLocation="http://www.liquibase.org/xml/ns/dbchangelog http://www.liquibase.org/xml/ns/dbchangelog/dbchangelog-2.0.xsd
-    http://www.liquibase.org/xml/ns/dbchangelog-ext http://www.liquibase.org/xml/ns/dbchangelog/dbchangelog-ext.xsd">
+	xmlns="http://www.liquibase.org/xml/ns/dbchangelog"
+	xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+	xmlns:ext="http://www.liquibase.org/xml/ns/dbchangelog-ext"
+	xsi:schemaLocation="http://www.liquibase.org/xml/ns/dbchangelog http://www.liquibase.org/xml/ns/dbchangelog/dbchangelog-2.0.xsd
+	http://www.liquibase.org/xml/ns/dbchangelog-ext http://www.liquibase.org/xml/ns/dbchangelog/dbchangelog-ext.xsd">
 
-	<changeSet author="${runasusername}" id="create-token-table">
+
+	<changeSet author="${runasusername}" id="create-token-table-id-seq">
 		<createSequence 
-            cycle="false"
-            incrementBy="1"
-            schemaName="${db.auth.schemaname}"
-            sequenceName="seq_auth_token_id"
-            startValue="1"/>
+			cycle="false"
+			incrementBy="1"
+			schemaName="${db.auth.schemaname}"
+			sequenceName="seq_auth_token_id"
+			startValue="1"/>
+			
+	   <rollback>
+			drop sequence ${db.auth.schemaname}.seq_auth_token_id;
+		</rollback>
+	</changeSet>
+	
+	<changeSet author="${runasusername}" id="create-token-table">
 		
 		<createTable 
 			remarks="Holds active tokens, expiration times and associated metadata"
 			tableName="AUTH_TOKEN">
-			<column name="ID" type="BIGINT" defaultValueComputed="NEXTVAL('seq_auth_token_id')" >
+			<column name="ID" type="BIGINT">
 				<constraints 
 					nullable="false" 
 					primaryKey="true" 
@@ -39,12 +47,16 @@
 			<column name="EXPIRES" type="java.sql.Types.TIMESTAMP" />
 			<column name="LAST_ACCESS" type="java.sql.Types.TIMESTAMP" defaultValueComputed="CURRENT_TIMESTAMP" />
 		</createTable>
+		
+		<sql>
+		create or replace trigger AUTH_TOKEN_ID_TRG 
+			before insert on AUTH_TOKEN 
+			for each row 
+			begin
+				select seq_auth_token_id.nextval into :new.id from dual;
+			end;
+		</sql>
 	
-		<sql>Grant Select On ${db.auth.schemaname}.AUTH_TOKEN To ${db.auth.user};</sql>
-		<sql>Grant Insert On ${db.auth.schemaname}.AUTH_TOKEN To ${db.auth.user};</sql>
-		<sql>Grant Delete On ${db.auth.schemaname}.AUTH_TOKEN To ${db.auth.user};</sql>
-		<sql>Grant Update On ${db.auth.schemaname}.AUTH_TOKEN To ${db.auth.user};</sql>
-    
 		<rollback>
 			drop table ${db.auth.schemaname}.AUTH_TOKEN;
 		</rollback>
