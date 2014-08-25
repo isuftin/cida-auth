@@ -48,14 +48,12 @@
 			<column name="LAST_ACCESS" type="java.sql.Types.TIMESTAMP" defaultValueComputed="CURRENT_TIMESTAMP" />
 		</createTable>
 		
-		<sql>
-		create or replace trigger AUTH_TOKEN_ID_TRG 
-			before insert on AUTH_TOKEN 
-			for each row 
-			begin
-				select seq_auth_token_id.nextval into :new.id from dual;
-			end;
-		</sql>
+		<sqlFile 
+			encoding="utf8"
+			path="auth_token_id_trigger.sql"
+			relativeToChangelogFile="true"
+			splitStatements="false"
+			stripComments="true"></sqlFile>
 	
 		<rollback>
 			drop table ${db.auth.schemaname}.AUTH_TOKEN;
