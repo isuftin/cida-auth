@@ -42,13 +42,22 @@ public class CachingAuthClient extends AuthClient {
 	 */
 	public AuthToken getToken(String tokenId) {
 		AuthToken token;
+		
+		// First, check the cache to see if it has a token 
 		if (tokenCache.containsKey(tokenId)) {
 			LOG.trace("Token {} found in cache.", tokenId);
 			token = tokenCache.get(tokenId);
 			if (!isValidToken(token)) {
-				LOG.trace("Token {} is invalid. Removing token.", tokenId);
-				invalidateToken(token);
-				token = null;
+				token = super.getToken(tokenId);
+				LOG.trace("Token {} in cache was invalid. Double checking server.", tokenId);
+				if (!isValidToken(token)) {
+					LOG.trace("Token {} is invalid on server. Removing token from cache.", tokenId);
+					invalidateToken(token);
+					token = null;
+				} else {
+					LOG.trace("Updated token {} found on token server. Updating cache.", tokenId);
+					tokenCache.put(token.getTokenId(), token);
+				}
 			}
 		} else {
 			LOG.trace("Token {} not found in cache. Will try to pull from server.", tokenId);
