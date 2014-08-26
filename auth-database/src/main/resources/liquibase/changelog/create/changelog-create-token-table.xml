@@ -57,17 +57,14 @@
 	
 	<changeSet author="${runasusername}" id="add-non-oracle-autonumber">
 		<preConditions  onFail="CONTINUE">
-			<or>
-				<dbms type="h2" />
-				<dbms type="postgresql" />
-			</or>
+			<dbms type="h2,postgresql" />
 		</preConditions>
 		<addAutoIncrement 
-            columnDataType="BIGINT"
-            columnName="ID"
-            incrementBy="1"
-            startWith="1"
-            tableName="AUTH_TOKEN"/>
+			columnDataType="BIGINT"
+			columnName="ID"
+			incrementBy="1"
+			startWith="1"
+			tableName="AUTH_TOKEN"/>
 	</changeSet>
 	
 	<changeSet author="${runasusername}" id="add-oracle-autonumber-trigger">
