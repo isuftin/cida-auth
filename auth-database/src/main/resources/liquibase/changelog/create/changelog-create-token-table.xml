@@ -15,7 +15,7 @@
 			sequenceName="seq_auth_token_id"
 			startValue="1"/>
 			
-	   <rollback>
+		<rollback>
 			drop sequence ${db.auth.schemaname}.seq_auth_token_id;
 		</rollback>
 	</changeSet>
@@ -48,15 +48,37 @@
 			<column name="LAST_ACCESS" type="java.sql.Types.TIMESTAMP" defaultValueComputed="CURRENT_TIMESTAMP" />
 		</createTable>
 		
+		
+	
+		<rollback>
+			drop table ${db.auth.schemaname}.AUTH_TOKEN;
+		</rollback>
+	</changeSet>
+	
+	<changeSet author="${runasusername}" id="add-non-oracle-autonumber">
+		<preConditions  onFail="CONTINUE">
+			<or>
+				<dbms type="h2" />
+				<dbms type="postgresql" />
+			</or>
+		</preConditions>
+		<addAutoIncrement 
+            columnDataType="BIGINT"
+            columnName="ID"
+            incrementBy="1"
+            startWith="1"
+            tableName="AUTH_TOKEN"/>
+	</changeSet>
+	
+	<changeSet author="${runasusername}" id="add-oracle-autonumber-trigger">
+		<preConditions  onFail="CONTINUE">
+			<dbms type="oracle" />
+		</preConditions>
 		<sqlFile 
 			encoding="utf8"
 			path="auth_token_id_trigger.sql"
 			relativeToChangelogFile="true"
 			splitStatements="false"
-			stripComments="true"></sqlFile>
-	
-		<rollback>
-			drop table ${db.auth.schemaname}.AUTH_TOKEN;
-		</rollback>
+			stripComments="true" />
 	</changeSet>
 </databaseChangeLog>

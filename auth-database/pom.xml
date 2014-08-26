@@ -134,6 +134,7 @@
 									<driver>org.postgresql.Driver</driver>
 									<schemas>${db.auth.schemaname}</schemas>
 									<url>jdbc:postgresql://127.0.0.1:5432/${db.auth.schemaname}</url>
+									<type>postgresql</type>
 									<username>${db.auth.user}</username>
 									<password>${db.auth.pass}</password>
 									<liquibase.logging>debug</liquibase.logging>
@@ -189,6 +190,7 @@
 									<changeLogFile>${file.changelog}</changeLogFile>
 									<schemas>${db.auth.schemaname}</schemas>
 									<driver>oracle.jdbc.driver.OracleDriver</driver>
+									<type>oracle</type>
 									<url>${db.url}</url>
 									<username>${db.username}</username>
 									<password>${db.password}</password>
