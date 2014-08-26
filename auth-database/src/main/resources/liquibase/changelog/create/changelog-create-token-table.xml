@@ -55,12 +55,9 @@
 		</rollback>
 	</changeSet>
 	
-	<changeSet author="${runasusername}" id="add-non-oracle-autonumber">
+	<changeSet author="${runasusername}" id="add-non-oracle-autonumber" context="test">
 		<preConditions  onFail="CONTINUE">
 			<dbms type="h2,postgresql" />
-			<not>
-				<dbms type="oracle" />
-			</not>
 		</preConditions>
 		<addAutoIncrement 
 			columnDataType="BIGINT"
@@ -70,7 +67,7 @@
 			tableName="AUTH_TOKEN"/>
 	</changeSet>
 	
-	<changeSet author="${runasusername}" id="add-oracle-autonumber-trigger">
+	<changeSet author="${runasusername}" id="add-oracle-autonumber-trigger" context="oracle">
 		<preConditions  onFail="CONTINUE">
 			<dbms type="oracle" />
 		</preConditions>
