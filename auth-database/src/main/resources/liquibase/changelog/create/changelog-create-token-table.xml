@@ -58,6 +58,9 @@
 	<changeSet author="${runasusername}" id="add-non-oracle-autonumber">
 		<preConditions  onFail="CONTINUE">
 			<dbms type="h2,postgresql" />
+			<not>
+				<dbms type="oracle" />
+			</not>
 		</preConditions>
 		<addAutoIncrement 
 			columnDataType="BIGINT"
