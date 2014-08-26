@@ -134,12 +134,12 @@
 									<driver>org.postgresql.Driver</driver>
 									<schemas>${db.auth.schemaname}</schemas>
 									<url>jdbc:postgresql://127.0.0.1:5432/${db.auth.schemaname}</url>
-									<type>postgresql</type>
 									<username>${db.auth.user}</username>
 									<password>${db.auth.pass}</password>
 									<liquibase.logging>debug</liquibase.logging>
 									<verbose>true</verbose>
 									<promptOnNonLocalDatabase>false</promptOnNonLocalDatabase>
+									<contexts>test</contexts>
 									<expressionVars>
 										<property>
 											<name>db.auth.schemaname</name>
@@ -194,6 +194,7 @@
 									<url>${db.url}</url>
 									<username>${db.username}</username>
 									<password>${db.password}</password>
+									<contexts>oracle</contexts>
 									<expressionVars>
 										<property>
 											<name>db.auth.schemaname</name>
@@ -325,6 +326,7 @@
 									<liquibase.logging>debug</liquibase.logging>
 									<verbose>true</verbose>
 									<promptOnNonLocalDatabase>false</promptOnNonLocalDatabase>
+									<contexts>test</contexts>
 									<expressionVars>
 										<property>
 											<name>db.auth.schemaname</name>
