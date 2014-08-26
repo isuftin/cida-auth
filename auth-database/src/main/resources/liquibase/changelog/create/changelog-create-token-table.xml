@@ -67,7 +67,7 @@
 			tableName="AUTH_TOKEN"/>
 	</changeSet>
 	
-	<changeSet author="${runasusername}" id="add-oracle-autonumber-trigger" context="oracle">
+	<changeSet author="${runasusername}" id="add-oracle-autonumber-trigger">
 		<preConditions  onFail="CONTINUE">
 			<dbms type="oracle" />
 		</preConditions>
