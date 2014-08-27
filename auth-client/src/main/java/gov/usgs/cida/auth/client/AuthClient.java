@@ -2,6 +2,7 @@ package gov.usgs.cida.auth.client;
 
 import gov.usgs.cida.auth.model.AuthToken;
 import gov.usgs.cida.auth.service.ServicePaths;
+import gov.usgs.cida.auth.util.JNDISingleton;
 import java.net.URI;
 import java.net.URISyntaxException;
 import java.text.MessageFormat;
@@ -23,8 +24,9 @@ import org.slf4j.LoggerFactory;
  * @author thongsav
  */
 public class AuthClient implements IAuthClient {
-
+	
 	private static final Logger LOG = LoggerFactory.getLogger(AuthClient.class);
+	private static final boolean isDevelopment = Boolean.parseBoolean(JNDISingleton.getInstance().getProperty("development", "false"));
 	final URI authEndpointUri;
 
 	/**
@@ -51,7 +53,7 @@ public class AuthClient implements IAuthClient {
 	 */
 	@Override
 	public AuthToken getNewToken(String username, String password) {
-		Client client = ClientBuilder.newClient();
+		Client client = createNewClient();
 		AuthToken result = null;
 		Form form = new Form();
 		form.param("username", username);
@@ -60,7 +62,7 @@ public class AuthClient implements IAuthClient {
 				path(ServicePaths.AUTHENTICATION).
 				path(ServicePaths.AD).
 				path(ServicePaths.TOKEN);
-		
+
 		try {
 			Entity<Form> postEntity = Entity.entity(form, MediaType.APPLICATION_FORM_URLENCODED_TYPE);
 			result = target.
@@ -80,7 +82,7 @@ public class AuthClient implements IAuthClient {
 	 * {@inheritDoc}
 	 */
 	public AuthToken getToken(String tokenId) {
-		Client client = ClientBuilder.newClient();
+		Client client = createNewClient();
 		AuthToken result = null;
 		WebTarget target = client.target(this.authEndpointUri).
 				path(ServicePaths.TOKEN).
@@ -103,8 +105,8 @@ public class AuthClient implements IAuthClient {
 	 */
 	public boolean invalidateToken(String tokenId) {
 		boolean deleted = false;
-		
-		Client client = ClientBuilder.newClient();
+
+		Client client = createNewClient();
 		WebTarget target = client.target(this.authEndpointUri).
 				path(ServicePaths.TOKEN).
 				path(tokenId);
@@ -113,11 +115,11 @@ public class AuthClient implements IAuthClient {
 			Response response = target.request(MediaType.APPLICATION_JSON_TYPE).delete();
 			int statusCode = response.getStatus();
 			if (statusCode == 200) {
-					LOG.info("Invalidated token {}", tokenId);
-					deleted = true;
-				} else {
-					LOG.info("Could not invalidate token {}. Error Code: {}, Reason: {}", tokenId, statusCode, response.getStatusInfo().getReasonPhrase());
-				}
+				LOG.info("Invalidated token {}", tokenId);
+				deleted = true;
+			} else {
+				LOG.info("Could not invalidate token {}. Error Code: {}, Reason: {}", tokenId, statusCode, response.getStatusInfo().getReasonPhrase());
+			}
 		} catch (ClientErrorException ex) {
 			LOG.info(String.format("An error occurred while trying to delete token %s", tokenId), ex);
 		} finally {
@@ -185,6 +187,25 @@ public class AuthClient implements IAuthClient {
 			}
 		} catch (Exception ex) {
 			LOG.debug("Client couldn't be closed", ex);
+		}
+	}
+	
+	/**
+	 * If in a development environment, will try to create a relaxed client that 
+	 * will not check self-signed SSL certificate validation. 
+	 * 
+	 * Otherwise, a regular, signature checking client is created.
+	 * 
+	 * If any errors are encountered during the creation of the relaxed client,
+	 * a regular client is created.
+	 * 
+	 * @return 
+	 */
+	private Client createNewClient() {
+		if (isDevelopment) {
+			return SSLTool.getRelaxedSSLClient();
+		} else {
+			return ClientBuilder.newClient();
 		}
 	}
 
