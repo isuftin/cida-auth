@@ -85,6 +85,14 @@
 		WHERE TOKEN_ID = #{id}
     </delete>
 	
+	<delete 
+		id="deleteExpiredTokens" 
+		flushCache="true"
+		statementType="PREPARED">
+		DELETE FROM AUTH_TOKEN
+		WHERE EXPIRES &gt; CURRENT_TIMESTAMP
+	</delete>
+	
 	<insert
 		id="insertToken"
 		flushCache="true"

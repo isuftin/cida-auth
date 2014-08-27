@@ -84,7 +84,20 @@ public class AuthTokenDAO {
 		}
 		return result;
 	}
-
+	
+	/**
+	 * 
+	 * @return 
+	 */
+	public int deleteExpiredTokens() {
+		int result;
+		try (SqlSession session = sqlSessionFactory.openSession()) {
+			result = session.delete(TOKEN_MAPPER_PACKAGE + ".deleteExpiredTokens");
+			session.commit();
+		}
+		return result;
+	}
+ 
 	/**
 	 * Inserts an AuthToken
 	 *
