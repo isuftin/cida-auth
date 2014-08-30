@@ -2,4 +2,8 @@
 <web-app version="2.5" xmlns="http://java.sun.com/xml/ns/javaee" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://java.sun.com/xml/ns/javaee http://java.sun.com/xml/ns/javaee/web-app_2_5.xsd">
 	<description>CIDA Auth Webervices</description>
 	<display-name>CIDA Auth Webervices</display-name>
+	<listener>
+        <description>TokenSweeper</description>
+        <listener-class>gov.usgs.cida.auth.service.TokenSweeper</listener-class>
+    </listener>
 </web-app>
