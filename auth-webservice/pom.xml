@@ -78,4 +78,44 @@
 		</dependency>
 	</dependencies>
 	
+	<build>
+		<plugins>
+			<plugin> <!-- This creates a version file in root with the pom version -->
+				<groupId>org.apache.maven.plugins</groupId>
+				<artifactId>maven-antrun-plugin</artifactId>
+				<version>1.7</version>
+				<executions>
+					<execution>
+						<id>generate-version-file</id>
+						<phase>compile</phase>
+						<goals>
+							<goal>run</goal>
+						</goals>
+						<configuration>
+							<tasks>
+								<propertyfile file="${basedir}/target/version" comment="Version information">
+									<entry key="version" value="${project.version}" />
+								</propertyfile>
+							</tasks>
+						</configuration>
+					</execution>
+				</executions> 
+			</plugin>
+			<plugin>
+				<groupId>org.apache.maven.plugins</groupId>
+				<artifactId>maven-war-plugin</artifactId>
+				<configuration>
+					<webResources>
+						<resource>
+							<directory>${basedir}/target</directory>
+							<includes>
+								<include>version</include>
+							</includes>
+						</resource>
+					</webResources>
+				</configuration>
+			</plugin>
+		</plugins>
+	</build>
+	
 </project>
