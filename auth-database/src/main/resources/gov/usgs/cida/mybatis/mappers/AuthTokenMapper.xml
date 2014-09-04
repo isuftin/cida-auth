@@ -90,7 +90,7 @@
 		flushCache="true"
 		statementType="PREPARED">
 		DELETE FROM AUTH_TOKEN
-		WHERE EXPIRES &gt; CURRENT_TIMESTAMP
+		WHERE EXPIRES &lt; CURRENT_TIMESTAMP
 	</delete>
 	
 	<insert
