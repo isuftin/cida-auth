@@ -19,15 +19,8 @@
 		<version>1.0.1-SNAPSHOT</version>
 	</parent>
 
-	<properties>
-		<syncope.version xmlns="">1.1.8</syncope.version>
-		<secretKey>cida-syncope</secretKey>
-	</properties>
-
 	<name>CIDA/Oracle build of Apache Syncope</name>
-	<groupId>gov.usgs.cida.auth</groupId>
 	<artifactId>auth-manager</artifactId>
-	<version>1.0.1-SNAPSHOT</version>
 	<packaging>pom</packaging>
 
 	<dependencyManagement>

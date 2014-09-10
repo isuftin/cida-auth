@@ -94,7 +94,7 @@
 							<artifactId>syncope-console</artifactId>
 						</overlay>
 					</overlays>
-					<failOnMissingWebXml>false</failOnMissingWebXml>
+					<failOnMissingWebXml>true</failOnMissingWebXml>
 				</configuration>
 			</plugin>
 		</plugins>
