@@ -18,7 +18,7 @@ hs_err_pid*
 *.settings
 *.project
 *.classpath
-**/target
+target/
 /auth-webservice/src/main/webapp/META-INF/context.xml
 /auth-client/mockserver_request.log
 /auth-client/mockserver.log
