@@ -18,12 +18,14 @@ hs_err_pid*
 /cida-auth-webservice/nb-configuration.xml
 /cida-auth-commons/target/
 /auth-client/target/
-.settings
-.project
-.classpath
+**/.settings
+**/.project
+**/.classpath
+**/target
 /auth-webservice/src/main/webapp/META-INF/context.xml
 /auth-client/mockserver_request.log
 /auth-client/mockserver.log
 /auth-client/catalina.base_IS_UNDEFINED/
 /auth-database/catalina.base_IS_UNDEFINED/
 /auth-webservice/nb-configuration.xml
+
