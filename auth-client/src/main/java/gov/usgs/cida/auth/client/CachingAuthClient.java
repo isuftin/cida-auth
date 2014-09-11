@@ -82,10 +82,9 @@ public class CachingAuthClient extends AuthClient {
 	 * {@inheritDoc}
 	 */
 	public List<String> getRolesByToken(String tokenId) {
-		List<String> roles = null;
+		List<String> roles = rolesCache.get(tokenId);
 		
 		if(isValidToken(tokenId)) {
-			roles = rolesCache.get(tokenId);
 		
 			if (roles == null) {
 				LOG.trace("Token {} not found in roles cache. Will try to pull from server.", tokenId);
@@ -94,7 +93,8 @@ public class CachingAuthClient extends AuthClient {
 					rolesCache.put(tokenId, roles);
 				}
 			}
-		} else if(rolesCache.containsKey(tokenId)){ //make sure no cache item exists for this invalid token
+		} else if(roles != null){ //this is the case of roles found in cache for invalid token
+			roles = null;
 			rolesCache.remove(tokenId);
 		}
 		
