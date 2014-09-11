@@ -136,4 +136,29 @@
 		WHERE 
 			TOKEN_ID = #{tokenId}
 	</update>
+	
+	<!-- TODO This may be temporary, using join on syncope table structure. May want to abstract the DB
+	structure away by using the Syncope REST API. Make that change up in DAO also if so. -->
+	<select 
+		id="getRolesByToken"
+		parameterType="String"
+		flushCache="true"
+		statementType="PREPARED"
+		resultType="String">
+			select
+			  name 
+			from syncoperole 
+			where syncoperole.id in (
+			  select syncoperole_id 
+			  from membership 
+			  where 
+			    syncopeuser_id in (
+			      SELECT 
+			        syncopeuser.id
+			      FROM auth_token
+			      LEFT JOIN syncopeuser ON auth_token.username = syncopeuser.username
+			      where auth_token.token_id = #{tokenId}
+			    )
+			)
+	</select>
 </mapper>

@@ -54,6 +54,20 @@ public class AuthTokenDAO {
 		}
 		return result;
 	}
+	
+	/**
+	 * Retrieves a list of role names associated with a token.
+	 *
+	 * @param tokenId
+	 * @return token created and inserted into database
+	 */
+	public List<String> getRolesByToken(String tokenId) {
+		List<String> results;
+		try (SqlSession session = sqlSessionFactory.openSession()) {
+			results = session.selectList(TOKEN_MAPPER_PACKAGE + ".getRolesByToken", tokenId);
+		}
+		return results;
+	}
 
 	/**
 	 * Gets all tokens that have passed their expiration date

@@ -2,6 +2,8 @@ package gov.usgs.cida.auth.webservice.token;
 
 import gov.usgs.cida.auth.dao.AuthTokenDAO;
 import gov.usgs.cida.auth.model.AuthToken;
+import gov.usgs.cida.auth.service.ServicePaths;
+
 import javax.ws.rs.DELETE;
 import javax.ws.rs.DefaultValue;
 import javax.ws.rs.GET;
@@ -11,9 +13,12 @@ import javax.ws.rs.PathParam;
 import javax.ws.rs.Produces;
 import javax.ws.rs.core.MediaType;
 import javax.ws.rs.core.Response;
+
 import org.apache.commons.lang3.StringUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+
+import com.google.gson.Gson;
 
 /**
  *
@@ -35,6 +40,19 @@ public class TokenService {
 	public Response getToken(@PathParam("tokenId") @DefaultValue("") String tokenId) {
 		LOG.trace("Attempting to retrieve token by id '{}'", tokenId);
 		return getTokenResponse(tokenId);
+	}
+	
+	/**
+	 *
+	 * @param tokenId
+	 * @return
+	 */
+	@GET
+	@Path("{tokenId}/" + ServicePaths.ROLES)
+	@Produces(MediaType.APPLICATION_JSON)
+	public Response getRolesByToken(@PathParam("tokenId") @DefaultValue("") String tokenId) {
+		LOG.trace("Attempting to retrieve roles for token '{}'", tokenId);
+		return Response.ok(new Gson().toJson(new AuthTokenDAO().getRolesByToken(tokenId)), MediaType.APPLICATION_JSON_TYPE).build();
 	}
 	
 	@DELETE

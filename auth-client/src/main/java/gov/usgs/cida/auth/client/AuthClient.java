@@ -3,9 +3,12 @@ package gov.usgs.cida.auth.client;
 import gov.usgs.cida.auth.model.AuthToken;
 import gov.usgs.cida.auth.service.ServicePaths;
 import gov.usgs.cida.auth.util.JNDISingleton;
+
 import java.net.URI;
 import java.net.URISyntaxException;
 import java.text.MessageFormat;
+import java.util.List;
+
 import javax.ws.rs.ClientErrorException;
 import javax.ws.rs.client.Client;
 import javax.ws.rs.client.ClientBuilder;
@@ -14,9 +17,13 @@ import javax.ws.rs.client.WebTarget;
 import javax.ws.rs.core.Form;
 import javax.ws.rs.core.MediaType;
 import javax.ws.rs.core.Response;
+
 import org.apache.commons.lang3.StringUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+
+import com.google.gson.Gson;
+import com.google.gson.reflect.TypeToken;
 
 /**
  * {@inheritDoc}
@@ -92,6 +99,30 @@ public class AuthClient implements IAuthClient {
 			result = target.request(MediaType.APPLICATION_JSON_TYPE).get(AuthToken.class);
 		} catch (ClientErrorException ex) {
 			LOG.info(MessageFormat.format("An error occurred while trying to get token {0}", tokenId), ex);
+		} finally {
+			closeClientQuietly(client);
+		}
+
+		return result;
+	}
+	
+	@Override
+	/**
+	 * {@inheritDoc}
+	 */
+	public List<String> getRolesByToken(String tokenId) {
+		Client client = createNewClient();
+		List<String> result = null;
+		WebTarget target = client.target(this.authEndpointUri).
+				path(ServicePaths.TOKEN).
+				path(tokenId).
+				path(ServicePaths.ROLES);
+
+		try {
+			String response = target.request(MediaType.APPLICATION_JSON_TYPE).get(String.class);
+			result = new Gson().fromJson(response, new TypeToken<List<String>>(){}.getType());
+		} catch (ClientErrorException ex) {
+			LOG.info(MessageFormat.format("An error occurred while trying get roles for token {0}", tokenId), ex);
 		} finally {
 			closeClientQuietly(client);
 		}
