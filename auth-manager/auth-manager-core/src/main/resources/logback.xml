@@ -20,10 +20,10 @@
         </timeBasedFileNamingAndTriggeringPolicy>
 
     </appender>
-    <root level="DEBUG">
+    <root level="ERROR">
         <appender-ref ref="stdout"/>
         <appender-ref ref="file"/>
     </root>
     
-    <logger name="org.apache.http.wire" level="DEBUG" />
+    <logger name="org.apache.http.wire" level="ERROR" />
 </configuration>
