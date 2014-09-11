@@ -1,9 +1,12 @@
 package gov.usgs.cida.auth.client;
 
 import gov.usgs.cida.auth.model.AuthToken;
+
 import java.net.URISyntaxException;
+import java.util.List;
 import java.util.Map;
 import java.util.concurrent.ConcurrentHashMap;
+
 import org.apache.commons.lang3.StringUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -18,6 +21,7 @@ public class CachingAuthClient extends AuthClient {
 
 	private static final Logger LOG = LoggerFactory.getLogger(CachingAuthClient.class);
 	private static final Map<String, AuthToken> tokenCache = new ConcurrentHashMap<>();
+	private static final Map<String, List<String>> rolesCache = new ConcurrentHashMap<>();
 
 	public CachingAuthClient(String authEndpoint) throws URISyntaxException {
 		super(authEndpoint);
@@ -71,6 +75,30 @@ public class CachingAuthClient extends AuthClient {
 		}
 
 		return token;
+	}
+	
+	@Override
+	/**
+	 * {@inheritDoc}
+	 */
+	public List<String> getRolesByToken(String tokenId) {
+		List<String> roles = rolesCache.get(tokenId);
+		
+		if(isValidToken(tokenId)) {
+		
+			if (roles == null) {
+				LOG.trace("Token {} not found in roles cache. Will try to pull from server.", tokenId);
+				roles = super.getRolesByToken(tokenId);
+				if(roles != null) {
+					rolesCache.put(tokenId, roles);
+				}
+			}
+		} else if(roles != null){ //this is the case of roles found in cache for invalid token
+			roles = null;
+			rolesCache.remove(tokenId);
+		}
+		
+		return roles;
 	}
 
 	@Override

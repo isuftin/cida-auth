@@ -1,5 +1,7 @@
 package gov.usgs.cida.auth.client;
 
+import java.util.List;
+
 import gov.usgs.cida.auth.model.AuthToken;
 
 /**
@@ -23,6 +25,13 @@ public interface IAuthClient {
 	 * @return 
 	 */
 	public AuthToken getToken(String tokenId);
+	
+	/**
+	 * Returns a list of role for a given token
+	 * @param tokenId
+	 * @return 
+	 */
+	public List<String> getRolesByToken(String tokenId);
 	
 	/**
 	 * Checks to see if a token is currently valid.
