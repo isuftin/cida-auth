@@ -1,7 +1,7 @@
 package gov.usgs.cida.auth.ws.rs.filter;
 
 import gov.usgs.cida.auth.client.IAuthClient;
-import gov.usgs.cida.auth.utils.HttpTokenUtils;
+import gov.usgs.cida.auth.ws.rs.service.SecurityContextUtils;
 
 import java.io.IOException;
 import java.util.List;
@@ -53,8 +53,8 @@ public abstract class AbstractTokenBasedSecurityFilter implements ContainerReque
     	//if root documentation or authenticate url, continue on without authorization
     	String requestedUri = requestContext.getUriInfo().getPath();
     	if(!getUnsecuredUris().contains(requestedUri)) {
-	        if (!HttpTokenUtils.isSessionAuthorizedForRoles(requestContext, httpRequest, getAuthorizedRoles())
-	        		&& !HttpTokenUtils.isTokenAuthorized(requestContext, httpRequest, getAuthClient(), getAdditionalRoles())) {
+	        if (!SecurityContextUtils.isSessionOrSecurityContextAuthorizedForRoles(requestContext, httpRequest, getAuthorizedRoles())
+	        		&& !SecurityContextUtils.isTokenAuthorized(requestContext, httpRequest, getAuthClient(), getAdditionalRoles())) {
 	        	blockUnauthorizedRequest(requestContext);
 	        }
     	}

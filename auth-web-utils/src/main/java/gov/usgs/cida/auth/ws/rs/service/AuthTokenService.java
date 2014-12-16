@@ -38,7 +38,7 @@ public class AuthTokenService {
 
 		if (token != null && !tokenId.trim().equals("")) {
 			response = Response.ok(token.toJSON(), MediaType.APPLICATION_JSON_TYPE).build();
-			HttpTokenUtils.populateSecurityContext(requestContext, client, tokenId, additionalRolesGranted);
+			SecurityContextUtils.populateSecurityContext(requestContext, httpRequest, client, tokenId, additionalRolesGranted);
 			HttpTokenUtils.saveTokenToSession(httpRequest, tokenId);
 		} else {
 			LOG.warn("Failed to authenticate " + username);
@@ -53,7 +53,6 @@ public class AuthTokenService {
 		boolean invalidated = client.invalidateToken(token);
 		requestContext.setSecurityContext(null);
 		httpRequest.getSession().invalidate();
-		
 		return Response.ok("{ \"status\": \"" + (invalidated ? "success" : "failed") + "\"}", MediaType.APPLICATION_JSON_TYPE).build();
 	}
 }

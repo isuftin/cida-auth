@@ -1,30 +1,15 @@
 package gov.usgs.cida.auth.utils;
 
 import gov.usgs.cida.auth.client.IAuthClient;
-import gov.usgs.cida.auth.ws.rs.AuthSecurityContext;
 
 import java.util.List;
 
 import javax.servlet.http.HttpServletRequest;
-import javax.ws.rs.container.ContainerRequestContext;
-import javax.ws.rs.core.MultivaluedMap;
-import javax.ws.rs.core.SecurityContext;
 
 public class HttpTokenUtils {
 	public static final String AUTHORIZED_TOKEN_SESSION_ATTRIBUTE = "AuthorizedToken";
 	public static final String AUTH_BEARER_STRING = "Bearer";
 	public static final String AUTHORIZATION_HEADER = "Authorization";
-
-    public static String getTokenIdFromRequestContext(ContainerRequestContext requestContext) {
-    	String authHeader = null;
-    	MultivaluedMap<String,String> headers = requestContext.getHeaders();
-    	List<String> authHeaderEntries = headers.get(AUTHORIZATION_HEADER);
-    	if(authHeaderEntries != null && authHeaderEntries.size() > 0) {
-    		authHeader = authHeaderEntries.get(0);
-    	}
-    	
-    	return getTokenFromHeader(authHeader);
-    }
     
 	/**
 	 * Pulls token in the "Authorization" HTTP header. The token
@@ -49,70 +34,37 @@ public class HttpTokenUtils {
 	
 	
 	/**
-	 * Will check a ContainerRequestContext and/or HttpServletRequest against a given role. If the session 
-	 * is authorized, will save the token into the http session and return true.
-	 * @param requestContext
+	 * Will check a HttpServletRequest to see if a session attribute was set for an authorized token.
 	 * @param httpRequest
-	 * @param roles list of roles that token is to be checked against
-	 * @return returns true if the token has one of hte roles
+	 * @return returns true if the session has had the attribute previously set
 	 */
-    public static boolean isSessionAuthorizedForRoles(ContainerRequestContext requestContext, HttpServletRequest httpRequest, List<String> roles) {
+    public static boolean isSessionPreauthorized(HttpServletRequest httpRequest) {
     	boolean authenticated = false;
-        final SecurityContext securityContext =
-                    requestContext.getSecurityContext();
-        
-        if (securityContext != null) {
-        	for(String r : roles) {
-        		if(securityContext.isUserInRole(r)) {
-        			authenticated = true;
-        		}
-        	}
-        }
         
         if(httpRequest.getSession().getAttribute(AUTHORIZED_TOKEN_SESSION_ATTRIBUTE) != null) {
         	authenticated = true;
-        }
-        
-        if(authenticated) {
-        	saveTokenToSession(httpRequest, (String) httpRequest.getSession().getAttribute(AUTHORIZED_TOKEN_SESSION_ATTRIBUTE));
         }
         
         return authenticated;
     }
     
     /**
-     * Will check the token attatched to the request context. If it is good, the security context will
-     * be updated with the allowed roles, and true will be returned.
-     * @param requestContext
+     * Will check the token in the Authorization header of the request, returns true if its valid. Will also save the header to the session if authorized.
      * @param httpRequest
      * @param client
      * @param additionalRoles if token is valid, these are additional roles to add to the security context
      * @return
      */
-    public static boolean isTokenAuthorized(ContainerRequestContext requestContext, HttpServletRequest httpRequest, IAuthClient client, List<String> additionalRoles) {
+    public static boolean isTokenInHeaderAuthorized(HttpServletRequest httpRequest, IAuthClient client, List<String> additionalRoles) {
     	boolean authenticated = false;
-    	
-    	String tokenId = getTokenIdFromRequestContext(requestContext);
+    	String tokenId = HttpTokenUtils.getTokenFromHeader(httpRequest.getHeader(AUTHORIZATION_HEADER));
     	authenticated = client.isValidToken(tokenId);
     	
-    	if(authenticated) {//token is good, update browser session if possible
-    		populateSecurityContext(requestContext, client, tokenId, additionalRoles);
+    	if(authenticated) {
+    		saveTokenToSession(httpRequest, tokenId);
     	}
+    	
     	return authenticated;
-    }
-    
-    /**
-     * Will load the roles for the given token, append the given additional roles, and save that to the SecurityContext.
-     */
-    public static void populateSecurityContext(ContainerRequestContext requestContext, IAuthClient client, String tokenId, List<String> additionalRoles) {
-		List<String> roles = client.getRolesByToken(tokenId);
-		if(additionalRoles != null) {
-			roles.addAll(additionalRoles);
-		}
-		
-		//set security context with role
-		requestContext.setSecurityContext(
-				new AuthSecurityContext(tokenId, roles));
     }
     
     public static void saveTokenToSession(HttpServletRequest httpRequest, String tokenId) {
