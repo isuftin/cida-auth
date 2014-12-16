@@ -7,6 +7,9 @@ import gov.usgs.cida.auth.model.AuthToken;
 /**
  * Provides methods which abstract the function of a cida-auth-webservice endpoint.
  * 
+ * {@link AuthClient}
+ * {@link CachingAuthClient}
+ * 
  * @author thongsav
  */
 public interface IAuthClient {
