@@ -52,7 +52,8 @@ public abstract class AbstractTokenBasedSecurityFilter implements ContainerReque
     public void filter(ContainerRequestContext requestContext) throws IOException {
     	//if root documentation or authenticate url, continue on without authorization
     	String requestedUri = requestContext.getUriInfo().getPath();
-    	if(!getUnsecuredUris().contains(requestedUri)) {
+    	List<String> allowedUris = getUnsecuredUris();
+    	if(allowedUris == null || !allowedUris.contains(requestedUri)) {
 	        if (!SecurityContextUtils.isSessionOrSecurityContextAuthorizedForRoles(requestContext, httpRequest, getAuthorizedRoles())
 	        		&& !SecurityContextUtils.isTokenAuthorized(requestContext, httpRequest, getAuthClient(), getAdditionalRoles())) {
 	        	blockUnauthorizedRequest(requestContext);
