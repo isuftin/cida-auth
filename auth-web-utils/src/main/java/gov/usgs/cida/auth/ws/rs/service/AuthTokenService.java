@@ -11,6 +11,7 @@ import javax.ws.rs.container.ContainerRequestContext;
 import javax.ws.rs.core.MediaType;
 import javax.ws.rs.core.Response;
 
+import org.apache.commons.lang3.StringUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -36,7 +37,7 @@ public class AuthTokenService {
 
 		String tokenId = token.getTokenId();
 
-		if (token != null && !tokenId.trim().equals("")) {
+		if (StringUtils.isNotBlank(tokenId)) {
 			response = Response.ok(token.toJSON(), MediaType.APPLICATION_JSON_TYPE).build();
 			SecurityContextUtils.populateSecurityContext(requestContext, httpRequest, client, tokenId, additionalRolesGranted);
 			HttpTokenUtils.saveTokenToSession(httpRequest, tokenId);
