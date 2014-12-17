@@ -62,7 +62,7 @@ public abstract class AbstractTokenBasedSecurityFilter implements ContainerReque
     }
     
     private void blockUnauthorizedRequest(ContainerRequestContext requestContext) {
-    	LOG.debug("Authentication failed");
+    	LOG.debug("blocking unauthorized request");
     	requestContext.abortWith(Response
 	            .status(Response.Status.UNAUTHORIZED)
 	            .entity("User cannot access the resource.")
