@@ -15,10 +15,10 @@ import org.slf4j.LoggerFactory;
 public class AuthClientSingleton {
 	private static final Logger LOG = LoggerFactory.getLogger(AuthClientSingleton.class);
 	public static final String AUTH_SERVICE_JNDI_NAME = "cida.auth.service.endpoint";
-	public static final String AUTHORIZATION_HEADER = "Authorization";
 	
 	private static IAuthClient authClient;
-	static {
+
+	public static void initAuthClient(Class<? extends IAuthClient> authClientType) {
 		String authUrl;
 		try {
 			Context ctx = new InitialContext();
@@ -29,13 +29,22 @@ public class AuthClientSingleton {
 		}
 		try {
 			LOG.info("Authentication/Authorization service: " + authUrl);
-			authClient = new AuthClient(authUrl);
+			if(authClientType.equals(AuthClient.class)) {
+				authClient = new AuthClient(authUrl);
+			} else if(authClientType.equals(CachingAuthClient.class)) {
+				authClient = new CachingAuthClient(authUrl);
+			} else {
+				LOG.warn("Unknown IAuthClient type");
+			}
 		} catch (URISyntaxException e) {
 			LOG.error("Failed to initialize authorization client", e);
 		}
 	}
 	
 	public static IAuthClient getAuthClient() {
+		if(authClient == null) {
+			throw new IllegalStateException("IAuthClient has not been initialized.");
+		}
 		return authClient;
 	}
 }
