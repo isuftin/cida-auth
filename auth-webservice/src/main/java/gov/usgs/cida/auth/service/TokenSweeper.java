@@ -1,7 +1,6 @@
 package gov.usgs.cida.auth.service;
 
 import gov.usgs.cida.auth.dao.AuthTokenDAO;
-import gov.usgs.cida.auth.service.authentication.LDAPService;
 import java.util.Timer;
 import java.util.TimerTask;
 import javax.servlet.ServletContextEvent;

@@ -1,8 +1,5 @@
 package gov.usgs.cida.auth.client;
 
-import gov.usgs.cida.auth.client.AuthClient;
-import gov.usgs.cida.auth.client.IAuthClient;
-
 import java.net.URISyntaxException;
 
 import javax.naming.Context;
