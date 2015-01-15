@@ -2,7 +2,6 @@ package gov.usgs.cida.auth.util;
 
 import java.io.IOException;
 import java.io.InputStream;
-import liquibase.util.StreamUtil;
 import org.apache.commons.io.IOUtils;
 import org.apache.ibatis.io.Resources;
 import org.apache.ibatis.session.SqlSessionFactory;
