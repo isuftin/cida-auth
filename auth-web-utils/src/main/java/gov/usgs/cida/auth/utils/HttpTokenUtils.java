@@ -31,6 +31,21 @@ public class HttpTokenUtils {
 
 		return token;
 	}
+	
+	/**
+	 * Given a HttpServletRequest, will look for the auth token in the header first, then check the session
+	 * for a preauthorized token (usually put in place my an authorization filter before the request).
+	 * 
+	 * @param req
+	 * @return the auth token used to previously this request.
+	 */
+	public static String getTokenFromRequest(final HttpServletRequest req) {
+		String authToken = HttpTokenUtils.getTokenFromHeader(req.getHeader(HttpTokenUtils.AUTHORIZATION_HEADER));
+		if(authToken == null) {
+			authToken = (String) req.getSession().getAttribute(HttpTokenUtils.AUTHORIZED_TOKEN_SESSION_ATTRIBUTE);
+		}
+		return authToken;
+	}
 
 
 	/**
