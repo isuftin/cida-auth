@@ -25,7 +25,6 @@
 		<dependency>
 			<groupId>org.glassfish.jersey.media</groupId>
 			<artifactId>jersey-media-moxy</artifactId>
-			<scope>test</scope>
 		</dependency>
 		
 		<!-- Logging -->
