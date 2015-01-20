@@ -7,6 +7,7 @@ import gov.usgs.cida.auth.utils.HttpTokenUtils;
 import java.util.List;
 
 import javax.servlet.http.HttpServletRequest;
+import javax.ws.rs.NotAuthorizedException;
 import javax.ws.rs.container.ContainerRequestContext;
 import javax.ws.rs.core.MediaType;
 import javax.ws.rs.core.Response;
@@ -31,9 +32,15 @@ public class AuthTokenService {
 			String password, 
 			ContainerRequestContext requestContext, 
 			HttpServletRequest httpRequest) {
-		AuthToken token = client.getNewToken(username, password);
-
+		
+		AuthToken token = null;
 		Response response;
+		
+		try {
+			token = client.getNewToken(username, password);
+		} catch(NotAuthorizedException ex) {
+			response = Response.status(Response.Status.UNAUTHORIZED).build();
+		}
 
 		String tokenId = token.getTokenId();
 
