@@ -10,6 +10,7 @@ import java.text.MessageFormat;
 import java.util.List;
 
 import javax.ws.rs.ClientErrorException;
+import javax.ws.rs.NotAuthorizedException;
 import javax.ws.rs.client.Client;
 import javax.ws.rs.client.ClientBuilder;
 import javax.ws.rs.client.Entity;
@@ -77,6 +78,10 @@ public class AuthClient implements IAuthClient {
 					post(postEntity, AuthToken.class);
 		} catch (ClientErrorException ex) {
 			LOG.info("User {} could not authenticate. Error Code: {}, Reason: {}", username, ex.getResponse().getStatus(), ex.getResponse().getStatusInfo().getReasonPhrase());
+			if(ex.getResponse().getStatus() == Response.Status.FORBIDDEN.getStatusCode() || 
+					ex.getResponse().getStatus() == Response.Status.UNAUTHORIZED.getStatusCode()) {
+				throw new NotAuthorizedException(ex.getResponse());
+			}
 		} finally {
 			closeClientQuietly(client);
 		}
