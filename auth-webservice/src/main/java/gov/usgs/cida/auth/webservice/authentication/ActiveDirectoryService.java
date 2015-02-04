@@ -3,7 +3,9 @@ package gov.usgs.cida.auth.webservice.authentication;
 import gov.usgs.cida.auth.dao.AuthTokenDAO;
 import gov.usgs.cida.auth.model.AuthToken;
 import gov.usgs.cida.auth.model.User;
+import gov.usgs.cida.auth.service.ServicePaths;
 import gov.usgs.cida.auth.service.authentication.LDAPService;
+
 import javax.naming.NamingException;
 import javax.ws.rs.Consumes;
 import javax.ws.rs.DefaultValue;
@@ -13,16 +15,17 @@ import javax.ws.rs.Path;
 import javax.ws.rs.Produces;
 import javax.ws.rs.core.MediaType;
 import javax.ws.rs.core.Response;
+
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-@Path("ad")
+@Path(ServicePaths.AD)
 public class ActiveDirectoryService {
 
 	private final static Logger LOG = LoggerFactory.getLogger(ActiveDirectoryService.class);
 
 	@POST
-	@Path("/token")
+	@Path(ServicePaths.TOKEN)
 	@Consumes(MediaType.APPLICATION_FORM_URLENCODED)
 	@Produces(MediaType.APPLICATION_JSON)
 	public Response doAuth(

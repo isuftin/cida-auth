@@ -18,6 +18,7 @@ import javax.ws.rs.client.WebTarget;
 import javax.ws.rs.core.Form;
 import javax.ws.rs.core.MediaType;
 import javax.ws.rs.core.Response;
+import javax.ws.rs.core.Response.Status;
 
 import org.apache.commons.lang3.StringUtils;
 import org.slf4j.Logger;
@@ -69,6 +70,39 @@ public class AuthClient implements IAuthClient {
 		WebTarget target = client.target(this.authEndpointUri).
 				path(ServicePaths.AUTHENTICATION).
 				path(ServicePaths.AD).
+				path(ServicePaths.TOKEN);
+
+		try {
+			Entity<Form> postEntity = Entity.entity(form, MediaType.APPLICATION_FORM_URLENCODED_TYPE);
+			result = target.
+					request(MediaType.APPLICATION_JSON_TYPE).
+					post(postEntity, AuthToken.class);
+		} catch (ClientErrorException ex) {
+			LOG.info("User {} could not authenticate. Error Code: {}, Reason: {}", username, ex.getResponse().getStatus(), ex.getResponse().getStatusInfo().getReasonPhrase());
+			if(ex.getResponse().getStatus() == Response.Status.FORBIDDEN.getStatusCode() || 
+					ex.getResponse().getStatus() == Response.Status.UNAUTHORIZED.getStatusCode()) {
+				throw new NotAuthorizedException(ex.getResponse());
+			}
+		} finally {
+			closeClientQuietly(client);
+		}
+
+		return result;
+	}
+
+	/**
+	 * {@inheritDoc}
+	 */
+	@Override
+	public AuthToken getCustomNewToken(String username, String password) {
+		Client client = createNewClient();
+		AuthToken result = null;
+		Form form = new Form();
+		form.param("username", username);
+		form.param("password", password);
+		WebTarget target = client.target(this.authEndpointUri).
+				path(ServicePaths.AUTHENTICATION).
+				path(ServicePaths.CUSTOM).
 				path(ServicePaths.TOKEN);
 
 		try {
@@ -150,7 +184,7 @@ public class AuthClient implements IAuthClient {
 		try {
 			Response response = target.request(MediaType.APPLICATION_JSON_TYPE).delete();
 			int statusCode = response.getStatus();
-			if (statusCode == 200) {
+			if (statusCode == Status.OK.getStatusCode()) {
 				LOG.info("Invalidated token {}", tokenId);
 				deleted = true;
 			} else {

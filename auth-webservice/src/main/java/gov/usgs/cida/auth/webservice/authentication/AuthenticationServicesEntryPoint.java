@@ -19,7 +19,7 @@ public class AuthenticationServicesEntryPoint extends Application {
 
 		// webservices
 		classes.add(ActiveDirectoryService.class);
-		classes.add(AlternativeAuthService.class);
+		classes.add(CustomAuthService.class);
 
 		return classes;
 	}

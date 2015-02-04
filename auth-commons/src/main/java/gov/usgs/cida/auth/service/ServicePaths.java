@@ -9,4 +9,5 @@ public class ServicePaths {
 	public final static String AUTHENTICATION = "auth";
 	public final static String AD = "ad";
 	public final static String ROLES = "roles";
+	public final static String CUSTOM = "custom";
 }

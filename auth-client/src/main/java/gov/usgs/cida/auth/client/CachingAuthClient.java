@@ -44,6 +44,19 @@ public class CachingAuthClient extends AuthClient {
 	/**
 	 * {@inheritDoc}
 	 */
+	public AuthToken getCustomNewToken(String username, String password) {
+		AuthToken token = super.getCustomNewToken(username, password);
+		if (token != null) {
+			tokenCache.put(token.getTokenId(), token);
+			LOG.trace("Added token {} to cache", token.getTokenId());
+		}
+		return token;
+	}
+
+	@Override
+	/**
+	 * {@inheritDoc}
+	 */
 	public AuthToken getToken(String tokenId) {
 		AuthToken token;
 		
