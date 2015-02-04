@@ -20,7 +20,7 @@
         </timeBasedFileNamingAndTriggeringPolicy>
 
     </appender>
-    <root level="DEBUG">
+    <root level="INFO">
         <appender-ref ref="stdout"/>
         <appender-ref ref="file"/>
     </root>
