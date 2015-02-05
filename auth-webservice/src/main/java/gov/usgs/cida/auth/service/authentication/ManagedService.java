@@ -19,29 +19,22 @@ import com.google.gson.JsonElement;
 import com.google.gson.JsonObject;
 import com.google.gson.JsonParser;
 
-public class CustomService {
+public class ManagedService {
 
-	private static final Logger LOG = LoggerFactory.getLogger(CustomService.class);
+	private static final Logger LOG = LoggerFactory.getLogger(ManagedService.class);
 	
 	// created for iplover crowd app, using DatatypeConveter.printBase64Binary
 	private static final String BASIC_AUTH = "BASIC aXBsb3ZlcjpkZ3h2eHZQRA==";
 	private static final String CROWD_BASE_URL = "https://my.usgs.gov/crowd/rest/usermanagement/latest";
 
-	private CustomService() {
+	private ManagedService() {
 		// Utility class, should not be instantiated
 	}
 
-	public static User authenticate(String username, String password) {
+	public static User authenticate(String username, char[] password) {
 		User user = new User();
 		user.setAuthenticated(false);
 		
-		LOG.debug("custom auth");
-		
-		String json = "{ \"value\" : \"" + password + "\" }";
-		JsonObject postData = new JsonParser().parse(json).getAsJsonObject();
-		
-		LOG.debug("post json = " + postData);
-
 		Client client = ClientBuilder.newClient();
 		WebTarget target = client.target(CROWD_BASE_URL).path("authentication");
 		
@@ -53,11 +46,10 @@ public class CustomService {
 				header("Authorization", BASIC_AUTH).
 				header("Content-Type", MediaType.APPLICATION_JSON);
 		
-		Response result = request.post(Entity.json(json));
-		
-		LOG.debug("basic auth = " + BASIC_AUTH);
-		LOG.debug("custom auth request result = " + result.getStatus());
+		Response result = request.post(Entity.json("{ \"value\" : \"" + password.toString() + "\" }"));
 		String resultText = result.readEntity(String.class);
+		
+		LOG.debug("custom auth request result = " + result.getStatus());
 		LOG.debug(resultText);
 		
 		if(Status.OK.getStatusCode() == result.getStatus()) {

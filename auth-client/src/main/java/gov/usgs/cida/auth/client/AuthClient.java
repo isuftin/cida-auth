@@ -90,39 +90,6 @@ public class AuthClient implements IAuthClient {
 		return result;
 	}
 
-	/**
-	 * {@inheritDoc}
-	 */
-	@Override
-	public AuthToken getCustomNewToken(String username, String password) {
-		Client client = createNewClient();
-		AuthToken result = null;
-		Form form = new Form();
-		form.param("username", username);
-		form.param("password", password);
-		WebTarget target = client.target(this.authEndpointUri).
-				path(ServicePaths.AUTHENTICATION).
-				path(ServicePaths.CUSTOM).
-				path(ServicePaths.TOKEN);
-
-		try {
-			Entity<Form> postEntity = Entity.entity(form, MediaType.APPLICATION_FORM_URLENCODED_TYPE);
-			result = target.
-					request(MediaType.APPLICATION_JSON_TYPE).
-					post(postEntity, AuthToken.class);
-		} catch (ClientErrorException ex) {
-			LOG.info("User {} could not authenticate. Error Code: {}, Reason: {}", username, ex.getResponse().getStatus(), ex.getResponse().getStatusInfo().getReasonPhrase());
-			if(ex.getResponse().getStatus() == Response.Status.FORBIDDEN.getStatusCode() || 
-					ex.getResponse().getStatus() == Response.Status.UNAUTHORIZED.getStatusCode()) {
-				throw new NotAuthorizedException(ex.getResponse());
-			}
-		} finally {
-			closeClientQuietly(client);
-		}
-
-		return result;
-	}
-
 	@Override
 	/**
 	 * {@inheritDoc}
@@ -250,7 +217,7 @@ public class AuthClient implements IAuthClient {
 		return isValid;
 	}
 
-	private void closeClientQuietly(Client client) {
+	protected void closeClientQuietly(Client client) {
 		try {
 			if (client != null) {
 				client.close();
@@ -271,7 +238,7 @@ public class AuthClient implements IAuthClient {
 	 * 
 	 * @return 
 	 */
-	private Client createNewClient() {
+	protected Client createNewClient() {
 		if (isDevelopment) {
 			return SSLTool.getRelaxedSSLClient();
 		} else {

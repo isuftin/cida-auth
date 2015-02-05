@@ -4,7 +4,7 @@ import gov.usgs.cida.auth.dao.AuthTokenDAO;
 import gov.usgs.cida.auth.model.AuthToken;
 import gov.usgs.cida.auth.model.User;
 import gov.usgs.cida.auth.service.ServicePaths;
-import gov.usgs.cida.auth.service.authentication.CustomService;
+import gov.usgs.cida.auth.service.authentication.ManagedService;
 
 import javax.naming.NamingException;
 import javax.ws.rs.Consumes;
@@ -19,10 +19,10 @@ import javax.ws.rs.core.Response;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-@Path(ServicePaths.CUSTOM)
-public class CustomAuthService {
+@Path(ServicePaths.MANAGED)
+public class ManagedAuthService {
 
-	private final static Logger LOG = LoggerFactory.getLogger(CustomAuthService.class);
+	private final static Logger LOG = LoggerFactory.getLogger(ManagedAuthService.class);
 
 	@POST
 	@Path(ServicePaths.TOKEN)
@@ -33,7 +33,7 @@ public class CustomAuthService {
 			@FormParam("password")
 			@DefaultValue("") String password) throws NamingException {
 		LOG.trace("User {} is attempting to authenticate", username);
-		return getResponse(username, password);
+		return getResponse(username, password.toCharArray());
 	}
 
 	/**
@@ -43,9 +43,9 @@ public class CustomAuthService {
 	 * @param password
 	 * @return
 	 */
-	protected Response getResponse(String username, String password) {
+	protected Response getResponse(String username, char[] password) {
 		Response response;
-		User user = CustomService.authenticate(username, password);
+		User user = ManagedService.authenticate(username, password);
 
 		if (user.isAuthenticated()) {
 			String name = user.getUsername();

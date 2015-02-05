@@ -23,14 +23,6 @@ public interface IAuthClient {
 	public AuthToken getNewToken(String username, String password);
 	
 	/**
-	 * Authenticates the username and password against a custom token service. 
-	 * @param username
-	 * @param password
-	 * @return AuthToken
-	 */
-	public AuthToken getCustomNewToken(String username, String password);
-
-	/**
 	 * Returns a token that has the provided ID
 	 * @param tokenId
 	 * @return 
