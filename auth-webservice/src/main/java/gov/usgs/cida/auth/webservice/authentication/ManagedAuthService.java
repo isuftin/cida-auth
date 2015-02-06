@@ -3,7 +3,8 @@ package gov.usgs.cida.auth.webservice.authentication;
 import gov.usgs.cida.auth.dao.AuthTokenDAO;
 import gov.usgs.cida.auth.model.AuthToken;
 import gov.usgs.cida.auth.model.User;
-import gov.usgs.cida.auth.service.authentication.AlternativeService;
+import gov.usgs.cida.auth.service.ServicePaths;
+import gov.usgs.cida.auth.service.authentication.ManagedService;
 
 import javax.naming.NamingException;
 import javax.ws.rs.Consumes;
@@ -18,13 +19,13 @@ import javax.ws.rs.core.Response;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-@Path("alt")
-public class AlternativeAuthService {
+@Path(ServicePaths.MANAGED)
+public class ManagedAuthService {
 
-	private final static Logger LOG = LoggerFactory.getLogger(AlternativeAuthService.class);
+	private final static Logger LOG = LoggerFactory.getLogger(ManagedAuthService.class);
 
 	@POST
-	@Path("/token")
+	@Path(ServicePaths.TOKEN)
 	@Consumes(MediaType.APPLICATION_FORM_URLENCODED)
 	@Produces(MediaType.APPLICATION_JSON)
 	public Response doAuth(
@@ -44,7 +45,7 @@ public class AlternativeAuthService {
 	 */
 	protected Response getResponse(String username, char[] password) {
 		Response response;
-		User user = AlternativeService.authenticate(username, password);
+		User user = ManagedService.authenticate(username, password);
 
 		if (user.isAuthenticated()) {
 			String name = user.getUsername();

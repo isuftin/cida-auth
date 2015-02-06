@@ -18,6 +18,7 @@ import javax.ws.rs.client.WebTarget;
 import javax.ws.rs.core.Form;
 import javax.ws.rs.core.MediaType;
 import javax.ws.rs.core.Response;
+import javax.ws.rs.core.Response.Status;
 
 import org.apache.commons.lang3.StringUtils;
 import org.slf4j.Logger;
@@ -150,7 +151,7 @@ public class AuthClient implements IAuthClient {
 		try {
 			Response response = target.request(MediaType.APPLICATION_JSON_TYPE).delete();
 			int statusCode = response.getStatus();
-			if (statusCode == 200) {
+			if (statusCode == Status.OK.getStatusCode()) {
 				LOG.info("Invalidated token {}", tokenId);
 				deleted = true;
 			} else {
@@ -216,7 +217,7 @@ public class AuthClient implements IAuthClient {
 		return isValid;
 	}
 
-	private void closeClientQuietly(Client client) {
+	protected void closeClientQuietly(Client client) {
 		try {
 			if (client != null) {
 				client.close();
@@ -237,7 +238,7 @@ public class AuthClient implements IAuthClient {
 	 * 
 	 * @return 
 	 */
-	private Client createNewClient() {
+	protected Client createNewClient() {
 		if (isDevelopment) {
 			return SSLTool.getRelaxedSSLClient();
 		} else {

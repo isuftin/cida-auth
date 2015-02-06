@@ -21,7 +21,7 @@ public interface IAuthClient {
 	 * @return AuthToken
 	 */
 	public AuthToken getNewToken(String username, String password);
-
+	
 	/**
 	 * Returns a token that has the provided ID
 	 * @param tokenId
