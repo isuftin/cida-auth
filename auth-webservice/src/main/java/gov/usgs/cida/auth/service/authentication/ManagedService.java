@@ -23,8 +23,8 @@ public class ManagedService {
 
 	private static final Logger LOG = LoggerFactory.getLogger(ManagedService.class);
 	
-	// created for iplover crowd app, using DatatypeConveter.printBase64Binary
-	private static final String BASIC_AUTH = "BASIC aXBsb3ZlcjpkZ3h2eHZQRA==";
+	// basic auth hash for crowd app, using DatatypeConverter.printBase64Binary
+	private static final String BASIC_AUTH = "BASIC Y2lkYTpkZ3h2eHZQRA==";
 	private static final String CROWD_BASE_URL = "https://my.usgs.gov/crowd/rest/usermanagement/latest";
 
 	private ManagedService() {
@@ -46,7 +46,7 @@ public class ManagedService {
 				header("Authorization", BASIC_AUTH).
 				header("Content-Type", MediaType.APPLICATION_JSON);
 		
-		Response result = request.post(Entity.json("{ \"value\" : \"" + password.toString() + "\" }"));
+		Response result = request.post(Entity.json("{ \"value\" : \"" + String.valueOf(password) + "\" }"));
 		String resultText = result.readEntity(String.class);
 		
 		LOG.debug("custom auth request result = " + result.getStatus());
@@ -64,7 +64,7 @@ public class ManagedService {
 		}
 
 		client.close();
-
+		
 		return user;
 	}
 
