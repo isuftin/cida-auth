@@ -1,18 +1,24 @@
 package gov.usgs.cida.auth.dao;
 
+import static org.hamcrest.MatcherAssert.assertThat;
+import static org.hamcrest.Matchers.equalTo;
+import static org.hamcrest.Matchers.greaterThan;
+import static org.hamcrest.Matchers.is;
+import static org.hamcrest.Matchers.notNullValue;
 import gov.usgs.cida.auth.model.AuthToken;
-import gov.usgs.cida.auth.util.AuthTokenFactory;
+import gov.usgs.cida.auth.model.User;
+
 import java.io.IOException;
 import java.io.InputStream;
 import java.sql.Timestamp;
+import java.util.ArrayList;
 import java.util.Calendar;
 import java.util.Date;
 import java.util.List;
+
 import org.apache.ibatis.io.Resources;
 import org.apache.ibatis.session.SqlSessionFactory;
 import org.apache.ibatis.session.SqlSessionFactoryBuilder;
-import static org.hamcrest.MatcherAssert.assertThat;
-import static org.hamcrest.Matchers.*;
 import org.junit.After;
 import org.junit.AfterClass;
 import org.junit.Before;
@@ -26,9 +32,11 @@ import org.junit.experimental.categories.Category;
  */
 @Category(IntegrationTests.class)
 public class AuthTokenDAOIT {
-
+	
 	private static SqlSessionFactory sqlSessionFactory;
 	private AuthTokenDAO dao;
+	private User user;
+	private List<String> roles;
 
 	public AuthTokenDAOIT() {
 	}
@@ -49,6 +57,11 @@ public class AuthTokenDAOIT {
 	@Before
 	public void setUp() {
 		dao = new AuthTokenDAO(sqlSessionFactory);
+		roles = new ArrayList<String>();
+		roles.add("read-only");
+		user = new User();
+		user.setUsername("test-user");
+		user.setRoles(roles);
 	}
 
 	@After
@@ -68,7 +81,6 @@ public class AuthTokenDAOIT {
 		System.out.println("getByTokenId");
 		AuthToken result = dao.getByTokenById("88AD43FE-58FA-12E8-41C1-72F0E20D9F1F");
 		assertThat(result, is(notNullValue()));
-		assertThat(result.getUsername(), is(equalTo("lobortis@diam.com")));
 	}
 
 	@Test
@@ -96,17 +108,6 @@ public class AuthTokenDAOIT {
 	}
 
 	@Test
-	public void testCreate() {
-		System.out.println("testCreate");
-
-		AuthToken token = dao.create("test-user");
-		assertThat(token, is(notNullValue()));
-
-		token = dao.getByTokenById(token.getTokenId());
-		assertThat(token, is(notNullValue()));
-	}
-
-	@Test
 	public void testInsertToken() {
 		System.out.println("insertToken");
 		Calendar cal = Calendar.getInstance();
@@ -117,12 +118,10 @@ public class AuthTokenDAOIT {
 		cal.add(Calendar.DATE, 1);
 		long tomorrow = cal.getTimeInMillis();
 
-		AuthToken token = new AuthToken();
+		AuthToken token = dao.create(user);
 		String tokenId = "TEST-TOKEN-ID";
-		String username = "isuftin@usgs.gov";
 
 		token.setTokenId(tokenId);
-		token.setUsername(username);
 		token.setIssued(new Timestamp(now));
 		token.setExpires(new Timestamp(tomorrow));
 		token.setLastAccess(new Timestamp(now));
@@ -133,7 +132,6 @@ public class AuthTokenDAOIT {
 		AuthToken result = dao.getByTokenById(tokenId);
 		assertThat(result, is(notNullValue()));
 		assertThat(result.getTokenId(), is(equalTo(tokenId)));
-		assertThat(result.getUsername(), is(equalTo(username)));
 		assertThat(result.getIssued().getTime(), is(equalTo(now)));
 		assertThat(result.getExpires().getTime(), is(equalTo(tomorrow)));
 		assertThat(result.getLastAccess().getTime(), is(equalTo(now)));
@@ -143,7 +141,7 @@ public class AuthTokenDAOIT {
 	public void testExists() {
 		System.out.println("testExists");
 		
-		AuthToken token = AuthTokenFactory.create("testuser", 600);
+		AuthToken token = dao.create(user, 600);
 		dao.insertToken(token);
 		
 		assertThat(dao.exists(token.getTokenId()), is(true));
@@ -169,12 +167,10 @@ public class AuthTokenDAOIT {
 		cal.add(Calendar.DATE, -1);
 		long yesterday = cal.getTimeInMillis();
 
-		AuthToken token = new AuthToken();
+		AuthToken token = dao.create(user);
 		String tokenId = "TEST-TOKEN-ID2";
-		String username = "isuftin@usgs.gov";
 
 		token.setTokenId(tokenId);
-		token.setUsername(username);
 		token.setIssued(new Timestamp(now));
 		token.setExpires(new Timestamp(yesterday));
 		token.setLastAccess(new Timestamp(now));

@@ -11,6 +11,9 @@
 		<result property="issued" column="ISSUED" javaType="java.sql.Timestamp"/>
 		<result property="expires" column="EXPIRES" javaType="java.sql.Timestamp"/>
 		<result property="lastAccess" column="LAST_ACCESS" javaType="java.sql.Timestamp"/>
+		<collection property="roles" ofType="String">
+			<result column="ROLE_NAME" />
+		</collection>
 	</resultMap>
 	
 	<select id="getAll" resultMap="tokenResultMap" useCache="false">
@@ -20,9 +23,12 @@
 			USERNAME,
 			ISSUED,
 			EXPIRES,
-			LAST_ACCESS
+			LAST_ACCESS,
+			ROLE_NAME
         FROM 
 			AUTH_TOKEN
+		LEFT JOIN
+			AUTH_ROLES ON AUTH_TOKEN.ID = AUTH_ROLES.AUTH_TOKEN_ID
     </select>
 	
 	<select 
@@ -35,9 +41,12 @@
 			USERNAME,
 			ISSUED,
 			EXPIRES,
-			LAST_ACCESS
+			LAST_ACCESS,
+			ROLE_NAME
         FROM 
 			AUTH_TOKEN
+		LEFT JOIN
+			AUTH_ROLES ON AUTH_TOKEN.ID = AUTH_ROLES.AUTH_TOKEN_ID
         WHERE
 			TOKEN_ID = #{id}
     </select>
@@ -69,9 +78,12 @@
 			USERNAME,
 			ISSUED,
 			EXPIRES,
-			LAST_ACCESS
+			LAST_ACCESS,
+			ROLE_NAME
 		FROM 
 			AUTH_TOKEN
+		LEFT JOIN
+			AUTH_ROLES ON AUTH_TOKEN.ID = AUTH_ROLES.AUTH_TOKEN_ID
 		WHERE
 			EXPIRES &lt; CURRENT_TIMESTAMP
 	</select>
@@ -101,6 +113,16 @@
 		>
 		INSERT INTO AUTH_TOKEN (TOKEN_ID,USERNAME,ISSUED,EXPIRES,LAST_ACCESS)
 		VALUES (#{tokenId}, #{username}, #{issued}, #{expires}, #{lastAccess})
+	</insert>
+	
+	<insert
+		id="insertRole"
+		flushCache="true"
+		statementType="PREPARED"
+		keyColumn="id"
+		>
+		INSERT INTO AUTH_ROLES (AUTH_TOKEN_ID, ROLE_NAME)
+		VALUES (#{id}, #{roleName})
 	</insert>
 	
 	<update
@@ -140,7 +162,7 @@
 	<!-- TODO This may be temporary, using join on syncope table structure. May want to abstract the DB
 	structure away by using the Syncope REST API. Make that change up in DAO also if so. -->
 	<select 
-		id="getRolesByToken"
+		id="getSyncopeRoles"
 		parameterType="String"
 		flushCache="true"
 		statementType="PREPARED"
@@ -155,9 +177,8 @@
 			    syncopeuser_id in (
 			      SELECT 
 			        syncopeuser.id
-			      FROM auth_token
-			      LEFT JOIN syncopeuser ON auth_token.username = syncopeuser.username
-			      where auth_token.token_id = #{tokenId}
+			      FROM syncopeuser
+			      WHERE syncopeuser.username #{username}
 			    )
 			)
 	</select>

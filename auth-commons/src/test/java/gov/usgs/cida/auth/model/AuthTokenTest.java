@@ -6,10 +6,16 @@
 
 package gov.usgs.cida.auth.model;
 
+import static org.hamcrest.MatcherAssert.assertThat;
+import static org.hamcrest.Matchers.equalTo;
+import static org.hamcrest.Matchers.greaterThan;
+import static org.hamcrest.Matchers.is;
+import static org.junit.Assert.assertEquals;
+
 import java.sql.Timestamp;
 import java.util.Calendar;
 import java.util.Date;
-import static org.junit.Assert.assertEquals;
+
 import org.junit.Test;
 
 /**
@@ -56,4 +62,75 @@ public class AuthTokenTest {
 		assertEquals(new Timestamp(1408543475000l), result.getIssued());
 	}
 	
+	@Test
+	public void testExtendExpirationUsingSeconds() {
+		System.out.println("testExtendExpirationUsingSeconds");
+		AuthToken token = new AuthToken();
+		String tokenId = "TEST-TOKEN-ID";
+		Calendar cal = Calendar.getInstance();
+		Date dt = new Date();
+		long now = dt.getTime();
+
+		cal.setTime(dt);
+		cal.add(Calendar.DATE, 1);
+		long tomorrow = cal.getTimeInMillis();
+
+		token.setTokenId(tokenId);
+		token.setIssued(new Timestamp(now));
+		token.setExpires(new Timestamp(tomorrow));
+		token.setLastAccess(new Timestamp(now));
+
+		int seconds = 60;
+		long sixtyMillis = seconds * 1000l;
+		token.extendExpiration(seconds);
+
+		Timestamp expires = token.getExpires();
+		assertThat(expires.getTime(), is(greaterThan(tomorrow)));
+		assertThat((expires.getTime() - tomorrow), is(equalTo(sixtyMillis)));
+	}
+	
+	@Test
+	public void testExtendExpiration() {
+		System.out.println("testExtendExpiration");
+		AuthToken token = new AuthToken();
+		String tokenId = "TEST-TOKEN-ID";
+		Calendar cal = Calendar.getInstance();
+		Date dt = new Date();
+		long now = dt.getTime();
+
+		cal.setTime(dt);
+		cal.add(Calendar.DATE, 1);
+		long tomorrow = cal.getTimeInMillis();
+
+		token.setTokenId(tokenId);
+		token.setIssued(new Timestamp(now));
+		token.setExpires(new Timestamp(now));
+		token.setLastAccess(new Timestamp(now));
+
+		// Extend it one day
+		token.extendExpiration();
+		Timestamp expires = token.getExpires();
+		assertThat(expires.getTime(), is(equalTo(tomorrow)));
+		
+		// Extend it another day
+		token.setLastAccess(new Timestamp(tomorrow));
+		token.extendExpiration();
+		expires = token.getExpires();
+		assertThat(expires.getTime(), is(greaterThan(tomorrow)));
+	}
+	
+	@Test
+	public void testIsExpired() {
+		System.out.println("testIsExpired");
+		AuthToken token = new AuthToken();
+		Date dt = new Date();
+		Calendar cal = Calendar.getInstance();
+		cal.setTime(dt);
+		cal.add(Calendar.DATE, -1);
+		long yesterday = cal.getTimeInMillis();
+		token.setExpires(new Timestamp(yesterday));
+		
+		boolean expired = token.isExpired();
+		assertThat(expired, is(Boolean.TRUE));
+	}	
 }

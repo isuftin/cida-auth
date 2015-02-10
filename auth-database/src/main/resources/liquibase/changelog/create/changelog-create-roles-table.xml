@@ -1,0 +1,40 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<databaseChangeLog
+	xmlns="http://www.liquibase.org/xml/ns/dbchangelog"
+	xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+	xmlns:ext="http://www.liquibase.org/xml/ns/dbchangelog-ext"
+	xsi:schemaLocation="http://www.liquibase.org/xml/ns/dbchangelog http://www.liquibase.org/xml/ns/dbchangelog/dbchangelog-2.0.xsd
+	http://www.liquibase.org/xml/ns/dbchangelog-ext http://www.liquibase.org/xml/ns/dbchangelog/dbchangelog-ext.xsd">
+
+	<changeSet author="${runasusername}" id="modify-token-table-1">
+		
+		<createTable 
+			remarks="Holds roles for active tokens"
+			tableName="AUTH_ROLES">
+			<column name="AUTH_TOKEN_ID" type="BIGINT">
+				<constraints nullable="false" />
+			</column>
+			<column name="ROLE_NAME" type="java.sql.Types.VARCHAR(127)">
+				<constraints nullable="false" />
+			</column>
+		</createTable>
+		
+		<addForeignKeyConstraint
+			baseColumnNames="AUTH_TOKEN_ID"
+			baseTableName="AUTH_ROLES"
+			constraintName="fk_AUTH_TOKEN_ID"
+			deferrable="false"
+			initiallyDeferred="false"
+			onDelete="CASCADE"
+			onUpdate="RESTRICT"
+			referencedColumnNames="ID"
+			referencedTableName="AUTH_TOKEN"
+		/>
+		
+		<rollback>
+		    <dropForeignKeyConstraint baseTableName="AUTH_ROLES" constraintName="fk_AUTH_TOKEN_ID"/>
+			<dropTable tableName="AUTH_ROLES" />
+		</rollback>
+	</changeSet>
+
+</databaseChangeLog>

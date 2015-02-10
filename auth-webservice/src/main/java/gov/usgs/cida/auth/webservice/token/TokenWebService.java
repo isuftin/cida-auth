@@ -3,6 +3,10 @@ package gov.usgs.cida.auth.webservice.token;
 import gov.usgs.cida.auth.dao.AuthTokenDAO;
 import gov.usgs.cida.auth.model.AuthToken;
 import gov.usgs.cida.auth.service.ServicePaths;
+import gov.usgs.cida.auth.service.token.TokenService;
+
+import java.util.ArrayList;
+import java.util.List;
 
 import javax.ws.rs.DELETE;
 import javax.ws.rs.DefaultValue;
@@ -14,7 +18,6 @@ import javax.ws.rs.Produces;
 import javax.ws.rs.core.MediaType;
 import javax.ws.rs.core.Response;
 
-import org.apache.commons.lang3.StringUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -25,9 +28,9 @@ import com.google.gson.Gson;
  * @author isuftin
  */
 @Path("/")
-public class TokenService {
+public class TokenWebService {
 
-	private final static Logger LOG = LoggerFactory.getLogger(TokenService.class);
+	private final static Logger LOG = LoggerFactory.getLogger(TokenWebService.class);
 
 	/**
 	 *
@@ -52,7 +55,19 @@ public class TokenService {
 	@Produces(MediaType.APPLICATION_JSON)
 	public Response getRolesByToken(@PathParam("tokenId") @DefaultValue("") String tokenId) {
 		LOG.trace("Attempting to retrieve roles for token '{}'", tokenId);
-		return Response.ok(new Gson().toJson(new AuthTokenDAO().getRolesByToken(tokenId)), MediaType.APPLICATION_JSON_TYPE).build();
+		
+		Response response;
+
+		List<String> roles = new ArrayList<String>();
+		AuthToken token = new TokenService().getTokenById(tokenId);
+		if (null != token) {
+			roles = token.getRoles();
+			response = Response.ok(new Gson().toJson(roles), MediaType.APPLICATION_JSON_TYPE).build();
+		} else {
+			response = Response.status(Response.Status.NOT_FOUND).build();
+		}
+		
+		return response;
 	}
 	
 	@DELETE
@@ -93,30 +108,10 @@ public class TokenService {
 	 */
 	protected Response getTokenResponse(String tokenId) {
 		Response response;
-		AuthTokenDAO dao = new AuthTokenDAO();
-		AuthToken token = null;
-		
-		if (StringUtils.isNotBlank(tokenId)) {
-			token = dao.getByTokenById(tokenId);
-		}
+		AuthToken token = new TokenService().getTokenById(tokenId);
 
 		if (token != null) {
-			LOG.trace("Token {} retrieved", tokenId);
-			if (token.isExpired()) {
-				LOG.info("Token {} expired, will be deleted", tokenId);
-				dao.deleteTokenUsingId(tokenId);
-				response = Response.status(Response.Status.NOT_FOUND).build();
-			} else {
-				try {
-					token.updateLastAccess();
-					token.extendExpiration();
-					dao.updateToken(token);
-				} catch (Exception e) {
-					LOG.warn("Could not update last access for token {}", tokenId);
-				}
-
-				response = Response.ok(token.toJSON(), MediaType.APPLICATION_JSON_TYPE).build();
-			}
+			response = Response.ok(token.toJSON(), MediaType.APPLICATION_JSON_TYPE).build();
 		} else {
 			response = Response.status(Response.Status.NOT_FOUND).build();
 		}

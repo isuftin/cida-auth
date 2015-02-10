@@ -48,9 +48,8 @@ public class ManagedAuthService {
 		User user = ManagedService.authenticate(username, password);
 
 		if (user.isAuthenticated()) {
-			String name = user.getUsername();
-			LOG.debug("User {} has authenticated", name);
-			AuthToken token = new AuthTokenDAO().create(name);
+			LOG.debug("User {} has authenticated", user.getUsername());
+			AuthToken token = new AuthTokenDAO().create(user);
 
 			if (token != null) {
 				LOG.trace("Added token {} to database", token.getTokenId());
