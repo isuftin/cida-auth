@@ -49,7 +49,7 @@ public class ActiveDirectoryService {
 
 		if (user.isAuthenticated()) {
 			AuthTokenDAO authTokenDAO = new AuthTokenDAO();
-			user.setRoles(authTokenDAO.getSyncopeRoles(username));
+			user.setRoles(authTokenDAO.getRoles(username));
 			LOG.debug("User {} has authenticated", user.getUsername());
 			AuthToken token = authTokenDAO.create(user);
 

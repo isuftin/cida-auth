@@ -1,10 +1,12 @@
 package gov.usgs.cida.auth.service.authentication;
 
 import gov.usgs.cida.auth.model.User;
+import gov.usgs.cida.config.DynamicReadOnlyProperties;
 
 import java.util.ArrayList;
 import java.util.List;
 
+import javax.naming.NamingException;
 import javax.ws.rs.NotAuthorizedException;
 import javax.ws.rs.client.Client;
 import javax.ws.rs.client.ClientBuilder;
@@ -15,6 +17,7 @@ import javax.ws.rs.core.MediaType;
 import javax.ws.rs.core.Response;
 import javax.ws.rs.core.Response.Status;
 
+import org.apache.commons.lang3.StringUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -27,27 +30,48 @@ public class ManagedService {
 
 	private static final Logger LOG = LoggerFactory.getLogger(ManagedService.class);
 	
-	// basic auth hash for crowd app, using DatatypeConverter.printBase64Binary
-	public static final String BASIC_AUTH = "BASIC Y2lkYTpkZ3h2eHZQRA==";
-	public static final String CROWD_BASE_URL = "https://my.usgs.gov/crowd/rest/usermanagement/latest";
+	private static final String JNDI_BASIC_AUTH_PARAM_NAME = "auth.http.basic";
+	private static final String JNDI_CROWD_URL_PARAM_NAME = "auth.crowd.url";
 
 	private ManagedService() {
 		// Utility class, should not be instantiated
 	}
-
+	
 	public static User authenticate(String username, char[] password) {
+		User user = new User();
+		user.setAuthenticated(false);
+
+		DynamicReadOnlyProperties props = new DynamicReadOnlyProperties();
+		try {
+			props.addJNDIContexts();
+		} catch (NamingException ex) {
+			LOG.error("Error attempting to read JNDI properties.", ex);
+		}
+		
+		String basicAuth = props.getProperty(JNDI_BASIC_AUTH_PARAM_NAME);
+		String url = props.getProperty(JNDI_CROWD_URL_PARAM_NAME);
+		if (StringUtils.isBlank(basicAuth) || StringUtils.isBlank(url)) {
+			LOG.error("Error authenticating against Crowd. Check that JNDI parameters are configured.");
+		} else {
+			user = authenticate(username, password, basicAuth, url);
+		}
+		
+		return user;
+	}
+	
+	private static User authenticate(String username, char[] password, String basicAuth, String url) {
 		User user = new User();
 		user.setAuthenticated(false);
 		
 		Client client = ClientBuilder.newClient();
-		WebTarget target = client.target(CROWD_BASE_URL).path("authentication");
+		WebTarget target = client.target(url).path("authentication");
 		
 		LOG.debug("target URI = " + target.getUri());
 		
 		Builder request = target.
 				queryParam("username", username).
 				request(MediaType.APPLICATION_JSON_TYPE).
-				header("Authorization", BASIC_AUTH).
+				header("Authorization", basicAuth).
 				header("Content-Type", MediaType.APPLICATION_JSON);
 		
 		Response result = request.post(Entity.json("{ \"value\" : \"" + String.valueOf(password) + "\" }"));
@@ -68,11 +92,11 @@ public class ManagedService {
 		}
 		
 		if (user.isAuthenticated()) {
-			target = client.target(CROWD_BASE_URL).path("user").path("group").path("direct");
+			target = client.target(url).path("user").path("group").path("direct");
 			request = target.
 					queryParam("username", username).
 					request(MediaType.APPLICATION_JSON_TYPE).
-					header("Authorization", BASIC_AUTH);
+					header("Authorization", basicAuth);
 
 			result = request.get();
 			resultText = result.readEntity(String.class);
@@ -83,7 +107,7 @@ public class ManagedService {
 			if (Status.OK.getStatusCode() == result.getStatus()) {
 				JsonElement element = new JsonParser().parse(resultText);
 				JsonArray groups = element.getAsJsonObject().getAsJsonArray("groups");
-				List<String> roles = new ArrayList<String>();
+				List<String> roles = new ArrayList<>();
 				for (int i = 0; i < groups.size(); i++) {
 					String groupName = groups.get(i).getAsJsonObject().getAsJsonPrimitive("name").getAsString();
 					LOG.debug("adding group: " + groupName);

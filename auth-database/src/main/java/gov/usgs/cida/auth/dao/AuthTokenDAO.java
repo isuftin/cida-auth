@@ -67,12 +67,12 @@ public class AuthTokenDAO {
 	}
 	
 	/**
-	 * Retrieves a list of Syncope role names associated with a username.
+	 * Retrieves a list of role names associated with a username.
 	 *
 	 * @param username
 	 * @return
 	 */
-	public List<String> getSyncopeRoles(String username) {
+	public List<String> getRoles(String username) {
 		List<String> results;
 		try (SqlSession session = sqlSessionFactory.openSession()) {
 			results = session.selectList(TOKEN_MAPPER_PACKAGE + ".getSyncopeRoles", username);
@@ -140,7 +140,7 @@ public class AuthTokenDAO {
 			BigInteger savedTokenId = savedToken.getId();
 			try (SqlSession session = sqlSessionFactory.openSession()) {
 				for (String role : token.getRoles()) {
-					Map<String, Object> map = new HashMap<String, Object>();
+					Map<String, Object> map = new HashMap<>();
 					map.put("id", savedTokenId);
 					map.put("roleName", role);
 					result = session.insert(TOKEN_MAPPER_PACKAGE + ".insertRole", map);
@@ -211,7 +211,7 @@ public class AuthTokenDAO {
 	public AuthToken create(User user, int ttl) {
 		String username = user.getUsername();
 		if (StringUtils.isBlank(username)) {
-			throw new IllegalArgumentException("Roles may not be null or empty");
+			throw new IllegalArgumentException("Username may not be null or empty");
 		}
 
 		List<String> roles = user.getRoles();

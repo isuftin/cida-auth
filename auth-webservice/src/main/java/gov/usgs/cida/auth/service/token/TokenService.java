@@ -31,6 +31,7 @@ public class TokenService {
 					dao.updateToken(token);
 				} catch (Exception e) {
 					LOG.warn("Could not update last access for token {}", tokenId);
+					LOG.warn("Exception: ", e);
 				}
 			}
 		}
