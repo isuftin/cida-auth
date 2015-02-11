@@ -18,7 +18,7 @@ public class TokenServicesEntryPoint extends Application {
 		final Set<Class<?>> classes = new HashSet<>();
 
 		// webservices
-		classes.add(TokenService.class);
+		classes.add(TokenWebService.class);
 
 		return classes;
 	}

@@ -1,11 +1,14 @@
 package gov.usgs.cida.auth.model;
 
-import com.google.gson.GsonBuilder;
 import java.math.BigInteger;
 import java.sql.Timestamp;
 import java.util.Calendar;
 import java.util.Date;
+import java.util.List;
+
 import javax.xml.bind.annotation.adapters.XmlJavaTypeAdapter;
+
+import com.google.gson.GsonBuilder;
 
 /**
  * Represents an authentication token issued to calling clients
@@ -23,10 +26,10 @@ public class AuthToken {
 	private Timestamp expires;
 	@XmlJavaTypeAdapter(TimestampAdapter.class)
 	private Timestamp lastAccess;
+	private List<String> roles;
 
 	/**
 	 * Serializes AuthToken to JSON
-	 *
 	 *
 	 * @return
 	 */
@@ -126,6 +129,20 @@ public class AuthToken {
 	 */
 	public void setLastAccess(Timestamp lastAccess) {
 		this.lastAccess = lastAccess;
+	}
+	
+	/**
+	 * @return roles
+	 */
+	public List<String> getRoles() {
+		return roles;
+	}
+	
+	/**
+	 * @param roles
+	 */
+	public void setRoles(List<String> roles) {
+		this.roles = roles;
 	}
 
 	/**

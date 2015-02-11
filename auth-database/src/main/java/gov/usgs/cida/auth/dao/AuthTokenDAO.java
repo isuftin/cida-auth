@@ -1,9 +1,19 @@
 package gov.usgs.cida.auth.dao;
 
 import gov.usgs.cida.auth.model.AuthToken;
-import gov.usgs.cida.auth.util.AuthTokenFactory;
+import gov.usgs.cida.auth.model.User;
 import gov.usgs.cida.auth.util.MyBatisConnectionFactory;
+
+import java.math.BigInteger;
+import java.sql.Timestamp;
+import java.util.Calendar;
+import java.util.Date;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
+import java.util.UUID;
+
+import org.apache.commons.lang3.StringUtils;
 import org.apache.ibatis.session.SqlSession;
 import org.apache.ibatis.session.SqlSessionFactory;
 
@@ -16,6 +26,7 @@ public class AuthTokenDAO {
 
 	private final SqlSessionFactory sqlSessionFactory;
 	final static String TOKEN_MAPPER_PACKAGE = "gov.usgs.cida.mybatis.mappers.AuthTokenMapper";
+	private static final int ONE_DAY_IN_SECONDS = 86_400;
 
 	public AuthTokenDAO() {
 		sqlSessionFactory = MyBatisConnectionFactory.getSqlSessionFactory();
@@ -56,15 +67,15 @@ public class AuthTokenDAO {
 	}
 	
 	/**
-	 * Retrieves a list of role names associated with a token.
+	 * Retrieves a list of role names associated with a username.
 	 *
-	 * @param tokenId
-	 * @return token created and inserted into database
+	 * @param username
+	 * @return
 	 */
-	public List<String> getRolesByToken(String tokenId) {
+	public List<String> getRoles(String username) {
 		List<String> results;
 		try (SqlSession session = sqlSessionFactory.openSession()) {
-			results = session.selectList(TOKEN_MAPPER_PACKAGE + ".getRolesByToken", tokenId);
+			results = session.selectList(TOKEN_MAPPER_PACKAGE + ".getSyncopeRoles", username);
 		}
 		return results;
 	}
@@ -124,6 +135,19 @@ public class AuthTokenDAO {
 			result = session.insert(TOKEN_MAPPER_PACKAGE + ".insertToken", token);
 			session.commit();
 		}
+		AuthToken savedToken = getByTokenById(token.getTokenId());
+		if (null != savedToken) {
+			BigInteger savedTokenId = savedToken.getId();
+			try (SqlSession session = sqlSessionFactory.openSession()) {
+				for (String role : token.getRoles()) {
+					Map<String, Object> map = new HashMap<>();
+					map.put("id", savedTokenId);
+					map.put("roleName", role);
+					result = session.insert(TOKEN_MAPPER_PACKAGE + ".insertRole", map);
+				}
+				session.commit();
+			}
+		}
 		return result;
 	}
 
@@ -166,17 +190,57 @@ public class AuthTokenDAO {
 		}
 		return result;
 	}
-
+	
 	/**
-	 * Creates a default token given a username and inserts it into the database
-	 *
-	 * @param username
-	 * @return token created and inserted into database
+	 * Create and insert an AuthToken with the set of roles. Will expired in 1 day.
+	 * 
+	 * @param roles
+	 * @return AuthToken
 	 */
-	public AuthToken create(String username) {
-		AuthToken token = AuthTokenFactory.create(username);
+	public AuthToken create(User user) {
+		return create(user, ONE_DAY_IN_SECONDS);
+	}
+	
+	/**
+	 * Create and insert an AuthToken with the set of roles and duration.
+	 * 
+	 * @param roles
+	 * @param ttl seconds until this AuthToken expires
+	 * @return AuthToken
+	 */
+	public AuthToken create(User user, int ttl) {
+		String username = user.getUsername();
+		if (StringUtils.isBlank(username)) {
+			throw new IllegalArgumentException("Username may not be null or empty");
+		}
+
+		List<String> roles = user.getRoles();
+		if (null == roles || roles.isEmpty()) {
+			throw new IllegalArgumentException("Roles may not be null or empty");
+		}
+
+		AuthToken token = new AuthToken();
+
+		Calendar cal = Calendar.getInstance();
+		Date nowDate = new Date();
+		cal.setTime(nowDate);
+		cal.add(Calendar.SECOND, ttl);
+				
+		long now = nowDate.getTime();
+		long expires = cal.getTimeInMillis();
+		Timestamp nowTs = new Timestamp(now);
+		Timestamp expiresTs = new Timestamp(expires);
+		
+		token.setTokenId(UUID.randomUUID().toString());
+		token.setUsername(username);
+		token.setIssued(nowTs);
+		token.setLastAccess(nowTs);
+		token.setExpires(expiresTs);
+		token.setRoles(roles);
+		
 		insertToken(token);
-		return getByTokenById(token.getTokenId());
+		
+		return token;
 	}
 
 	/**

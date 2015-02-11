@@ -48,9 +48,10 @@ public class ActiveDirectoryService {
 		User user = LDAPService.authenticate(username, password);
 
 		if (user.isAuthenticated()) {
-			String name = user.getUsername();
-			LOG.debug("User {} has authenticated", name);
-			AuthToken token = new AuthTokenDAO().create(name);
+			AuthTokenDAO authTokenDAO = new AuthTokenDAO();
+			user.setRoles(authTokenDAO.getRoles(username));
+			LOG.debug("User {} has authenticated", user.getUsername());
+			AuthToken token = authTokenDAO.create(user);
 
 			if (token != null) {
 				LOG.trace("Added token {} to database", token.getTokenId());
