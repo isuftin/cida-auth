@@ -38,18 +38,18 @@ public class AuthTokenService {
 		
 		try {
 			token = client.getNewToken(username, password);
+			
+			String tokenId = token.getTokenId();
+
+			if (StringUtils.isNotBlank(tokenId)) {
+				response = Response.ok(token.toJSON(), MediaType.APPLICATION_JSON_TYPE).build();
+				SecurityContextUtils.populateSecurityContext(requestContext, httpRequest, client, tokenId, additionalRolesGranted);
+				HttpTokenUtils.saveTokenToSession(httpRequest, tokenId);
+			} else {
+				LOG.warn("Failed to authenticate " + username);
+				response = Response.status(Response.Status.UNAUTHORIZED).build();
+			}
 		} catch(NotAuthorizedException ex) {
-			response = Response.status(Response.Status.UNAUTHORIZED).build();
-		}
-
-		String tokenId = token.getTokenId();
-
-		if (StringUtils.isNotBlank(tokenId)) {
-			response = Response.ok(token.toJSON(), MediaType.APPLICATION_JSON_TYPE).build();
-			SecurityContextUtils.populateSecurityContext(requestContext, httpRequest, client, tokenId, additionalRolesGranted);
-			HttpTokenUtils.saveTokenToSession(httpRequest, tokenId);
-		} else {
-			LOG.warn("Failed to authenticate " + username);
 			response = Response.status(Response.Status.UNAUTHORIZED).build();
 		}
 
