@@ -15,6 +15,13 @@ import javax.ws.rs.core.Response;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
  
+/**
+ * This jersey filter automatically handles restricting access if a user does not have roles. This is
+ * used if your webservice layer does not have the functionality to restrict by endpoint.
+ * 
+ * This filter will restrict all access, but anonymous access to certain URLs by overriding getUnsecuredUris to return
+ * a list of URIs
+ */
 public abstract class AbstractTokenBasedSecurityFilter implements ContainerRequestFilter {
 	private static final Logger LOG = LoggerFactory.getLogger(AbstractTokenBasedSecurityFilter.class);
 	
