@@ -6,9 +6,12 @@ import gov.usgs.cida.auth.ws.rs.service.SecurityContextUtils;
 import java.io.IOException;
 import java.util.List;
 
+import javax.annotation.Priority;
 import javax.servlet.http.HttpServletRequest;
+import javax.ws.rs.Priorities;
 import javax.ws.rs.container.ContainerRequestContext;
 import javax.ws.rs.container.ContainerRequestFilter;
+import javax.ws.rs.container.PreMatching;
 import javax.ws.rs.core.Context;
 
 import org.slf4j.Logger;
@@ -21,6 +24,8 @@ import org.slf4j.LoggerFactory;
  * 
  * @author thongsav
  */
+@PreMatching
+@Priority(Priorities.AUTHENTICATION)
 public abstract class AbstractTokenBasedSecurityContextFilter implements ContainerRequestFilter {
 	private static final Logger LOG = LoggerFactory.getLogger(AbstractTokenBasedSecurityContextFilter.class);
 	

@@ -1,5 +1,7 @@
 package gov.usgs.cida.auth.ws.rs;
 
+import gov.usgs.cida.auth.model.User;
+
 import java.security.Principal;
 import java.util.List;
 
@@ -19,20 +21,16 @@ public class AuthSecurityContext implements SecurityContext{
 
 	@Override
 	public Principal getUserPrincipal() {
-		// TODO Auto-generated method stub
 		return null;
 	}
 	
 	@Override
 	public boolean isSecure() {
-		// TODO Auto-generated method stub
-		return false;
+		return true;
 	}
 	
 	@Override
 	public String getAuthenticationScheme() {
-		// TODO Auto-generated method stub
 		return null;
 	}
-
 }
