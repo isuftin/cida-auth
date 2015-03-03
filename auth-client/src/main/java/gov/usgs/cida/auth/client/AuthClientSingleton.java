@@ -17,6 +17,11 @@ public class AuthClientSingleton {
 
 	public static void initAuthClient(Class<? extends IAuthClient> authClientType) {
 		String authUrl;
+		
+		if(authClient != null) {
+			throw new IllegalStateException("cannot initialize the AuthClientSingleton more than once");
+		}
+		
 		try {
 			Context ctx = new InitialContext();
 			authUrl =  (String) ctx.lookup("java:comp/env/" + AUTH_SERVICE_JNDI_NAME);
@@ -36,6 +41,10 @@ public class AuthClientSingleton {
 		} catch (URISyntaxException e) {
 			LOG.error("Failed to initialize authorization client", e);
 		}
+	}
+	
+	public static boolean isInitialized() {
+		return authClient != null;
 	}
 	
 	public static IAuthClient getAuthClient() {

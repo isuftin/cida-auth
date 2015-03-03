@@ -6,9 +6,12 @@ import gov.usgs.cida.auth.ws.rs.service.SecurityContextUtils;
 import java.io.IOException;
 import java.util.List;
 
+import javax.annotation.Priority;
 import javax.servlet.http.HttpServletRequest;
+import javax.ws.rs.Priorities;
 import javax.ws.rs.container.ContainerRequestContext;
 import javax.ws.rs.container.ContainerRequestFilter;
+import javax.ws.rs.container.PreMatching;
 import javax.ws.rs.core.Context;
 import javax.ws.rs.core.Response;
 
@@ -22,6 +25,8 @@ import org.slf4j.LoggerFactory;
  * This filter will restrict all access, but anonymous access to certain URLs by overriding getUnsecuredUris to return
  * a list of URIs
  */
+@PreMatching
+@Priority(Priorities.AUTHENTICATION)
 public abstract class AbstractTokenBasedSecurityFilter implements ContainerRequestFilter {
 	private static final Logger LOG = LoggerFactory.getLogger(AbstractTokenBasedSecurityFilter.class);
 	
