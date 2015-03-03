@@ -178,7 +178,7 @@
 			      SELECT 
 			        syncopeuser.id
 			      FROM syncopeuser
-			      WHERE syncopeuser.username #{username}
+			      WHERE syncopeuser.username = #{username}
 			    )
 			)
 	</select>
