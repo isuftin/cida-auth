@@ -6,7 +6,6 @@ import gov.usgs.cida.auth.ws.rs.service.SecurityContextUtils;
 import java.util.List;
 
 import javax.annotation.Priority;
-import javax.naming.NamingException;
 import javax.servlet.http.HttpServletRequest;
 import javax.ws.rs.Priorities;
 import javax.ws.rs.container.ContainerRequestContext;
@@ -61,6 +60,10 @@ public abstract class AbstractTokenBasedSecurityContextFilter implements Contain
 	    	//The two calls below DO populate the security context with the roles needed. They also update the current session.
 	        sessionAuthorized = SecurityContextUtils.isSessionOrSecurityContextAuthorizedForRoles(requestContext, httpRequest, getAuthorizedRoles());
 	        tokenAuthorized = SecurityContextUtils.isTokenAuthorized(requestContext, httpRequest, getAuthClient(), getAdditionalRoles());
+	        
+	        if(sessionAuthorized && !tokenAuthorized) { //will have to populate the security context
+	        	SecurityContextUtils.populateSecurityContextFromSession(requestContext, httpRequest, getAuthClient());
+	        }
     	} catch (IllegalArgumentException | IllegalStateException e) {
     		LOG.warn("Error settings session/security context state", e);
     	}
