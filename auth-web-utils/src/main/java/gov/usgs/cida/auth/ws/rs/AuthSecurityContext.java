@@ -1,7 +1,5 @@
 package gov.usgs.cida.auth.ws.rs;
 
-import gov.usgs.cida.auth.model.User;
-
 import java.security.Principal;
 import java.util.List;
 
