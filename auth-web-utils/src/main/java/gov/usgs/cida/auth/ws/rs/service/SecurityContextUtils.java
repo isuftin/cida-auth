@@ -42,6 +42,22 @@ public class SecurityContextUtils {
 			roles.addAll(additionalRoles);
 		}
 		
+		populateSecurityContext(requestContext, httpRequest, tokenId, roles);
+    }
+    
+    /**
+     * Will load the token stored in the session and use it to load roles for the security context.
+     */
+    public static void populateSecurityContextFromSession(ContainerRequestContext requestContext, HttpServletRequest httpRequest, IAuthClient client) {
+		String tokenId = HttpTokenUtils.getTokenFromPreauthorizedSession(httpRequest);
+		List<String> roles = client.getRolesByToken(tokenId);
+		populateSecurityContext(requestContext, httpRequest, tokenId, roles);
+    }
+    
+    /**
+     * Will load the roles for the given token, append the given additional roles, and save that to the SecurityContext.
+     */
+    public static void populateSecurityContext(ContainerRequestContext requestContext, HttpServletRequest httpRequest, String tokenId, List<String> roles) {
 		//set security context with role
 		requestContext.setSecurityContext(
 				new AuthSecurityContext(tokenId, roles));

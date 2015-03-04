@@ -58,11 +58,15 @@ public class HttpTokenUtils {
 	public static boolean isSessionPreauthorized(HttpServletRequest httpRequest) {
 		boolean authenticated = false;
 
-		if(httpRequest.getSession().getAttribute(AUTHORIZED_TOKEN_SESSION_ATTRIBUTE) != null) {
+		if( getTokenFromPreauthorizedSession(httpRequest) != null) {
 			authenticated = true;
 		}
 
 		return authenticated;
+	}
+	
+	public static String getTokenFromPreauthorizedSession(HttpServletRequest httpRequest) {
+		return (String) httpRequest.getSession().getAttribute(AUTHORIZED_TOKEN_SESSION_ATTRIBUTE);
 	}
 
 	/**
