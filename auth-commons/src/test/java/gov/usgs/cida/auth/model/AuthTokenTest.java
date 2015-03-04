@@ -128,9 +128,16 @@ public class AuthTokenTest {
 		cal.setTime(dt);
 		cal.add(Calendar.DATE, -1);
 		long yesterday = cal.getTimeInMillis();
-		token.setExpires(new Timestamp(yesterday));
 		
+		cal.add(Calendar.DATE, +2);
+		long tomorrow = cal.getTimeInMillis();
+		
+		token.setExpires(new Timestamp(yesterday));
 		boolean expired = token.isExpired();
 		assertThat(expired, is(Boolean.TRUE));
+		
+		token.setExpires(new Timestamp(tomorrow));
+		expired = token.isExpired();
+		assertThat(expired, is(Boolean.FALSE));
 	}	
 }

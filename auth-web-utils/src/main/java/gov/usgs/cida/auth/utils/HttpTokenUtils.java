@@ -1,6 +1,7 @@
 package gov.usgs.cida.auth.utils;
 
 import gov.usgs.cida.auth.client.IAuthClient;
+import gov.usgs.cida.auth.model.AuthToken;
 
 import java.util.List;
 
@@ -8,6 +9,7 @@ import javax.servlet.http.HttpServletRequest;
 
 public class HttpTokenUtils {
 	public static final String AUTHORIZED_TOKEN_SESSION_ATTRIBUTE = "AuthorizedToken";
+	public static final String AUTHORIZED_USER_SESSION_ATTRIBUTE = "AuthorizedUser";
 	public static final String AUTH_BEARER_STRING = "Bearer";
 	public static final String AUTHORIZATION_HEADER = "Authorization";
 
@@ -77,6 +79,7 @@ public class HttpTokenUtils {
 
 		if(authenticated) {
 			saveTokenToSession(httpRequest, tokenId);
+			saveUsernameToSession(httpRequest, client.getToken(tokenId));
 		}
 
 		return authenticated;
@@ -84,5 +87,9 @@ public class HttpTokenUtils {
 
 	public static void saveTokenToSession(HttpServletRequest httpRequest, String tokenId) {
 		httpRequest.getSession().setAttribute(AUTHORIZED_TOKEN_SESSION_ATTRIBUTE, tokenId);
+	}
+	
+	public static void saveUsernameToSession(HttpServletRequest httpRequest, AuthToken token) {
+		httpRequest.getSession().setAttribute(AUTHORIZED_USER_SESSION_ATTRIBUTE, token.getUsername());
 	}
 }

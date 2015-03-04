@@ -215,9 +215,6 @@ public class AuthTokenDAO {
 		}
 
 		List<String> roles = user.getRoles();
-		if (null == roles || roles.isEmpty()) {
-			throw new IllegalArgumentException("Roles may not be null or empty");
-		}
 
 		AuthToken token = new AuthToken();
 
