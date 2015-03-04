@@ -3,10 +3,10 @@ package gov.usgs.cida.auth.ws.rs.filter;
 import gov.usgs.cida.auth.client.IAuthClient;
 import gov.usgs.cida.auth.ws.rs.service.SecurityContextUtils;
 
-import java.io.IOException;
 import java.util.List;
 
 import javax.annotation.Priority;
+import javax.naming.NamingException;
 import javax.servlet.http.HttpServletRequest;
 import javax.ws.rs.Priorities;
 import javax.ws.rs.container.ContainerRequestContext;
@@ -54,11 +54,17 @@ public abstract class AbstractTokenBasedSecurityContextFilter implements Contain
 	public abstract List<String> getAuthorizedRoles();
 	
     @Override
-    public void filter(ContainerRequestContext requestContext) throws IOException {
-    	//The two calls below DO populate the security context with the roles needed. They also update the session.
-        boolean sessionAuthorized = SecurityContextUtils.isSessionOrSecurityContextAuthorizedForRoles(requestContext, httpRequest, getAuthorizedRoles());
-        boolean tokenAuthorized = SecurityContextUtils.isTokenAuthorized(requestContext, httpRequest, getAuthClient(), getAdditionalRoles());
-        
+    public void filter(ContainerRequestContext requestContext) {
+    	boolean sessionAuthorized = false;
+    	boolean tokenAuthorized = false;
+    	try {
+	    	//The two calls below DO populate the security context with the roles needed. They also update the current session.
+	        sessionAuthorized = SecurityContextUtils.isSessionOrSecurityContextAuthorizedForRoles(requestContext, httpRequest, getAuthorizedRoles());
+	        tokenAuthorized = SecurityContextUtils.isTokenAuthorized(requestContext, httpRequest, getAuthClient(), getAdditionalRoles());
+    	} catch (IllegalArgumentException | IllegalStateException e) {
+    		LOG.warn("Error settings session/security context state", e);
+    	}
+    	
         LOG.trace("Session authorized: {}", sessionAuthorized);
         LOG.trace("Token authorized: {}", tokenAuthorized);
     }
