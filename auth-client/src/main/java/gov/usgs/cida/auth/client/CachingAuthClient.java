@@ -3,6 +3,9 @@ package gov.usgs.cida.auth.client;
 import gov.usgs.cida.auth.model.AuthToken;
 
 import java.net.URISyntaxException;
+import java.sql.Timestamp;
+import java.util.Calendar;
+import java.util.Date;
 import java.util.List;
 import java.util.Map;
 import java.util.concurrent.ConcurrentHashMap;
@@ -119,7 +122,18 @@ public class CachingAuthClient extends AuthClient {
 	 * {@inheritDoc}
 	 */
 	public boolean isValidToken(AuthToken token) {
-		return super.isValidToken(token);
+		boolean isValid = super.isValidToken(token);
+		
+		//extend expiry if valid
+		if(isValid) {
+			Calendar cal = Calendar.getInstance();
+			Date nowDate = new Date();
+			cal.setTime(nowDate);
+			cal.add(Calendar.SECOND, 900); //15 minute extension on cached client
+			
+			token.setExpires(new Timestamp(cal.getTimeInMillis()));
+		}
+		return isValid;
 	}
 
 	@Override
