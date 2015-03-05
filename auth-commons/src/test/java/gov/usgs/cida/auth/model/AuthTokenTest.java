@@ -99,24 +99,24 @@ public class AuthTokenTest {
 		long now = dt.getTime();
 
 		cal.setTime(dt);
-		cal.add(Calendar.DATE, 1);
-		long tomorrow = cal.getTimeInMillis();
+		cal.add(Calendar.HOUR, 1);
+		long extendedExpiration = cal.getTimeInMillis();
 
 		token.setTokenId(tokenId);
 		token.setIssued(new Timestamp(now));
 		token.setExpires(new Timestamp(now));
 		token.setLastAccess(new Timestamp(now));
 
-		// Extend it one day
+		// Extend it one hour
 		token.extendExpiration();
 		Timestamp expires = token.getExpires();
-		assertThat(expires.getTime(), is(equalTo(tomorrow)));
+		assertThat(expires.getTime(), is(equalTo(extendedExpiration)));
 		
 		// Extend it another day
-		token.setLastAccess(new Timestamp(tomorrow));
+		token.setLastAccess(new Timestamp(extendedExpiration));
 		token.extendExpiration();
 		expires = token.getExpires();
-		assertThat(expires.getTime(), is(greaterThan(tomorrow)));
+		assertThat(expires.getTime(), is(greaterThan(extendedExpiration)));
 	}
 	
 	@Test

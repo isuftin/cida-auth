@@ -5,6 +5,8 @@ import gov.usgs.cida.auth.model.AuthToken;
 import java.net.URISyntaxException;
 import java.util.List;
 
+import javax.ws.rs.NotAuthorizedException;
+
 import static org.hamcrest.CoreMatchers.*;
 import static org.junit.Assert.*;
 
@@ -84,20 +86,25 @@ public class AuthClientTest extends BaseClientTest{
 		assertThat(result.getLastAccess(), is(notNullValue()));
 		assertFalse(result.isExpired());
 		
-		AuthToken result2 = instance.getToken(expiredTokenId);
-		assertNotNull(result2);
-		assertThat(result2.getTokenId(), is(equalTo(expiredTokenId)));
-		assertThat(result2.getExpires(), is(notNullValue()));
-		assertThat(result2.getIssued(), is(notNullValue()));
-		assertThat(result2.getLastAccess(), is(notNullValue()));
-		assertTrue(result2.isExpired());
+		//expired tokens do not return
+		try {
+			AuthToken result2 = instance.getToken(expiredTokenId);
+			assertTrue("This should not have happened, NotFoundException should be thrown", false);
+		} catch(Exception e) {
+			assertTrue(e instanceof NotAuthorizedException);
+		}
 	}
 
 	@Test
-	public void testGetWrongToken() throws URISyntaxException {
-		System.out.println("testGetWrongToken");
-		AuthToken result = instance.getToken(tokenId + '-');
-		assertNull(result);
+	public void testGetNonexistantToken() throws URISyntaxException {
+		System.out.println("testGetNonexistantToken");
+		try {
+			AuthToken result = instance.getToken(nonExistantToken); //the dash makes this token bad
+			assertTrue("This should not have happened, NotFoundException should be thrown", false);
+		} catch(Exception e) {
+			e.printStackTrace();
+			assertTrue(e instanceof NotAuthorizedException);
+		}
 	}
 
 }

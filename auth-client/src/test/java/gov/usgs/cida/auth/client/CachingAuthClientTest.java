@@ -12,6 +12,8 @@ import gov.usgs.cida.auth.model.AuthToken;
 
 import java.net.URISyntaxException;
 
+import javax.ws.rs.NotAuthorizedException;
+
 import org.junit.Before;
 import org.junit.Test;
 
@@ -91,17 +93,21 @@ public class CachingAuthClientTest extends AuthClientTest {
 		assertThat(result.getLastAccess(), is(notNullValue()));
 		assertFalse(result.isExpired());
 		
-		//expired tokens are discarded from cache
-		AuthToken result2 = instance.getToken(expiredTokenId);
-		assertNull(result2);
+		//expired tokens do not return
+		try {
+			AuthToken result2 = instance.getToken(expiredTokenId);
+			assertTrue("This should not have happened, NotFoundException should be thrown", false);
+		} catch(Exception e) {
+			assertTrue(e instanceof NotAuthorizedException);
+		}
 	}
 
 	@Test
 	@Override
-	public void testGetWrongToken() throws URISyntaxException {
-		super.testGetWrongToken();
+	public void testGetNonexistantToken() throws URISyntaxException {
+		super.testGetNonexistantToken();
 		mockServer.reset(); //these stops the server from responding to requests
-		super.testGetWrongToken(); //tests should still pass
+		super.testGetNonexistantToken(); //tests should still pass
 	}
 
 }
