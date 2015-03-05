@@ -19,6 +19,6 @@ public class ExpiredTokenExceptionMapper implements
 
 	public Response toResponse(ExpiredTokenException ex) {
 		Response.Status code = Response.Status.FORBIDDEN;
-		return Response.status(code).entity(ex.getMessage()).type(MediaType.TEXT_PLAIN).build();
+		return Response.status(code).entity("{ \"error\": \"" + ex.getMessage() + "\" }").type(MediaType.APPLICATION_JSON).build();
 	}
 }

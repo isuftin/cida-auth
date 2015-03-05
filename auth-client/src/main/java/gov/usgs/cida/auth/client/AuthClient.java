@@ -81,7 +81,7 @@ public class AuthClient implements IAuthClient {
 			LOG.info("User {} could not authenticate. Error Code: {}, Reason: {}", username, ex.getResponse().getStatus(), ex.getResponse().getStatusInfo().getReasonPhrase());
 			if(ex.getResponse().getStatus() == Response.Status.FORBIDDEN.getStatusCode() || 
 					ex.getResponse().getStatus() == Response.Status.UNAUTHORIZED.getStatusCode()) {
-				throw new NotAuthorizedException(ex.getResponse());
+				throw new NotAuthorizedException(ex.getMessage());
 			}
 		} finally {
 			closeClientQuietly(client);
@@ -106,8 +106,9 @@ public class AuthClient implements IAuthClient {
 		} catch (ClientErrorException ex) {
 			LOG.info(MessageFormat.format("An error occurred while trying to get roles for token {0}", tokenId), ex);
 			if(ex.getResponse().getStatus() == Response.Status.FORBIDDEN.getStatusCode() || 
-					ex.getResponse().getStatus() == Response.Status.UNAUTHORIZED.getStatusCode()) {
-				throw new NotAuthorizedException(ex.getResponse());
+					ex.getResponse().getStatus() == Response.Status.UNAUTHORIZED.getStatusCode()|| 
+							ex.getResponse().getStatus() == Response.Status.NOT_FOUND.getStatusCode()) {
+				throw new NotAuthorizedException(ex.getMessage());
 			}
 		} finally {
 			closeClientQuietly(client);

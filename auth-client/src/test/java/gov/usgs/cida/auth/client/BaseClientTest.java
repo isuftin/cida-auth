@@ -1,21 +1,29 @@
 package gov.usgs.cida.auth.client;
 
 import gov.usgs.cida.auth.service.ServicePaths;
+
 import java.io.File;
 import java.io.FileInputStream;
 import java.io.IOException;
 import java.net.URISyntaxException;
 import java.net.URL;
+
+import javax.ws.rs.core.Response;
+
 import org.apache.commons.io.IOUtils;
 import org.junit.After;
 import org.junit.AfterClass;
 import org.junit.Before;
 import org.junit.BeforeClass;
 import org.mockserver.integration.ClientAndServer;
+
 import static org.mockserver.integration.ClientAndServer.startClientAndServer;
+
 import org.mockserver.model.Header;
+
 import static org.mockserver.model.HttpRequest.request;
 import static org.mockserver.model.HttpResponse.response;
+
 import org.mockserver.socket.PortFactory;
 
 /**
@@ -35,6 +43,7 @@ public class BaseClientTest {
 	protected static final String host = "http://localhost:";
 	protected static final String tokenId = "fda34827-f5d7-44d7-b46f-db6603accb7c";
 	protected static final String expiredTokenId = "ased4827-f5d7-44d7-b46f-db6602421asf";
+	protected static final String nonExistantToken = "THIS_TOKEN_DOESNT_EXIST";
 	protected IAuthClient instance = null;
 	public BaseClientTest() {
 	}
@@ -63,6 +72,8 @@ public class BaseClientTest {
 
 	@Before
 	public void setUpBase() throws URISyntaxException {
+		//THIS METHOD IS A GOOD DOCUMENT OF WHAT THE CLIENT EXPECTS FROM THE AUTH WEBSERVICE, MAKE SURE THESE MATCH UP 
+		//TO ACTUAL RESPONSES.
 		mockServer.reset();
 		mockServer.
 				when(request().withPath(appName + ServicePaths.AUTHENTICATION + "/" + ServicePaths.AD + "/" + ServicePaths.TOKEN)).
@@ -80,12 +91,21 @@ public class BaseClientTest {
 						withHeaders(new Header("Content-Type", "application/json")).
 						withBody(getAuthTokenValidResponse));
 		
+		//Both expired and non-existent tokens return a 403 with the same message
 		mockServer.
 			when(request().withMethod("GET").withPath(appName + ServicePaths.TOKEN + "/" + expiredTokenId)).
 			respond(response().
+					withStatusCode(Response.Status.FORBIDDEN.getStatusCode()).
 					withHeaders(new Header("Content-Type", "application/json")).
 					withBody(getAuthTokenValidExpiredResponse));
-		
+					
+		mockServer.
+			when(request().withMethod("GET").withPath(appName + ServicePaths.TOKEN + "/" + nonExistantToken)).
+			respond(response().
+					withStatusCode(Response.Status.FORBIDDEN.getStatusCode()).
+					withHeaders(new Header("Content-Type", "application/json")).
+					withBody(getAuthTokenValidExpiredResponse));
+					
 		mockServer.
 			when(request().withMethod("GET").withPath(appName + ServicePaths.TOKEN + "/" + tokenId + "/" + ServicePaths.ROLES)).
 			respond(response().
