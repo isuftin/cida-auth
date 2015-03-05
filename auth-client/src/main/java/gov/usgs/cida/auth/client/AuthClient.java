@@ -104,7 +104,11 @@ public class AuthClient implements IAuthClient {
 		try {
 			result = target.request(MediaType.APPLICATION_JSON_TYPE).get(AuthToken.class);
 		} catch (ClientErrorException ex) {
-			LOG.info(MessageFormat.format("An error occurred while trying to get token {0}", tokenId), ex);
+			LOG.info(MessageFormat.format("An error occurred while trying to get roles for token {0}", tokenId), ex);
+			if(ex.getResponse().getStatus() == Response.Status.FORBIDDEN.getStatusCode() || 
+					ex.getResponse().getStatus() == Response.Status.UNAUTHORIZED.getStatusCode()) {
+				throw new NotAuthorizedException(ex.getResponse());
+			}
 		} finally {
 			closeClientQuietly(client);
 		}

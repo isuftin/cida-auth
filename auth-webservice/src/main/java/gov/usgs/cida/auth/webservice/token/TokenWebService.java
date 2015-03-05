@@ -4,6 +4,7 @@ import gov.usgs.cida.auth.dao.AuthTokenDAO;
 import gov.usgs.cida.auth.model.AuthToken;
 import gov.usgs.cida.auth.service.ServicePaths;
 import gov.usgs.cida.auth.service.token.TokenService;
+import gov.usgs.cida.auth.webservice.error.ExpiredTokenException;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -41,6 +42,7 @@ public class TokenWebService {
 	@Path("{tokenId}")
 	@Produces(MediaType.APPLICATION_JSON)
 	public Response getToken(@PathParam("tokenId") @DefaultValue("") String tokenId) {
+		validateToken(tokenId);
 		LOG.trace("Attempting to retrieve token by id '{}'", tokenId);
 		return getTokenResponse(tokenId);
 	}
@@ -54,6 +56,7 @@ public class TokenWebService {
 	@Path("{tokenId}/" + ServicePaths.ROLES)
 	@Produces(MediaType.APPLICATION_JSON)
 	public Response getRolesByToken(@PathParam("tokenId") @DefaultValue("") String tokenId) {
+		validateToken(tokenId);
 		LOG.trace("Attempting to retrieve roles for token '{}'", tokenId);
 		
 		Response response;
@@ -73,6 +76,7 @@ public class TokenWebService {
 	@DELETE
 	@Path("{tokenId}")
 	public Response invalidateToken(@PathParam("tokenId") @DefaultValue("") String tokenId) {
+		validateToken(tokenId);
 		LOG.trace("Attempting to delete token by id '{}'", tokenId);
 		return getInvalidateTokenResponse(tokenId);
 	}
@@ -80,6 +84,7 @@ public class TokenWebService {
 	@HEAD
 	@Path("{tokenId}")
 	public Response checkToken(@PathParam("tokenId") @DefaultValue("") String tokenId) {
+		validateToken(tokenId);
 		LOG.trace("Attempting to retrieve token by id '{}'", tokenId);
 		return getCheckTokenResponse(tokenId);
 	}
@@ -132,5 +137,16 @@ public class TokenWebService {
 			response = Response.status(Response.Status.NOT_FOUND).build();
 		}
 		return response;
+	}
+	
+	private void validateToken(String tokenId) throws ExpiredTokenException {
+		if(!isTokenValid(tokenId)) {
+			throw new ExpiredTokenException("Token is expired or does not exist.");
+		}
+	}
+	
+	private boolean isTokenValid(String tokenId) {
+		AuthTokenDAO dao = new AuthTokenDAO();
+		return dao.exists(tokenId) && !dao.getByTokenById(tokenId).isExpired();
 	}
 }

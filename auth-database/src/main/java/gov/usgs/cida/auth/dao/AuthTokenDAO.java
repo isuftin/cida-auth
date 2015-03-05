@@ -26,7 +26,7 @@ public class AuthTokenDAO {
 
 	private final SqlSessionFactory sqlSessionFactory;
 	final static String TOKEN_MAPPER_PACKAGE = "gov.usgs.cida.mybatis.mappers.AuthTokenMapper";
-	private static final int ONE_DAY_IN_SECONDS = 86_400;
+	private static final int ONE_HOUR_IN_SECONDS = 3_600;
 
 	public AuthTokenDAO() {
 		sqlSessionFactory = MyBatisConnectionFactory.getSqlSessionFactory();
@@ -198,7 +198,7 @@ public class AuthTokenDAO {
 	 * @return AuthToken
 	 */
 	public AuthToken create(User user) {
-		return create(user, ONE_DAY_IN_SECONDS);
+		return create(user, ONE_HOUR_IN_SECONDS);
 	}
 	
 	/**
@@ -249,8 +249,8 @@ public class AuthTokenDAO {
 	public boolean exists(String tokenId) {
 		boolean exists = false;
 		try (SqlSession session = sqlSessionFactory.openSession()) {
-			int count = session.selectOne(TOKEN_MAPPER_PACKAGE + ".getCountForId", tokenId);
-			if (count > 0) {
+			Integer count = session.selectOne(TOKEN_MAPPER_PACKAGE + ".getCountForId", tokenId);
+			if (count != null && count > 0) {
 				exists = true;
 			}
 		}
