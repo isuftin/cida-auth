@@ -119,7 +119,8 @@ public class CachingAuthClient extends AuthClient {
 
 	@Override
 	/**
-	 * {@inheritDoc}
+	 * If a token is valid, this will set the expiration time for 15 minutes from current time.
+	 * If a token is not valid, it will attempt to load the remote token and check that.
 	 */
 	public boolean isValidToken(AuthToken token) {
 		boolean isValid = super.isValidToken(token);
@@ -129,9 +130,14 @@ public class CachingAuthClient extends AuthClient {
 			Calendar cal = Calendar.getInstance();
 			Date nowDate = new Date();
 			cal.setTime(nowDate);
-			cal.add(Calendar.SECOND, 900); //15 minute extension on cached client
+			cal.add(Calendar.SECOND, 30); //15 minute extension on cached client
 			
 			token.setExpires(new Timestamp(cal.getTimeInMillis()));
+		} else { //check server if the actual token is expered
+			token = super.getToken(token.getTokenId());
+			isValid = !token.isExpired();
+			//update cache entry
+			tokenCache.put(token.getTokenId(), token);
 		}
 		return isValid;
 	}

@@ -152,7 +152,7 @@ public class AuthToken {
 	public void extendExpiration() {
 		Calendar cal = Calendar.getInstance();
 		cal.setTime(this.lastAccess);
-		cal.add(Calendar.HOUR, 24);
+		cal.add(Calendar.HOUR, 1);
 		this.expires = new Timestamp(cal.getTimeInMillis());
 	}
 
