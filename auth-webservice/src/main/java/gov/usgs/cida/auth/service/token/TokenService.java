@@ -1,6 +1,7 @@
 package gov.usgs.cida.auth.service.token;
 
 import gov.usgs.cida.auth.dao.AuthTokenDAO;
+import gov.usgs.cida.auth.dao.IAuthTokenDAO;
 import gov.usgs.cida.auth.model.AuthToken;
 
 import org.apache.commons.lang3.StringUtils;
@@ -11,7 +12,7 @@ public class TokenService {
 	private final static Logger LOG = LoggerFactory.getLogger(TokenService.class);
 	
 	public AuthToken getTokenById(String tokenId) {
-		AuthTokenDAO dao = new AuthTokenDAO();
+		IAuthTokenDAO dao = new AuthTokenDAO();
 		AuthToken token = null;
 		
 		if (StringUtils.isNotBlank(tokenId)) {

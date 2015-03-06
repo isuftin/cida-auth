@@ -4,6 +4,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import gov.usgs.cida.auth.dao.AuthTokenDAO;
+import gov.usgs.cida.auth.dao.IAuthTokenDAO;
 import gov.usgs.cida.auth.exception.NotAuthorizedException;
 import gov.usgs.cida.auth.model.AuthToken;
 import gov.usgs.cida.auth.model.User;
@@ -11,11 +12,22 @@ import gov.usgs.cida.auth.model.User;
 public class ManagedAuthTokenService implements IAuthTokenService{
 	private final static Logger LOG = LoggerFactory.getLogger(ManagedAuthTokenService.class);
 	
-	private AuthTokenDAO authTokenDao = new AuthTokenDAO();
-	private IAuthService authService = new ManagedAuthService();
+	private IAuthTokenDAO authTokenDao; 
+	private IAuthService authService;
+	
+	public ManagedAuthTokenService() {
+		authTokenDao = new AuthTokenDAO();
+		authService = new ManagedAuthService();
+	}
+	
+	//For testability
+	public ManagedAuthTokenService(IAuthTokenDAO authTokenDao, IAuthService authService) {
+		this.authTokenDao = authTokenDao;
+		this.authService = authService;
+	}
 	
 	//For testing, can replace later with IOC/DI
-	protected void setAuthTokenDao(AuthTokenDAO authTokenDao) {
+	protected void setAuthTokenDao(IAuthTokenDAO authTokenDao) {
 		this.authTokenDao = authTokenDao;
 	}
 	protected void setAuthService(IAuthService authService) {

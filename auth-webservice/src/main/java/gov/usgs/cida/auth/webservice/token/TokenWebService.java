@@ -1,6 +1,7 @@
 package gov.usgs.cida.auth.webservice.token;
 
 import gov.usgs.cida.auth.dao.AuthTokenDAO;
+import gov.usgs.cida.auth.dao.IAuthTokenDAO;
 import gov.usgs.cida.auth.model.AuthToken;
 import gov.usgs.cida.auth.service.ServicePaths;
 import gov.usgs.cida.auth.service.token.TokenService;
@@ -146,7 +147,7 @@ public class TokenWebService {
 	}
 	
 	private boolean isTokenValid(String tokenId) {
-		AuthTokenDAO dao = new AuthTokenDAO();
+		IAuthTokenDAO dao = new AuthTokenDAO();
 		return dao.exists(tokenId) && !dao.getByTokenById(tokenId).isExpired();
 	}
 }

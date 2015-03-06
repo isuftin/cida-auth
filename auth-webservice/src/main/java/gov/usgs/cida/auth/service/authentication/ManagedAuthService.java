@@ -7,7 +7,6 @@ import java.util.ArrayList;
 import java.util.List;
 
 import javax.naming.NamingException;
-import javax.ws.rs.NotAuthorizedException;
 import javax.ws.rs.client.Client;
 import javax.ws.rs.client.ClientBuilder;
 import javax.ws.rs.client.Entity;
@@ -87,7 +86,8 @@ public class ManagedAuthService  implements IAuthService{
 			user.setEmail(object.getAsJsonPrimitive("email").getAsString());
 			user.setAuthenticated(true);
 		} else {
-			throw new NotAuthorizedException(resultText);
+			user.setAuthenticated(false);
+			return user;
 		}
 		
 		if (user.isAuthenticated()) {

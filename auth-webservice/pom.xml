@@ -46,6 +46,16 @@
 			<groupId>org.slf4j</groupId>
 		</dependency>
 		
+		<!-- Testing -->
+		<dependency>
+			<groupId>org.hamcrest</groupId>
+			<artifactId>hamcrest-all</artifactId>
+		</dependency>
+		<dependency>
+			<groupId>junit</groupId>
+			<artifactId>junit</artifactId>
+		</dependency>
+		
 		<!-- Other -->
 		<dependency>
 			<groupId>gov.usgs.cida</groupId>
