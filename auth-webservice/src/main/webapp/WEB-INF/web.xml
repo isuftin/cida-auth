@@ -4,6 +4,6 @@
 	<display-name>CIDA Auth Webervices</display-name>
 	<listener>
         <description>TokenSweeper</description>
-        <listener-class>gov.usgs.cida.auth.service.TokenSweeper</listener-class>
+        <listener-class>gov.usgs.cida.auth.webservice.token.TokenSweeper</listener-class>
     </listener>
 </web-app>

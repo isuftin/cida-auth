@@ -6,9 +6,9 @@
 		<artifactId>auth-parent</artifactId>
 		<version>1.0.3-SNAPSHOT</version>
 	</parent>
-	<artifactId>auth-webservice</artifactId>
-	<packaging>war</packaging>
-	<name>CIDA Auth WebService</name>
+	<artifactId>auth-service</artifactId>
+	<packaging>jar</packaging>
+	<name>CIDA Auth Service Layer</name>
 	
 	<properties>
 		<project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
@@ -18,17 +18,13 @@
 		<!-- Inter-Module -->
 		<dependency>
 			<groupId>gov.usgs.cida.auth</groupId>
-			<artifactId>auth-service</artifactId>
+			<artifactId>auth-database</artifactId>
 		</dependency>
 		
-		<!-- Jersey -->
+		<!-- Jersey, used for rest client -->
 		<dependency>
 			<groupId>org.glassfish.jersey.containers</groupId>
 			<artifactId>jersey-container-servlet</artifactId>
-		</dependency>
-		<dependency>
-			<groupId>org.glassfish.jersey.media</groupId>
-			<artifactId>jersey-media-moxy</artifactId>
 		</dependency>
 		
 		<!-- Logging -->
@@ -56,55 +52,15 @@
 		<dependency>
 			<groupId>gov.usgs.cida</groupId>
 			<artifactId>dynamicProperties</artifactId>
-			<version>1.0.2</version>
 		</dependency>
 		<dependency>
 			<groupId>org.apache.commons</groupId>
 			<artifactId>commons-lang3</artifactId>
 		</dependency>
-		<dependency>
-			<groupId>javax.servlet</groupId>
-			<artifactId>javax.servlet-api</artifactId>
-		</dependency>
 	</dependencies>
 	
 	<build>
 		<plugins>
-			<plugin> <!-- This creates a version file in root with the pom version -->
-				<groupId>org.apache.maven.plugins</groupId>
-				<artifactId>maven-antrun-plugin</artifactId>
-				<version>1.7</version>
-				<executions>
-					<execution>
-						<id>generate-version-file</id>
-						<phase>compile</phase>
-						<goals>
-							<goal>run</goal>
-						</goals>
-						<configuration>
-							<tasks>
-								<propertyfile file="${basedir}/target/version" comment="Version information">
-									<entry key="version" value="${project.version}" />
-								</propertyfile>
-							</tasks>
-						</configuration>
-					</execution>
-				</executions> 
-			</plugin>
-			<plugin>
-				<groupId>org.apache.maven.plugins</groupId>
-				<artifactId>maven-war-plugin</artifactId>
-				<configuration>
-					<webResources>
-						<resource>
-							<directory>${basedir}/target</directory>
-							<includes>
-								<include>version</include>
-							</includes>
-						</resource>
-					</webResources>
-				</configuration>
-			</plugin>
 		</plugins>
 	</build>
 	

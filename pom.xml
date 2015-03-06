@@ -21,6 +21,7 @@
 	<modules>
 		<module>auth-commons</module>
 		<module>auth-database</module>
+		<module>auth-service</module>
 		<module>auth-webservice</module>
 		<module>auth-client</module>
 		<module>auth-web-utils</module>
@@ -191,6 +192,11 @@
 			<dependency>
 				<groupId>${project.groupId}</groupId>
 				<artifactId>auth-client</artifactId>
+				<version>${project.version}</version>
+			</dependency>
+			<dependency>
+				<groupId>${project.groupId}</groupId>
+				<artifactId>auth-service</artifactId>
 				<version>${project.version}</version>
 			</dependency>
 			
