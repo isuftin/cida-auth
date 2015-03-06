@@ -1,8 +1,10 @@
 package gov.usgs.cida.auth.service;
 
 /**
- *
+ * IMPORTANT: Any change to this class will change the webservice API, change with care.
+ * 
  * @author isuftin
+ * @author thongsav
  */
 public class ServicePaths {
 	public final static String TOKEN = "token";

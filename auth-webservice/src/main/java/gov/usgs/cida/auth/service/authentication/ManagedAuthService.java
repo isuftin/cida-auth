@@ -26,18 +26,17 @@ import com.google.gson.JsonElement;
 import com.google.gson.JsonObject;
 import com.google.gson.JsonParser;
 
-public class ManagedService {
+public class ManagedAuthService  implements IAuthService{
 
-	private static final Logger LOG = LoggerFactory.getLogger(ManagedService.class);
+	private static final Logger LOG = LoggerFactory.getLogger(ManagedAuthService.class);
 	
 	private static final String JNDI_BASIC_AUTH_PARAM_NAME = "auth.http.basic";
 	private static final String JNDI_CROWD_URL_PARAM_NAME = "auth.crowd.url";
 
-	private ManagedService() {
-		// Utility class, should not be instantiated
+	public ManagedAuthService() {
 	}
 	
-	public static User authenticate(String username, char[] password) {
+	public User authenticate(String username, char[] password) {
 		User user = new User();
 		user.setAuthenticated(false);
 
@@ -59,7 +58,7 @@ public class ManagedService {
 		return user;
 	}
 	
-	private static User authenticate(String username, char[] password, String basicAuth, String url) {
+	private User authenticate(String username, char[] password, String basicAuth, String url) {
 		User user = new User();
 		user.setAuthenticated(false);
 		

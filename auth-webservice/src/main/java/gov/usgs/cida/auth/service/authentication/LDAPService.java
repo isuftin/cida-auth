@@ -19,18 +19,17 @@ import org.slf4j.LoggerFactory;
  *
  * @author isuftin
  */
-public class LDAPService {
+public class LDAPService implements IAuthService {
 
 	private static final Logger LOG = LoggerFactory.getLogger(LDAPService.class);
 
 	private static final String JNDI_LDAP_URL_PARAM_NAME = "auth.ldap.url";
 	private static final String JNDI_LDAP_DOMAIN_PARAM_NAME = "auth.ldap.domain";
 
-	private LDAPService() {
-		// Utility class, should not be instantiated
+	public LDAPService() {
 	}
 
-	public static User authenticate(String username, char[] password) {
+	public User authenticate(String username, char[] password) {
 		User user = new User();
 		user.setAuthenticated(false);
 		
@@ -61,7 +60,7 @@ public class LDAPService {
 	 * @param basedn
 	 * @return
 	 */
-	private static User authenticate(String username, char[] password, String ldapUrl, String basedn) {
+	private User authenticate(String username, char[] password, String ldapUrl, String basedn) {
 		//basedn should be "DC=gs,DC=doi,dc=net"
 		Properties props = new Properties();
 		props.put(Context.INITIAL_CONTEXT_FACTORY, "com.sun.jndi.ldap.LdapCtxFactory");

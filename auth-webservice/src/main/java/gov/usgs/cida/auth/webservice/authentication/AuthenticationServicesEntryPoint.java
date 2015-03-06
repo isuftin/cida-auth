@@ -18,8 +18,7 @@ public class AuthenticationServicesEntryPoint extends Application {
 		final Set<Class<?>> classes = new HashSet<>();
 
 		// webservices
-		classes.add(ActiveDirectoryService.class);
-		classes.add(ManagedAuthService.class);
+		classes.add(AuthenticationWebervice.class);
 
 		return classes;
 	}
