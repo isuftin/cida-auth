@@ -48,7 +48,7 @@ public class TokenService implements ITokenService {
 			if (token.isExpired()) {
 				LOG.info("Token {} expired, will be deleted", tokenId);
 				tokenDao.deleteTokenUsingId(tokenId);
-				token = null;
+				throw new ExpiredTokenException("Token is expired.");
 			} else {
 				try {
 					token.updateLastAccess();
@@ -68,7 +68,7 @@ public class TokenService implements ITokenService {
 	 */
 	@Override
 	public List<String> getRolesByTokenId(String tokenId) {
-		AuthToken token = new TokenService().getTokenById(tokenId);
+		AuthToken token = getTokenById(tokenId);
 		return token.getRoles();
 	}
 	

@@ -1,4 +1,4 @@
-package gov.usgs.cida.auth.service.authentication;
+package gov.usgs.cida.auth.service;
 
 import java.math.BigInteger;
 import java.sql.Timestamp;
@@ -29,23 +29,25 @@ public class TestTokenDAO implements IAuthTokenDAO {
 		cal.add(Calendar.DATE, 2);
 		long tomorrow = cal.getTimeInMillis();
 
-		AuthToken t1 = new AuthToken();
-		AuthToken t2 = new AuthToken(); //dun-dun-dun-d-dun
+		AuthToken expiredToken = new AuthToken();
+		AuthToken validToken = new AuthToken();
 		
-		t1.setTokenId("t1");
-		t1.setId(new BigInteger("1"));
-		t1.setIssued(new Timestamp(twoDaysAgo));
-		t1.setLastAccess(new Timestamp(twoDaysAgo));
-		t1.setExpires(new Timestamp(yesterday));
+		expiredToken.setTokenId("expiredTokenId");
+		expiredToken.setId(new BigInteger("1"));
+		expiredToken.setIssued(new Timestamp(twoDaysAgo));
+		expiredToken.setLastAccess(new Timestamp(twoDaysAgo));
+		expiredToken.setExpires(new Timestamp(yesterday));
+		expiredToken.setRoles(Arrays.asList(new String[] { "ROLE1" }));
 
-		t2.setTokenId("t2");
-		t2.setId(new BigInteger("2"));
-		t2.setIssued(new Timestamp(now));
-		t2.setLastAccess(new Timestamp(now));
-		t2.setExpires(new Timestamp(tomorrow));
+		validToken.setTokenId("validTokenId");
+		validToken.setId(new BigInteger("2"));
+		validToken.setIssued(new Timestamp(now));
+		validToken.setLastAccess(new Timestamp(now));
+		validToken.setExpires(new Timestamp(tomorrow));
+		validToken.setRoles(Arrays.asList(new String[] { "ROLE2" }));
 		
-		authTokens.add(t1);
-		authTokens.add(t2);
+		authTokens.add(expiredToken);
+		authTokens.add(validToken);
 	}
 
 	@Override
@@ -96,7 +98,14 @@ public class TestTokenDAO implements IAuthTokenDAO {
 
 	@Override
 	public int updateToken(AuthToken token) {
-		return 1;
+		for(AuthToken t: authTokens) {
+			if(t.getTokenId().endsWith(token.getTokenId())) {
+				t = token;
+				return 1;
+			}
+		}
+		
+		return 0;
 	}
 
 	@Override

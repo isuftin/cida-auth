@@ -5,6 +5,7 @@ import static org.junit.Assert.assertNotNull;
 import static org.junit.Assert.assertTrue;
 import gov.usgs.cida.auth.exception.NotAuthorizedException;
 import gov.usgs.cida.auth.model.AuthToken;
+import gov.usgs.cida.auth.service.TestTokenDAO;
 
 import org.junit.Test;
 
