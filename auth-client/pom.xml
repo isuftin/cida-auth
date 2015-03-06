@@ -22,10 +22,11 @@
 			<artifactId>jersey-container-servlet-core</artifactId>
 			<scope>test</scope>
 		</dependency>
+		
+		<!-- Downward libs can exclude this if that want to use a JAXB impl -->
 		<dependency>
 			<groupId>org.glassfish.jersey.media</groupId>
 			<artifactId>jersey-media-moxy</artifactId>
-			<scope>test</scope>
 		</dependency>
 		
 		<!-- Logging -->
