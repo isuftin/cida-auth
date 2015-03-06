@@ -1,12 +1,10 @@
 package gov.usgs.cida.auth.webservice.token;
 
-import gov.usgs.cida.auth.dao.AuthTokenDAO;
 import gov.usgs.cida.auth.model.AuthToken;
 import gov.usgs.cida.auth.service.ServicePaths;
+import gov.usgs.cida.auth.service.token.ITokenService;
 import gov.usgs.cida.auth.service.token.TokenService;
-import gov.usgs.cida.auth.webservice.error.ExpiredTokenException;
 
-import java.util.ArrayList;
 import java.util.List;
 
 import javax.ws.rs.DELETE;
@@ -30,8 +28,9 @@ import com.google.gson.Gson;
  */
 @Path("/")
 public class TokenWebService {
-
 	private final static Logger LOG = LoggerFactory.getLogger(TokenWebService.class);
+	
+	ITokenService tokenService = new TokenService();
 
 	/**
 	 *
@@ -42,7 +41,7 @@ public class TokenWebService {
 	@Path("{tokenId}")
 	@Produces(MediaType.APPLICATION_JSON)
 	public Response getToken(@PathParam("tokenId") @DefaultValue("") String tokenId) {
-		validateToken(tokenId);
+		tokenService.validateToken(tokenId);
 		LOG.trace("Attempting to retrieve token by id '{}'", tokenId);
 		return getTokenResponse(tokenId);
 	}
@@ -56,27 +55,18 @@ public class TokenWebService {
 	@Path("{tokenId}/" + ServicePaths.ROLES)
 	@Produces(MediaType.APPLICATION_JSON)
 	public Response getRolesByToken(@PathParam("tokenId") @DefaultValue("") String tokenId) {
-		validateToken(tokenId);
+		tokenService.validateToken(tokenId);
 		LOG.trace("Attempting to retrieve roles for token '{}'", tokenId);
-		
 		Response response;
-
-		List<String> roles = new ArrayList<String>();
-		AuthToken token = new TokenService().getTokenById(tokenId);
-		if (null != token) {
-			roles = token.getRoles();
-			response = Response.ok(new Gson().toJson(roles), MediaType.APPLICATION_JSON_TYPE).build();
-		} else {
-			response = Response.status(Response.Status.NOT_FOUND).build();
-		}
-		
+		List<String> roles = tokenService.getRolesByTokenId(tokenId);
+		response = Response.ok(new Gson().toJson(roles), MediaType.APPLICATION_JSON_TYPE).build();
 		return response;
 	}
 	
 	@DELETE
 	@Path("{tokenId}")
 	public Response invalidateToken(@PathParam("tokenId") @DefaultValue("") String tokenId) {
-		validateToken(tokenId);
+		tokenService.validateToken(tokenId);
 		LOG.trace("Attempting to delete token by id '{}'", tokenId);
 		return getInvalidateTokenResponse(tokenId);
 	}
@@ -84,7 +74,7 @@ public class TokenWebService {
 	@HEAD
 	@Path("{tokenId}")
 	public Response checkToken(@PathParam("tokenId") @DefaultValue("") String tokenId) {
-		validateToken(tokenId);
+		tokenService.validateToken(tokenId);
 		LOG.trace("Attempting to retrieve token by id '{}'", tokenId);
 		return getCheckTokenResponse(tokenId);
 	}
@@ -96,7 +86,7 @@ public class TokenWebService {
 	 * @return 
 	 */
 	protected Response getInvalidateTokenResponse(String tokenId) {
-		int deleted = new AuthTokenDAO().deleteTokenUsingId(tokenId);
+		int deleted = tokenService.deleteToken(tokenId);
 		if (deleted == 1) {
 			LOG.trace("Deleted token by id '{}'", tokenId);
 		} else {
@@ -131,22 +121,11 @@ public class TokenWebService {
 	 */
 	private Response getCheckTokenResponse(String tokenId) {
 		Response response;
-		if (new AuthTokenDAO().exists(tokenId)) {
+		if (tokenService.tokenExists(tokenId)) {
 			response = Response.ok().build();
 		} else {
 			response = Response.status(Response.Status.NOT_FOUND).build();
 		}
 		return response;
-	}
-	
-	private void validateToken(String tokenId) throws ExpiredTokenException {
-		if(!isTokenValid(tokenId)) {
-			throw new ExpiredTokenException("Token is expired or does not exist.");
-		}
-	}
-	
-	private boolean isTokenValid(String tokenId) {
-		AuthTokenDAO dao = new AuthTokenDAO();
-		return dao.exists(tokenId) && !dao.getByTokenById(tokenId).isExpired();
 	}
 }

@@ -22,7 +22,7 @@ import org.apache.ibatis.session.SqlSessionFactory;
  *
  * @author isuftin
  */
-public class AuthTokenDAO {
+public class AuthTokenDAO implements IAuthTokenDAO {
 
 	private final SqlSessionFactory sqlSessionFactory;
 	final static String TOKEN_MAPPER_PACKAGE = "gov.usgs.cida.mybatis.mappers.AuthTokenMapper";
@@ -37,11 +37,10 @@ public class AuthTokenDAO {
 		sqlSessionFactory = factory;
 	}
 
-	/**
-	 * Gets all available authentication tokens
-	 *
-	 * @return
+	/* (non-Javadoc)
+	 * @see gov.usgs.cida.auth.dao.IAuthTokenDAO#getAll()
 	 */
+	@Override
 	public List<AuthToken> getAll() {
 		List<AuthToken> result;
 
@@ -52,12 +51,10 @@ public class AuthTokenDAO {
 		return result;
 	}
 
-	/**
-	 * Gets an authentication token based on an ID
-	 *
-	 * @param id
-	 * @return
+	/* (non-Javadoc)
+	 * @see gov.usgs.cida.auth.dao.IAuthTokenDAO#getByTokenById(java.lang.String)
 	 */
+	@Override
 	public AuthToken getByTokenById(String id) {
 		AuthToken result;
 		try (SqlSession session = sqlSessionFactory.openSession()) {
@@ -66,12 +63,10 @@ public class AuthTokenDAO {
 		return result;
 	}
 	
-	/**
-	 * Retrieves a list of role names associated with a username.
-	 *
-	 * @param username
-	 * @return
+	/* (non-Javadoc)
+	 * @see gov.usgs.cida.auth.dao.IAuthTokenDAO#getRoles(java.lang.String)
 	 */
+	@Override
 	public List<String> getRoles(String username) {
 		List<String> results;
 		try (SqlSession session = sqlSessionFactory.openSession()) {
@@ -80,11 +75,10 @@ public class AuthTokenDAO {
 		return results;
 	}
 
-	/**
-	 * Gets all tokens that have passed their expiration date
-	 *
-	 * @return
+	/* (non-Javadoc)
+	 * @see gov.usgs.cida.auth.dao.IAuthTokenDAO#getExpiredTokens()
 	 */
+	@Override
 	public List<AuthToken> getExpiredTokens() {
 		List<AuthToken> result;
 
@@ -95,12 +89,10 @@ public class AuthTokenDAO {
 		return result;
 	}
 
-	/**
-	 * Deletes a token based on a token ID
-	 *
-	 * @param id
-	 * @return 1 if deleted, 0 if not
+	/* (non-Javadoc)
+	 * @see gov.usgs.cida.auth.dao.IAuthTokenDAO#deleteTokenUsingId(java.lang.String)
 	 */
+	@Override
 	public int deleteTokenUsingId(String id) {
 		int result;
 		try (SqlSession session = sqlSessionFactory.openSession()) {
@@ -110,10 +102,10 @@ public class AuthTokenDAO {
 		return result;
 	}
 	
-	/**
-	 * 
-	 * @return 
+	/* (non-Javadoc)
+	 * @see gov.usgs.cida.auth.dao.IAuthTokenDAO#deleteExpiredTokens()
 	 */
+	@Override
 	public int deleteExpiredTokens() {
 		int result;
 		try (SqlSession session = sqlSessionFactory.openSession()) {
@@ -123,12 +115,10 @@ public class AuthTokenDAO {
 		return result;
 	}
  
-	/**
-	 * Inserts an AuthToken
-	 *
-	 * @param token
-	 * @return 1 if inserted, 0 if not
+	/* (non-Javadoc)
+	 * @see gov.usgs.cida.auth.dao.IAuthTokenDAO#insertToken(gov.usgs.cida.auth.model.AuthToken)
 	 */
+	@Override
 	public int insertToken(AuthToken token) {
 		int result;
 		try (SqlSession session = sqlSessionFactory.openSession()) {
@@ -151,6 +141,10 @@ public class AuthTokenDAO {
 		return result;
 	}
 
+	/* (non-Javadoc)
+	 * @see gov.usgs.cida.auth.dao.IAuthTokenDAO#updateToken(gov.usgs.cida.auth.model.AuthToken)
+	 */
+	@Override
 	public int updateToken(AuthToken token) {
 		int result;
 		try (SqlSession session = sqlSessionFactory.openSession()) {
@@ -160,12 +154,10 @@ public class AuthTokenDAO {
 		return result;
 	}
 
-	/**
-	 * Updates AuthToken expiration based on the expiration field in the token
-	 *
-	 * @param token
-	 * @return 1 if updated, 0 if not
+	/* (non-Javadoc)
+	 * @see gov.usgs.cida.auth.dao.IAuthTokenDAO#updateTokenExpiration(gov.usgs.cida.auth.model.AuthToken)
 	 */
+	@Override
 	public int updateTokenExpiration(AuthToken token) {
 		int result;
 		try (SqlSession session = sqlSessionFactory.openSession()) {
@@ -175,13 +167,10 @@ public class AuthTokenDAO {
 		return result;
 	}
 
-	/**
-	 * Updates the AuthToken last access based on the last access field in the
-	 * token
-	 *
-	 * @param token
-	 * @return
+	/* (non-Javadoc)
+	 * @see gov.usgs.cida.auth.dao.IAuthTokenDAO#updateTokenLastAccess(gov.usgs.cida.auth.model.AuthToken)
 	 */
+	@Override
 	public int updateTokenLastAccess(AuthToken token) {
 		int result;
 		try (SqlSession session = sqlSessionFactory.openSession()) {
@@ -191,23 +180,18 @@ public class AuthTokenDAO {
 		return result;
 	}
 	
-	/**
-	 * Create and insert an AuthToken with the set of roles. Will expired in 1 day.
-	 * 
-	 * @param roles
-	 * @return AuthToken
+	/* (non-Javadoc)
+	 * @see gov.usgs.cida.auth.dao.IAuthTokenDAO#create(gov.usgs.cida.auth.model.User)
 	 */
+	@Override
 	public AuthToken create(User user) {
 		return create(user, ONE_HOUR_IN_SECONDS);
 	}
 	
-	/**
-	 * Create and insert an AuthToken with the set of roles and duration.
-	 * 
-	 * @param roles
-	 * @param ttl seconds until this AuthToken expires
-	 * @return AuthToken
+	/* (non-Javadoc)
+	 * @see gov.usgs.cida.auth.dao.IAuthTokenDAO#create(gov.usgs.cida.auth.model.User, int)
 	 */
+	@Override
 	public AuthToken create(User user, int ttl) {
 		String username = user.getUsername();
 		if (StringUtils.isBlank(username)) {
@@ -240,12 +224,10 @@ public class AuthTokenDAO {
 		return token;
 	}
 
-	/**
-	 * Do a cheap check if a token exists
-	 *
-	 * @param tokenId
-	 * @return
+	/* (non-Javadoc)
+	 * @see gov.usgs.cida.auth.dao.IAuthTokenDAO#exists(java.lang.String)
 	 */
+	@Override
 	public boolean exists(String tokenId) {
 		boolean exists = false;
 		try (SqlSession session = sqlSessionFactory.openSession()) {

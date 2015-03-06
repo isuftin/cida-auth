@@ -1,4 +1,4 @@
-package gov.usgs.cida.auth.webservice.error;
+package gov.usgs.cida.auth.exception;
 
 /**
  *

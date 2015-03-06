@@ -34,7 +34,7 @@ import org.junit.experimental.categories.Category;
 public class AuthTokenDAOIT {
 	
 	private static SqlSessionFactory sqlSessionFactory;
-	private AuthTokenDAO dao;
+	private IAuthTokenDAO dao;
 	private User user;
 	private List<String> roles;
 

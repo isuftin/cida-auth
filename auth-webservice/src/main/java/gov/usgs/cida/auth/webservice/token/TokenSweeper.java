@@ -1,4 +1,4 @@
-package gov.usgs.cida.auth.service;
+package gov.usgs.cida.auth.webservice.token;
 
 import gov.usgs.cida.auth.dao.AuthTokenDAO;
 import java.util.Timer;
