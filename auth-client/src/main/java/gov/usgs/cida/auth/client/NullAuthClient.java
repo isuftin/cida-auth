@@ -1,9 +1,12 @@
 package gov.usgs.cida.auth.client;
 
 import gov.usgs.cida.auth.model.AuthToken;
+import java.sql.Timestamp;
+import java.time.Instant;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
+import java.util.UUID;
 import javax.naming.Context;
 import javax.naming.InitialContext;
 
@@ -35,7 +38,7 @@ public class NullAuthClient implements IAuthClient {
 			String delimitedRoles =  (String) ctx.lookup("java:comp/env/" + AUTH_ROLES_JNDI_NAME);
 			if (delimitedRoles != null) {
 				String[] split = delimitedRoles.split(AUTH_ROLES_DELIMITER);
-				roles = Arrays.asList(split);
+				roles.addAll(Arrays.asList(split));
 			}
 		} catch (NamingException ex) {
 			LOG.debug("JNDI name " + AUTH_ROLES_JNDI_NAME + "not set, users will have no roles assigned");
@@ -44,13 +47,19 @@ public class NullAuthClient implements IAuthClient {
 	
 	@Override
 	public AuthToken getNewToken(String username, String password) {
-		AuthToken authToken = new AuthToken();
+		AuthToken authToken = getToken(UUID.randomUUID().toString());
 		return authToken;
 	}
 
 	@Override
 	public AuthToken getToken(String tokenId) {
 		AuthToken authToken = new AuthToken();
+		authToken.setIssued(Timestamp.from(Instant.now()));
+		authToken.setLastAccess(Timestamp.from(Instant.now()));
+		authToken.setExpires(Timestamp.from(Instant.MAX));
+		authToken.setRoles(roles);
+		authToken.setTokenId(tokenId);
+		authToken.setUsername("jdoe");
 		return authToken;
 	}
 
@@ -61,12 +70,16 @@ public class NullAuthClient implements IAuthClient {
 
 	@Override
 	public boolean isValidToken(String tokenId) {
-		return true;
+		return tokenId != null;
 	}
 
 	@Override
 	public boolean isValidToken(AuthToken token) {
-		return true;
+		if (token != null) {
+			return isValidToken(token.getTokenId());
+		} else {
+			return false;
+		}
 	}
 
 	@Override
