@@ -41,7 +41,7 @@ public class NullAuthClient implements IAuthClient {
 				roles.addAll(Arrays.asList(split));
 			}
 		} catch (NamingException ex) {
-			LOG.debug("JNDI name " + AUTH_ROLES_JNDI_NAME + "not set, users will have no roles assigned");
+			LOG.debug("JNDI name " + AUTH_ROLES_JNDI_NAME + " not set, users will have no roles assigned");
 		}
 	}
 	
