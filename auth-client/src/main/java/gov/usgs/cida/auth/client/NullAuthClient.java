@@ -2,9 +2,9 @@ package gov.usgs.cida.auth.client;
 
 import gov.usgs.cida.auth.model.AuthToken;
 import java.sql.Timestamp;
-import java.time.Instant;
 import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.Date;
 import java.util.List;
 import java.util.UUID;
 import javax.naming.Context;
@@ -54,9 +54,9 @@ public class NullAuthClient implements IAuthClient {
 	@Override
 	public AuthToken getToken(String tokenId) {
 		AuthToken authToken = new AuthToken();
-		authToken.setIssued(Timestamp.from(Instant.now()));
-		authToken.setLastAccess(Timestamp.from(Instant.now()));
-		authToken.setExpires(Timestamp.from(Instant.MAX));
+		authToken.setIssued(new Timestamp(new Date().getTime()));
+		authToken.setLastAccess(new Timestamp(new Date().getTime()));
+		authToken.setExpires(new Timestamp(Long.MAX_VALUE));
 		authToken.setRoles(roles);
 		authToken.setTokenId(tokenId);
 		authToken.setUsername("jdoe");
