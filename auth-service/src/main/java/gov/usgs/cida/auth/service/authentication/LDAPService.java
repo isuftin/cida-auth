@@ -25,6 +25,9 @@ public class LDAPService implements IAuthService {
 
 	private static final String JNDI_LDAP_URL_PARAM_NAME = "auth.ldap.url";
 	private static final String JNDI_LDAP_DOMAIN_PARAM_NAME = "auth.ldap.domain";
+	private static final String JNDI_BIND_USER_PREFIX_PARAM_NAME = "auth.ldap.bind.user.prefix";
+	private static final String JNDI_BIND_USER_SUFFIX_PARAM_NAME = "auth.ldap.bind.user.suffix";
+	private static final String DEFAULT_BIND_USER_SUFFIX = "@gs.doi.net";
 
 	public LDAPService() {
 	}
@@ -42,10 +45,20 @@ public class LDAPService implements IAuthService {
 		
 		String url = props.getProperty(JNDI_LDAP_URL_PARAM_NAME);
 		String domain = props.getProperty(JNDI_LDAP_DOMAIN_PARAM_NAME);
+		String bindUserPrefix = props.getProperty(JNDI_BIND_USER_PREFIX_PARAM_NAME);
+		String bindUserSuffix = props.getProperty(JNDI_BIND_USER_SUFFIX_PARAM_NAME);
+		
 		if (StringUtils.isBlank(url) || StringUtils.isBlank(domain)) {
 			LOG.error("Error authenticating against LDAP. Check that JNDI parameters are configured.");
 		} else {
-			user = authenticate(username, password, url, domain);
+			user = authenticate(
+					username, 
+					password, 
+					url, 
+					domain,
+					bindUserPrefix != null ? bindUserPrefix : "",
+					bindUserSuffix != null ? bindUserSuffix : DEFAULT_BIND_USER_SUFFIX
+					);
 		}
 
 		return user;
@@ -60,8 +73,10 @@ public class LDAPService implements IAuthService {
 	 * @param basedn
 	 * @return
 	 */
-	private User authenticate(String username, char[] password, String ldapUrl, String basedn) {
-		//basedn should be "DC=gs,DC=doi,dc=net"
+	private User authenticate(String username, char[] password, String ldapUrl, String basedn, String bindUserPrefix, String bindUserSuffix) {
+		//basedn should default to "DC=gs,DC=doi,dc=net"
+		//bind suffix should default to "@gs.doi.net"
+		
 		Properties props = new Properties();
 		props.put(Context.INITIAL_CONTEXT_FACTORY, "com.sun.jndi.ldap.LdapCtxFactory");
 		props.put(Context.PROVIDER_URL, ldapUrl);
@@ -69,7 +84,7 @@ public class LDAPService implements IAuthService {
 		props.put(Context.SECURITY_AUTHENTICATION, "simple");
 
 		// set properties for authentication
-		props.put(Context.SECURITY_PRINCIPAL, username + "@gs.doi.net");
+		props.put(Context.SECURITY_PRINCIPAL, bindUserPrefix + username + bindUserSuffix);
 		props.put(Context.SECURITY_CREDENTIALS, password);
 
 		User user = new User();
@@ -87,9 +102,9 @@ public class LDAPService implements IAuthService {
 			if (answers.hasMore()) {
 				SearchResult result = answers.next();
 				Attributes attributes = result.getAttributes();
-				String mail = (String) attributes.get("mail").get();
-				String givenname = (String) attributes.get("givenname").get();
-				String uid = (String) attributes.get("samaccountname").get();
+				String mail = attributes.get("mail") != null ? (String) attributes.get("mail").get() : "";
+				String givenname = attributes.get("givenname") != null ? (String) attributes.get("givenname").get() : "";
+				String uid = attributes.get("samaccountname") != null ? (String) attributes.get("samaccountname").get() : "";
 
 				user.setUsername(uid);
 				user.setEmail(mail);
