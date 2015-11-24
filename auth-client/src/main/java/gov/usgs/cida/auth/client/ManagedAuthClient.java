@@ -51,7 +51,7 @@ public class ManagedAuthClient extends AuthClient {
 			LOG.info("User {} could not authenticate. Error Code: {}, Reason: {}", username, ex.getResponse().getStatus(), ex.getResponse().getStatusInfo().getReasonPhrase());
 			if(ex.getResponse().getStatus() == Response.Status.FORBIDDEN.getStatusCode() || 
 					ex.getResponse().getStatus() == Response.Status.UNAUTHORIZED.getStatusCode()) {
-				throw new NotAuthorizedException(ex.getResponse());
+				throw new NotAuthorizedException(ex.getMessage());
 			}
 		} finally {
 			closeClientQuietly(client);

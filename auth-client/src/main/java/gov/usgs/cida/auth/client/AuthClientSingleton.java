@@ -37,6 +37,8 @@ public class AuthClientSingleton {
 				authClient = new CachingAuthClient(authUrl);
 			} else if(authClientType.equals(NullAuthClient.class)) {
 				authClient = new NullAuthClient();
+			} else if(authClientType.equals(ManagedAuthClient.class)) {
+				authClient = new ManagedAuthClient(authUrl);
 			} else {
 				LOG.warn("Unknown IAuthClient type");
 			}
