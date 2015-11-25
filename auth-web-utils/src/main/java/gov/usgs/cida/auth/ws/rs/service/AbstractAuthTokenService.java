@@ -18,6 +18,21 @@ import javax.ws.rs.core.Response;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+/**
+ * Abstract service class which provides concrete, overridable implementations of
+ * the getToken and logout services. 
+ * 
+ * <b>NOTE:</b> If you have a Jersey service that is extending this class (and you 
+ * absolutely should have one), it is important to add the @Path annotation at the 
+ * class level to your concrete class. Jersey will not scan @Path annotations on 
+ * inherited classes and you will not be able to register this class via Jersey 
+ * through org.glassfish.jersey.server.ResourceConfig#packages() function because
+ * Jersey will try to instantiate this abstract class
+ * 
+ * More info <a href="http://tinyurl.com/nq8wu3v">in the Jersey docs</a>
+ * 
+ * @author isuftin, thongsav
+ */
 @Path("auth")
 public abstract class AbstractAuthTokenService {
 	private static final Logger LOG = LoggerFactory.getLogger(AbstractAuthTokenService.class);
