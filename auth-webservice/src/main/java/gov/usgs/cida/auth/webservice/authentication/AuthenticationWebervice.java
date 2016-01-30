@@ -61,8 +61,9 @@ public class AuthenticationWebervice {
 	
 	@GET
 	@Path(ServicePaths.OAUTH + "/" + ServicePaths.OAUTH_BEGIN)
-	public Response redirectOauth(@QueryParam("redirectTemplate") String redirectTemplate) throws NamingException, URISyntaxException, UnsupportedEncodingException {
-		URI targetURIForRedirection = new URI(oAuthService.buildOauthTargetRequest(redirectTemplate));
+	public Response redirectOauth(@QueryParam("successUrl") String successUrl,
+			@QueryParam("redirectTemplate") String redirectTemplate) throws NamingException, URISyntaxException, UnsupportedEncodingException {
+		URI targetURIForRedirection = new URI(oAuthService.buildOauthTargetRequest(successUrl, redirectTemplate));
 		return Response.seeOther(targetURIForRedirection).build();
 	}
 	

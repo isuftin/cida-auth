@@ -43,19 +43,17 @@ public class OAuthService {
 	private static final String JNDI_OATH_URL_PARAM_NAME = "auth.oauth.endpoint";
 	private static final String JNDI_CLIENT_ID_PARAM_NAME = "auth.oauth.client.id";
 	private static final String JNDI_CLIENT_SECRET_PARAM_NAME = "auth.oath.client.secret";
-	private static final String JNDI_SUCCESS_URL_PARAM_NAME = "auth.oauth.success.handler";
 	private static final String JNDI_REQUIRED_DOMAIN_PARAM_NAME = "auth.oauth.required.domain";
 
-	private static final String CIDA_AUTH_TEMPLATE_REPLACEMENT_STRING = "{cida_auth_token}";
+	private static final String CIDA_AUTH_TEMPLATE_REPLACEMENT_STRING = "[cida_auth_token]";
 
 	private static final int DATA_TTL = 300000; //data only kept around for 5 minutes
-	private static final Cache<String, String> inProgressState = 
+	private static final Cache<String, String[]> inProgressState = 
 			CacheBuilder.newBuilder().expireAfterWrite(DATA_TTL, TimeUnit.MILLISECONDS).build();
 
 	private String url;
 	private String clientId;
 	private String clientSecret;
-	private String successUrl;
 	private String requiredDomain;
 
 	private IAuthTokenDAO authTokenDao; 
@@ -73,13 +71,12 @@ public class OAuthService {
 		url = props.getProperty(JNDI_OATH_URL_PARAM_NAME);
 		clientId = props.getProperty(JNDI_CLIENT_ID_PARAM_NAME);
 		clientSecret = props.getProperty(JNDI_CLIENT_SECRET_PARAM_NAME);
-		successUrl = props.getProperty(JNDI_SUCCESS_URL_PARAM_NAME);
 		requiredDomain = props.getProperty(JNDI_REQUIRED_DOMAIN_PARAM_NAME);
 	}
 
-	public String buildOauthTargetRequest(String redirectTemplate) throws UnsupportedEncodingException {
+	public String buildOauthTargetRequest(String successUrl, String redirectTemplate) throws UnsupportedEncodingException {
 		String state = UUID.randomUUID().toString();
-		inProgressState.asMap().put(state, redirectTemplate);
+		inProgressState.asMap().put(state, new String[] { successUrl, redirectTemplate });
 
 		StringBuilder fullUrl = new StringBuilder();
 		fullUrl.append(url)
@@ -93,15 +90,17 @@ public class OAuthService {
 
 	public String authorize(String code, String state) throws NotAuthorizedException {
 		//Build final redirect URL and confirm state parameter for anti-forgery protection
-		String redirectUrl = inProgressState.asMap().get(state);
-		if(redirectUrl == null) { //not valid unless this state ID has been registered here recently by buildOauthTargetRequest
+		String[] savedState = inProgressState.asMap().get(state);
+		if(savedState == null) { //not valid unless this state ID has been registered here recently by buildOauthTargetRequest
 			throw new NotAuthorizedException();
 		}
+		String successUrl = savedState[0];
+		String redirectUrl = savedState[1];
 
 		//Use code to pull down ID
 		Map<String, String> idToken = null;
 		try {
-			idToken =  getIdTokenAsMap(code);
+			idToken =  getIdTokenAsMap(code, successUrl);
 			
 			String email = idToken.get("email");
 			String name = idToken.get("name");
@@ -132,7 +131,7 @@ public class OAuthService {
 		return redirectUrl;
 	}
 
-	private Map<String, String> getIdTokenAsMap(String code) throws IOException {
+	private Map<String, String> getIdTokenAsMap(String code, String successUrl) throws IOException {
 		GoogleTokenResponse response =
 				new GoogleAuthorizationCodeTokenRequest(new NetHttpTransport(), new JacksonFactory(),
 						clientId, clientSecret, code, successUrl)
