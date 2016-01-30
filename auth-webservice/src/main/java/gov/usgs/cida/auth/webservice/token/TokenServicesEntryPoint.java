@@ -2,6 +2,7 @@ package gov.usgs.cida.auth.webservice.token;
 
 import gov.usgs.cida.auth.service.ServicePaths;
 import gov.usgs.cida.auth.webservice.error.ExpiredTokenExceptionMapper;
+import gov.usgs.cida.auth.webservice.error.GenericExceptionMapper;
 
 import java.util.HashSet;
 import java.util.Set;
@@ -25,6 +26,7 @@ public class TokenServicesEntryPoint extends Application {
 		
 		//error provider
 		classes.add(ExpiredTokenExceptionMapper.class);
+		classes.add(GenericExceptionMapper.class);
 
 		return classes;
 	}
