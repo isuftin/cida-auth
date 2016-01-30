@@ -1,5 +1,6 @@
 <?xml version="1.0"?>
-<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
+<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+	xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
 	<modelVersion>4.0.0</modelVersion>
 	<parent>
 		<groupId>gov.usgs.cida.auth</groupId>
@@ -9,24 +10,30 @@
 	<artifactId>auth-service</artifactId>
 	<packaging>jar</packaging>
 	<name>CIDA Auth Service Layer</name>
-	
+
 	<properties>
 		<project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
 	</properties>
-	
+
 	<dependencies>
 		<!-- Inter-Module -->
 		<dependency>
 			<groupId>gov.usgs.cida.auth</groupId>
 			<artifactId>auth-database</artifactId>
 		</dependency>
-		
+
 		<!-- Jersey, used for rest client -->
 		<dependency>
 			<groupId>org.glassfish.jersey.containers</groupId>
 			<artifactId>jersey-container-servlet</artifactId>
 		</dependency>
-		
+
+		<!-- OAuth or OpenId Connect -->
+		<dependency>
+			<groupId>com.google.api-client</groupId>
+			<artifactId>google-api-client</artifactId>
+		</dependency>
+
 		<!-- Logging -->
 		<dependency>
 			<groupId>ch.qos.logback</groupId>
@@ -37,7 +44,7 @@
 			<artifactId>slf4j-api</artifactId>
 			<groupId>org.slf4j</groupId>
 		</dependency>
-		
+
 		<!-- Testing -->
 		<dependency>
 			<groupId>org.hamcrest</groupId>
@@ -47,7 +54,7 @@
 			<groupId>junit</groupId>
 			<artifactId>junit</artifactId>
 		</dependency>
-		
+
 		<!-- Other -->
 		<dependency>
 			<groupId>gov.usgs.cida</groupId>
@@ -57,11 +64,16 @@
 			<groupId>org.apache.commons</groupId>
 			<artifactId>commons-lang3</artifactId>
 		</dependency>
+
+		<dependency>
+			<groupId>com.google.guava</groupId>
+			<artifactId>guava</artifactId>
+		</dependency>
 	</dependencies>
-	
+
 	<build>
 		<plugins>
 		</plugins>
 	</build>
-	
+
 </project>
