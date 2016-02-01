@@ -36,10 +36,13 @@ public class ManagedAuthTokenService implements IAuthTokenService{
 	
 	@Override
 	public AuthToken authenticate(String username, char[] password) throws NotAuthorizedException {
-		User user = authService.authenticate(username, password);
-		user.setRoles(authTokenDao.getRoles(username));
-		LOG.debug("User {} has authenticated", user.getUsername());
+		LOG.debug("Authenticating {} using externally managed system", username);
 		
+		User user = authService.authenticate(username, password);
+		
+		//add role to this user signaling they were authenticated using externally managed systems
+		user.getRoles().add(AuthenticationRoles.MANAGED_SERVICE_AUTHENTICATED.toString());
+				
 		if (user.isAuthenticated()) {
 			AuthToken token = authTokenDao.create(user);
 			return token;

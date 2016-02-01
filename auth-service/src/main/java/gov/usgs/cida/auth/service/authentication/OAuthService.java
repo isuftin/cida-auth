@@ -38,8 +38,6 @@ import gov.usgs.cida.config.DynamicReadOnlyProperties;
 public class OAuthService {
 	private static final Logger LOG = LoggerFactory.getLogger(OAuthService.class);
 	
-	public static final String OAUTH_AUTHENTICATED_BASE_ROLE = "DOI_OAUTH_AUTHENTICATED";
-
 	private static final String JNDI_OATH_URL_PARAM_NAME = "auth.oauth.endpoint";
 	private static final String JNDI_CLIENT_ID_PARAM_NAME = "auth.oauth.client.id";
 	private static final String JNDI_CLIENT_SECRET_PARAM_NAME = "auth.oath.client.secret";
@@ -120,7 +118,10 @@ public class OAuthService {
 			user.setGivenName(name);
 			user.setEmail(email);
 			user.setAuthenticated(true);
-			user.setRoles(Arrays.asList(new String[] { OAUTH_AUTHENTICATED_BASE_ROLE }));
+			
+			//See comment on this method, roles are NOT restricted to user's domain.
+			CidaActiveDirectoryTokenService.loadRoles(user, AuthenticationRoles.OAUTH_AUTHENTICATED.toString(), authTokenDao);
+			
 			AuthToken token = authTokenDao.create(user);
 			
 			redirectUrl = redirectUrl.replace(CIDA_AUTH_TEMPLATE_REPLACEMENT_STRING, token.getTokenId());
@@ -131,6 +132,7 @@ public class OAuthService {
 		return redirectUrl;
 	}
 
+	@SuppressWarnings("unchecked")
 	private Map<String, String> getIdTokenAsMap(String code, String successUrl) throws IOException {
 		GoogleTokenResponse response =
 				new GoogleAuthorizationCodeTokenRequest(new NetHttpTransport(), new JacksonFactory(),
