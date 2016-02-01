@@ -1,5 +1,7 @@
 package gov.usgs.cida.auth.service.authentication;
 
+import java.util.ArrayList;
+
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -56,7 +58,9 @@ public class CidaActiveDirectoryTokenService implements IAuthTokenService {
 	* remains known and is restricted to the domain the roles manager expects.
 	*/
 	public static void loadRoles(User user, String authenticationMethod, IAuthTokenDAO authTokenDao) {
-		user.setRoles(authTokenDao.getRoles(user.getUsername()));
-		user.getRoles().add(authenticationMethod);
+		ArrayList<String> newRoles = new ArrayList<>();
+		newRoles.addAll(authTokenDao.getRoles(user.getUsername()));
+		newRoles.add(authenticationMethod);
+		user.setRoles(newRoles);
 	}
 }
