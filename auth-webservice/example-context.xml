@@ -59,7 +59,4 @@
 	<Environment name="auth.oauth.endpoint" type="java.lang.String" value="https://accounts.google.com/o/oauth2/v2/auth" />
 	<Environment name="auth.oauth.client.id" type="java.lang.String" value="YOUR CLIENT ID" />
 	<Environment name="auth.oath.client.secret" type="java.lang.String" value="YOUR CLIENT SECRET" />
-	<!-- The following is a example during local dev, this URL must be accessable be end user's browser
-		likely involving a proxy provided by applications -->
-	<Environment name="auth.oauth.success.handler" type="java.lang.String" value="https://localhost:8443/auth-webservice/auth/oauth/success" />
 </Context>
