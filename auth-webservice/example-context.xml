@@ -56,6 +56,7 @@
 	<Environment name="auth.crowd.url" type="java.lang.String" value="https://my.usgs.gov/crowd/rest/usermanagement/latest" />
 		
 	<!-- External oauth for authentication-->
+	<Environment name="auth.oauth.required.domain" type="java.lang.String" value="usgs.gov" />
 	<Environment name="auth.oauth.endpoint" type="java.lang.String" value="https://accounts.google.com/o/oauth2/v2/auth" />
 	<Environment name="auth.oauth.client.id" type="java.lang.String" value="YOUR CLIENT ID" />
 	<Environment name="auth.oath.client.secret" type="java.lang.String" value="YOUR CLIENT SECRET" />

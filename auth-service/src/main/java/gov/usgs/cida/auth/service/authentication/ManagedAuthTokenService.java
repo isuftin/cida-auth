@@ -1,5 +1,7 @@
 package gov.usgs.cida.auth.service.authentication;
 
+import java.util.ArrayList;
+
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -41,7 +43,7 @@ public class ManagedAuthTokenService implements IAuthTokenService{
 		User user = authService.authenticate(username, password);
 		
 		//add role to this user signaling they were authenticated using externally managed systems
-		user.getRoles().add(AuthenticationRoles.MANAGED_SERVICE_AUTHENTICATED.toString());
+		addManagedRole(user);
 				
 		if (user.isAuthenticated()) {
 			AuthToken token = authTokenDao.create(user);
@@ -51,4 +53,12 @@ public class ManagedAuthTokenService implements IAuthTokenService{
 		}
 	}
 
+	private static void addManagedRole(User user) {
+		ArrayList<String> newRoles = new ArrayList<>();
+		if(user.getRoles() != null) {
+			newRoles.addAll(user.getRoles());
+		}
+		newRoles.add(AuthenticationRoles.MANAGED_SERVICE_AUTHENTICATED.toString());
+		user.setRoles(newRoles);
+	}
 }
