@@ -1,6 +1,8 @@
 package gov.usgs.cida.auth.webservice.authentication;
 
 import gov.usgs.cida.auth.service.ServicePaths;
+import gov.usgs.cida.auth.webservice.error.GenericExceptionMapper;
+
 import java.util.HashSet;
 import java.util.Set;
 import javax.ws.rs.ApplicationPath;
@@ -19,6 +21,7 @@ public class AuthenticationServicesEntryPoint extends Application {
 
 		// webservices
 		classes.add(AuthenticationWebervice.class);
+		classes.add(GenericExceptionMapper.class);
 
 		return classes;
 	}

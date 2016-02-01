@@ -36,8 +36,10 @@ public class CidaActiveDirectoryTokenService implements IAuthTokenService {
 	
 	@Override
 	public AuthToken authenticate(String username, char[] password) throws NotAuthorizedException {
+		
 		User user = authService.authenticate(username, password);
-		user.setRoles(authTokenDao.getRoles(username));
+		loadRoles(user, AuthenticationRoles.AD_AUTHENTICATED.toString(), authTokenDao);
+
 		LOG.debug("User {} has authenticated", user.getUsername());
 		
 		if (user.isAuthenticated()) {
@@ -46,5 +48,15 @@ public class CidaActiveDirectoryTokenService implements IAuthTokenService {
 		} else {
 			throw new NotAuthorizedException();
 		}
+	}
+	
+	/**
+	* ***NOTE***, these roles are NOT restricted by domain (eg: johndoe@usgs.gov will get 
+	* the roles of johndoe@gmail.com), this is OK *as long as* the authentication mechanism 
+	* remains known and is restricted to the domain the roles manager expects.
+	*/
+	public static void loadRoles(User user, String authenticationMethod, IAuthTokenDAO authTokenDao) {
+		user.setRoles(authTokenDao.getRoles(user.getUsername()));
+		user.getRoles().add(authenticationMethod);
 	}
 }

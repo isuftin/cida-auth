@@ -12,4 +12,7 @@ public class ServicePaths {
 	public final static String AD = "ad";
 	public final static String ROLES = "roles";
 	public final static String MANAGED = "managed";
+	public final static String OAUTH = "oauth";
+	public final static String OAUTH_BEGIN = "begin";
+	public final static String OAUTH_SUCCESS = "success";
 }

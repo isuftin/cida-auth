@@ -6,14 +6,21 @@ import gov.usgs.cida.auth.service.ServicePaths;
 import gov.usgs.cida.auth.service.authentication.CidaActiveDirectoryTokenService;
 import gov.usgs.cida.auth.service.authentication.IAuthTokenService;
 import gov.usgs.cida.auth.service.authentication.ManagedAuthTokenService;
+import gov.usgs.cida.auth.service.authentication.OAuthService;
+
+import java.io.UnsupportedEncodingException;
+import java.net.URI;
+import java.net.URISyntaxException;
 
 import javax.naming.NamingException;
 import javax.ws.rs.Consumes;
 import javax.ws.rs.DefaultValue;
 import javax.ws.rs.FormParam;
+import javax.ws.rs.GET;
 import javax.ws.rs.POST;
 import javax.ws.rs.Path;
 import javax.ws.rs.Produces;
+import javax.ws.rs.QueryParam;
 import javax.ws.rs.core.MediaType;
 import javax.ws.rs.core.Response;
 
@@ -26,6 +33,7 @@ public class AuthenticationWebervice {
 
 	private IAuthTokenService cidaActiveDirectoryAuthTokenService = new CidaActiveDirectoryTokenService();
 	private IAuthTokenService managedAuthTokenService = new ManagedAuthTokenService();
+	private OAuthService oAuthService = new OAuthService();
 	
 	@POST
 	@Path(ServicePaths.AD + "/" + ServicePaths.TOKEN)
@@ -49,6 +57,21 @@ public class AuthenticationWebervice {
 			@DefaultValue("") String password) throws NamingException {
 		LOG.trace("User {} is attempting to authenticate", username);
 		return getADResponse(managedAuthTokenService, username, password.toCharArray());
+	}
+	
+	@GET
+	@Path(ServicePaths.OAUTH + "/" + ServicePaths.OAUTH_BEGIN)
+	public Response redirectOauth(@QueryParam("successUrl") String successUrl,
+			@QueryParam("redirectTemplate") String redirectTemplate) throws NamingException, URISyntaxException, UnsupportedEncodingException {
+		URI targetURIForRedirection = new URI(oAuthService.buildOauthTargetRequest(successUrl, redirectTemplate));
+		return Response.seeOther(targetURIForRedirection).build();
+	}
+	
+	@GET
+	@Path(ServicePaths.OAUTH + "/" + ServicePaths.OAUTH_SUCCESS)
+	public Response acceptOauthResponse(@QueryParam("code") String code, @QueryParam("state") String state) throws NamingException, URISyntaxException, NotAuthorizedException {
+		URI targetURIForRedirection = new URI(oAuthService.authorize(code, state));
+		return Response.seeOther(targetURIForRedirection).build();
 	}
 
 	/**
