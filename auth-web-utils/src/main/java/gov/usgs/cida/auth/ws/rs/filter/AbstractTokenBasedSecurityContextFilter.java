@@ -52,23 +52,17 @@ public abstract class AbstractTokenBasedSecurityContextFilter implements Contain
 	 */
 	public abstract List<String> getAuthorizedRoles();
 	
-    @Override
-    public void filter(ContainerRequestContext requestContext) {
-    	boolean sessionAuthorized = false;
-    	boolean tokenAuthorized = false;
-    	try {
-	    	//The two calls below DO populate the security context with the roles needed. They also update the current session.
-	        sessionAuthorized = SecurityContextUtils.isSessionOrSecurityContextAuthorizedForRoles(requestContext, httpRequest, getAuthorizedRoles());
-	        tokenAuthorized = SecurityContextUtils.isTokenAuthorized(requestContext, httpRequest, getAuthClient(), getAdditionalRoles());
-	        
-	        if(sessionAuthorized && !tokenAuthorized) { //will have to populate the security context
-	        	SecurityContextUtils.populateSecurityContextFromSession(requestContext, httpRequest, getAuthClient());
-	        }
-    	} catch (IllegalArgumentException | IllegalStateException e) {
-    		LOG.warn("Error settings session/security context state", e);
-    	}
-    	
-        LOG.trace("Session authorized: {}", sessionAuthorized);
-        LOG.trace("Token authorized: {}", tokenAuthorized);
-    }
+	@Override
+	public void filter(ContainerRequestContext requestContext) {
+		boolean tokenAuthorized = false;
+		try {
+			if(SecurityContextUtils.isTokenAuthorized(requestContext, httpRequest, getAuthClient(), getAdditionalRoles())) { //will have to populate the security context
+				SecurityContextUtils.populateSecurityContextFromSession(requestContext, httpRequest, getAuthClient());
+			}
+		} catch (IllegalArgumentException | IllegalStateException e) {
+			LOG.warn("Error settings session/security context state", e);
+		}
+		
+		LOG.trace("Token authorized: {}", tokenAuthorized);
+	}
 }

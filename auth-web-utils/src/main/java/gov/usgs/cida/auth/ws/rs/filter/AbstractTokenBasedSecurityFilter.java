@@ -60,24 +60,23 @@ public abstract class AbstractTokenBasedSecurityFilter implements ContainerReque
 	 */
 	public abstract List<String> getUnsecuredUris();
 	
-    @Override
-    public void filter(ContainerRequestContext requestContext) throws IOException {
-    	//if root documentation or authenticate url, continue on without authorization
-    	String requestedUri = requestContext.getUriInfo().getPath();
-    	List<String> allowedUris = getUnsecuredUris();
-    	if(allowedUris == null || !allowedUris.contains(requestedUri)) {
-	        if (!SecurityContextUtils.isSessionOrSecurityContextAuthorizedForRoles(requestContext, httpRequest, getAuthorizedRoles())
-	        		&& !SecurityContextUtils.isTokenAuthorized(requestContext, httpRequest, getAuthClient(), getAdditionalRoles())) {
-	        	blockUnauthorizedRequest(requestContext);
-	        }
-    	}
-    }
-    
-    private void blockUnauthorizedRequest(ContainerRequestContext requestContext) {
-    	LOG.debug("blocking unauthorized request");
-    	requestContext.abortWith(Response
-	            .status(Response.Status.UNAUTHORIZED)
-	            .entity("User cannot access the resource.")
-	            .build());
-    }
+	@Override
+	public void filter(ContainerRequestContext requestContext) throws IOException {
+		//if root documentation or authenticate url, continue on without authorization
+		String requestedUri = requestContext.getUriInfo().getPath();
+		List<String> allowedUris = getUnsecuredUris();
+		if(allowedUris == null || !allowedUris.contains(requestedUri)) {
+			if (!SecurityContextUtils.isTokenAuthorized(requestContext, httpRequest, getAuthClient(), getAdditionalRoles())) {
+				blockUnauthorizedRequest(requestContext);
+			}
+		}
+	}
+	
+	private void blockUnauthorizedRequest(ContainerRequestContext requestContext) {
+		LOG.debug("blocking unauthorized request");
+		requestContext.abortWith(Response
+				.status(Response.Status.UNAUTHORIZED)
+				.entity("User cannot access the resource.")
+				.build());
+	}
 }
