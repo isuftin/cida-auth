@@ -67,9 +67,18 @@ public abstract class AbstractTokenBasedSecurityFilter implements ContainerReque
 		List<String> allowedUris = getUnsecuredUris();
 		if(allowedUris == null || !allowedUris.contains(requestedUri)) {
 			if (!SecurityContextUtils.isTokenAuthorized(requestContext, httpRequest, getAuthClient(), getAdditionalRoles())) {
-				blockUnauthorizedRequest(requestContext);
+				handleUnauthorizedRequest(requestContext);
 			}
 		}
+	}
+	
+	/**
+	 * Override this to customize what happens during an unauthorized request.
+	 * 
+	 * @param requestContext
+	 */
+	public void handleUnauthorizedRequest(ContainerRequestContext requestContext) {
+		blockUnauthorizedRequest(requestContext);
 	}
 	
 	private void blockUnauthorizedRequest(ContainerRequestContext requestContext) {
