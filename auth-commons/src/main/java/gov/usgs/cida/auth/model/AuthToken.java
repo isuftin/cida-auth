@@ -27,8 +27,6 @@ public class AuthToken {
 	@XmlJavaTypeAdapter(TimestampAdapter.class)
 	private Timestamp lastAccess;
 	private List<String> roles;
-	
-	private int ttl = 60000; //default 1 hour
 
 	/**
 	 * Serializes AuthToken to JSON
@@ -148,21 +146,13 @@ public class AuthToken {
 	}
 
 	/**
-	 * Extends the expiration date for this token to a day after its last
-	 * accessed date
-	 */
-	public void extendExpiration() {
-		extendExpiration(ttl);
-	}
-
-	/**
-	 * Extends the token expiration date
+	 * Extends the token expiration date to an hour after lastAccess
 	 *
 	 * @param seconds amount of seconds to extend the expiration date by
 	 */
 	public void extendExpiration(int seconds) {
 		Calendar cal = Calendar.getInstance();
-		cal.setTime(this.expires);
+		cal.setTime(this.lastAccess);
 		cal.add(Calendar.SECOND, seconds);
 		this.expires = new Timestamp(cal.getTimeInMillis());
 	}

@@ -155,7 +155,7 @@ public class AuthTokenDAOIT {
 		List<AuthToken> results = dao.getExpiredTokens();
 		for (AuthToken result : results) {
 			result.updateLastAccess();
-			result.extendExpiration();
+			result.extendExpiration(3600);
 			dao.updateToken(result);
 		}
 
