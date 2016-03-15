@@ -20,7 +20,7 @@ public class HttpTokenUtils {
 	 * @param httpRequest
 	 * @return
 	 */
-	public static String getTokenFromHeader(String authHeader) {
+	private static String getTokenFromHeader(String authHeader) {
 		String token = null;
 
 		if(authHeader != null &&
