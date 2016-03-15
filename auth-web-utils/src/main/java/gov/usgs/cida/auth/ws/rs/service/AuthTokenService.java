@@ -58,7 +58,7 @@ public class AuthTokenService {
 	}
 
 	public Response logout(ContainerRequestContext requestContext, HttpServletRequest httpRequest) {
-		String token = HttpTokenUtils.getTokenFromHeader(httpRequest.getHeader(HttpTokenUtils.AUTHORIZATION_HEADER));
+		String token = HttpTokenUtils.getTokenFromRequest(httpRequest);
 		if(token == null) {
 			token = HttpTokenUtils.getTokenFromPreauthorizedSession(httpRequest);
 		}

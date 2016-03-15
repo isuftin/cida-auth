@@ -23,9 +23,8 @@ public class SecurityContextUtils {
 		boolean authenticated = false;
 		authenticated = HttpTokenUtils.isTokenAuthorized(httpRequest, client, additionalRoles);
 
-		String tokenId = HttpTokenUtils.getTokenFromHeader(httpRequest.getHeader(HttpTokenUtils.AUTHORIZATION_HEADER));
-
 		if(authenticated) {//token is good, populate securitycontext and update browser session
+			String tokenId = HttpTokenUtils.getTokenFromRequest(httpRequest);
 			populateSecurityContext(requestContext, httpRequest, client, tokenId, additionalRoles);
 			HttpTokenUtils.saveTokenToSession(httpRequest, tokenId);
 		}

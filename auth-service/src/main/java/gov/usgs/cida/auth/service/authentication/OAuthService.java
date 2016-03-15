@@ -28,6 +28,7 @@ import gov.usgs.cida.auth.dao.IAuthTokenDAO;
 import gov.usgs.cida.auth.exception.NotAuthorizedException;
 import gov.usgs.cida.auth.model.AuthToken;
 import gov.usgs.cida.auth.model.User;
+import gov.usgs.cida.auth.util.ConfigurationLoader;
 import gov.usgs.cida.config.DynamicReadOnlyProperties;
 
 /**
@@ -122,7 +123,7 @@ public class OAuthService {
 			//See comment on this method, roles are NOT restricted to user's domain.
 			CidaActiveDirectoryTokenService.loadRoles(user, AuthenticationRoles.OAUTH_AUTHENTICATED.toString(), authTokenDao);
 			
-			AuthToken token = authTokenDao.create(user);
+			AuthToken token = authTokenDao.create(user, ConfigurationLoader.getTtlSeconds());
 			
 			redirectUrl = redirectUrl.replace(CIDA_AUTH_TEMPLATE_REPLACEMENT_STRING, token.getTokenId());
 		} catch (IOException e) {
