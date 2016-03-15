@@ -2,18 +2,35 @@ package gov.usgs.cida.auth.client;
 
 import java.net.URISyntaxException;
 
-import javax.naming.Context;
-import javax.naming.InitialContext;
 import javax.naming.NamingException;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+
+import gov.usgs.cida.config.DynamicReadOnlyProperties;
 
 public class AuthClientSingleton {
 	private static final Logger LOG = LoggerFactory.getLogger(AuthClientSingleton.class);
 	public static final String AUTH_SERVICE_JNDI_NAME = "cida.auth.service.endpoint";
 	
 	private static IAuthClient authClient;
+	
+	private static DynamicReadOnlyProperties props = null;
+	
+	private static DynamicReadOnlyProperties getPropInstance() {
+		if (null == props) {
+			try {
+				props = new DynamicReadOnlyProperties().addJNDIContexts();
+			} catch (NamingException e) {
+				LOG.warn("Error occured during initing property reader", e);
+			}
+		}
+		return props;
+	}
+	
+	public static String getProperty(String prop) {
+		return getPropInstance().getJNDIPropertyUsingContexts(prop);
+	}
 
 	public static void initAuthClient(Class<? extends IAuthClient> authClientType) {
 		String authUrl;
@@ -22,13 +39,8 @@ public class AuthClientSingleton {
 			throw new IllegalStateException("cannot initialize the AuthClientSingleton more than once");
 		}
 		
-		try {
-			Context ctx = new InitialContext();
-			authUrl =  (String) ctx.lookup("java:comp/env/" + AUTH_SERVICE_JNDI_NAME);
-		} catch (NamingException ex) {
-			LOG.info("JNDI name cida.auth.service.endpoint must be set to the target authentication service URL");
-			authUrl = "";
-		}
+		authUrl =  getProperty(AUTH_SERVICE_JNDI_NAME);
+		
 		try {
 			LOG.info("Authentication/Authorization service: " + authUrl);
 			if(authClientType.equals(AuthClient.class)) {

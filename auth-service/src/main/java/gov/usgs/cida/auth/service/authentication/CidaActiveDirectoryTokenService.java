@@ -10,6 +10,7 @@ import gov.usgs.cida.auth.dao.IAuthTokenDAO;
 import gov.usgs.cida.auth.exception.NotAuthorizedException;
 import gov.usgs.cida.auth.model.AuthToken;
 import gov.usgs.cida.auth.model.User;
+import gov.usgs.cida.auth.util.ConfigurationLoader;
 
 public class CidaActiveDirectoryTokenService implements IAuthTokenService {
 	private final static Logger LOG = LoggerFactory.getLogger(CidaActiveDirectoryTokenService.class);
@@ -45,7 +46,7 @@ public class CidaActiveDirectoryTokenService implements IAuthTokenService {
 		LOG.debug("User {} has authenticated", user.getUsername());
 		
 		if (user.isAuthenticated()) {
-			AuthToken token = authTokenDao.create(user);
+			AuthToken token = authTokenDao.create(user, ConfigurationLoader.getTtlSeconds());
 			return token;
 		} else {
 			throw new NotAuthorizedException();

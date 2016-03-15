@@ -6,6 +6,7 @@ import gov.usgs.cida.auth.dao.AuthTokenDAO;
 import gov.usgs.cida.auth.dao.IAuthTokenDAO;
 import gov.usgs.cida.auth.exception.ExpiredTokenException;
 import gov.usgs.cida.auth.model.AuthToken;
+import gov.usgs.cida.auth.util.ConfigurationLoader;
 
 import org.apache.commons.lang3.StringUtils;
 import org.slf4j.Logger;
@@ -52,7 +53,7 @@ public class TokenService implements ITokenService {
 			} else {
 				try {
 					token.updateLastAccess();
-					token.extendExpiration();
+					token.extendExpiration(ConfigurationLoader.getTtlSeconds());
 					tokenDao.updateToken(token);
 				} catch (Exception e) {
 					LOG.warn("Could not update last access for token {}", tokenId);
