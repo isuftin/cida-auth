@@ -63,33 +63,6 @@ public class AuthTokenTest {
 	}
 	
 	@Test
-	public void testExtendExpirationUsingSeconds() {
-		System.out.println("testExtendExpirationUsingSeconds");
-		AuthToken token = new AuthToken();
-		String tokenId = "TEST-TOKEN-ID";
-		Calendar cal = Calendar.getInstance();
-		Date dt = new Date();
-		long now = dt.getTime();
-
-		cal.setTime(dt);
-		cal.add(Calendar.DATE, 1);
-		long tomorrow = cal.getTimeInMillis();
-
-		token.setTokenId(tokenId);
-		token.setIssued(new Timestamp(now));
-		token.setExpires(new Timestamp(tomorrow));
-		token.setLastAccess(new Timestamp(now));
-
-		int seconds = 60;
-		long sixtyMillis = seconds * 1000l;
-		token.extendExpiration(seconds);
-
-		Timestamp expires = token.getExpires();
-		assertThat(expires.getTime(), is(greaterThan(tomorrow)));
-		assertThat((expires.getTime() - tomorrow), is(equalTo(sixtyMillis)));
-	}
-	
-	@Test
 	public void testExtendExpiration() {
 		System.out.println("testExtendExpiration");
 		AuthToken token = new AuthToken();
@@ -108,13 +81,13 @@ public class AuthTokenTest {
 		token.setLastAccess(new Timestamp(now));
 
 		// Extend it one hour
-		token.extendExpiration();
+		token.extendExpiration(3600);
 		Timestamp expires = token.getExpires();
 		assertThat(expires.getTime(), is(equalTo(extendedExpiration)));
 		
 		// Extend it another day
 		token.setLastAccess(new Timestamp(extendedExpiration));
-		token.extendExpiration();
+		token.extendExpiration(3600);
 		expires = token.getExpires();
 		assertThat(expires.getTime(), is(greaterThan(extendedExpiration)));
 	}
