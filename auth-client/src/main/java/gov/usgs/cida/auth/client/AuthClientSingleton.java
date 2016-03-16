@@ -29,7 +29,7 @@ public class AuthClientSingleton {
 	}
 	
 	public static String getProperty(String prop) {
-		return getPropInstance().getJNDIPropertyUsingContexts(prop);
+		return getPropInstance().getProperty(prop);
 	}
 
 	public static void initAuthClient(Class<? extends IAuthClient> authClientType) {
