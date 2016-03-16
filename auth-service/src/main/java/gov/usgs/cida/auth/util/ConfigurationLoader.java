@@ -29,7 +29,7 @@ public class ConfigurationLoader {
 	}
 	
 	public static String getProperty(String prop) {
-		return getPropInstance().getJNDIPropertyUsingContexts(prop);
+		return getPropInstance().getProperty(prop);
 	}
 
 	public static int getTtlSeconds() {
