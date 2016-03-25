@@ -50,16 +50,6 @@ public class HttpTokenUtils {
 	}
 
 	/**
-	 * Sessions which were previously authorized will have a token associated with them. This returns that token.
-	 * 
-	 * @param httpRequest
-	 * @return
-	 */
-	public static String getTokenFromPreauthorizedSession(HttpServletRequest httpRequest) {
-		return (String) httpRequest.getSession().getAttribute(AUTHORIZED_TOKEN_SESSION_ATTRIBUTE);
-	}
-
-	/**
 	 * Will check the token in the Authorization header of the request OR session, returns true if its valid. 
 	 * Will also save the header to the session if authorized.
 	 * 
@@ -70,20 +60,13 @@ public class HttpTokenUtils {
 	 */
 	public static boolean isTokenAuthorized(HttpServletRequest httpRequest, IAuthClient client, List<String> additionalRoles) {
 		boolean authenticated = false;
-		String tokenId = HttpTokenUtils.getTokenFromHeader(httpRequest.getHeader(AUTHORIZATION_HEADER));
+		String tokenId = HttpTokenUtils.getTokenFromRequest(httpRequest);
 		
-		if(tokenId != null) {
-			authenticated = client.isValidToken(tokenId);
-	
-			if(authenticated) {
-				saveTokenToSession(httpRequest, tokenId);
-				saveUsernameToSession(httpRequest, client.getToken(tokenId));
-			}
-		} else {
-			tokenId = HttpTokenUtils.getTokenFromPreauthorizedSession(httpRequest);
-			if(tokenId != null) {
-				authenticated = client.isValidToken(tokenId);
-			}
+		authenticated = client.isValidToken(tokenId);
+
+		if(authenticated) {
+			saveTokenToSession(httpRequest, tokenId);
+			saveUsernameToSession(httpRequest, client.getToken(tokenId));
 		}
 
 		return authenticated;

@@ -59,9 +59,6 @@ public class AuthTokenService {
 
 	public Response logout(ContainerRequestContext requestContext, HttpServletRequest httpRequest) {
 		String token = HttpTokenUtils.getTokenFromRequest(httpRequest);
-		if(token == null) {
-			token = HttpTokenUtils.getTokenFromPreauthorizedSession(httpRequest);
-		}
 		boolean invalidated = false;
 		if(token != null) {
 			invalidated = client.invalidateToken(token);
