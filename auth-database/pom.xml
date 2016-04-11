@@ -141,9 +141,9 @@
 											<value>${db.auth.user}</value>
 										</property>
 										<property>
- -											<name>runasusername</name>
- -											<value>${db.auth.runasusername}</value>
- -										</property>
+ 											<name>runasusername</name>
+ 											<value>${db.auth.runasusername}</value>
+ 										</property>
 									</expressionVars>	
 								</configuration>
 							</execution>
@@ -208,9 +208,9 @@
 											<value>${db.auth.user}</value>
 										</property>
 										<property>
- -											<name>runasusername</name>
- -											<value>${db.auth.runasusername}</value>
- -										</property>
+											<name>runasusername</name>
+											<value>${db.auth.runasusername}</value>
+										</property>
 									</expressionVars>	
 								</configuration>
 							</execution>
