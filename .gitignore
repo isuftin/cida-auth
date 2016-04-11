@@ -26,3 +26,5 @@ target/
 /auth-database/catalina.base_IS_UNDEFINED/
 /auth-webservice/nb-configuration.xml
 
+/auth-database/nbactions-cida-auth-liquibase-local.xml
+tcp/

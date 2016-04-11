@@ -46,7 +46,7 @@
 		<dependency>
 			<groupId>org.postgresql</groupId>
 			<artifactId>postgresql</artifactId>
-			<version>9.3-1102-jdbc41</version>
+			<version>9.4.1208.jre7</version>
 		</dependency>
 		<dependency>
 			<groupId>com.oracle</groupId>
@@ -84,18 +84,80 @@
 	
 	<profiles>
 		
-		<!-- Bootstrap the local database with needed tables -->
+		<!-- Oracle -->
 		<profile>
-			<id>cida-auth-liquibase-local</id>
+			<id>cida-auth-liquibase-oracle</id>
 			<activation>
 				<activeByDefault>false</activeByDefault>
 				<property>
-					<name>cida-auth-liquibase-local</name>
+					<name>cida-auth-liquibase-oracle</name>
 				</property>
 			</activation>
 			<properties>
 				<db.auth.schemaname>app_auth_server</db.auth.schemaname>
-				<db.auth.runasusername>maven-profile-cida-auth-liquibase-local</db.auth.runasusername>
+			</properties>
+			<build>
+				<plugins>
+					<plugin>
+						<groupId>org.liquibase</groupId>
+						<artifactId>liquibase-maven-plugin</artifactId>
+						<executions>
+							<execution>
+								<phase>process-resources</phase>
+								<goals>
+									<goal>update</goal>
+								</goals>
+								<configuration>
+									<changeLogFile>${file.changelog}</changeLogFile>
+									<driver>oracle.jdbc.driver.OracleDriver</driver>
+									<schemas>${db.auth.schemaname}</schemas>
+									<type>oracle</type>
+									<url>jdbc:oracle:thin@${db.auth.host}:1521:${db.auth.dbname}</url>
+									<username>${db.auth.user}</username>
+									<password>${db.auth.pass}</password>
+									<contexts>oracle</contexts>
+									<liquibase.logging>debug</liquibase.logging>
+									<verbose>true</verbose>
+									<promptOnNonLocalDatabase>false</promptOnNonLocalDatabase>
+									<expressionVars>
+										<property>
+											<name>db.auth.schemaname</name>
+											<value>${db.auth.schemaname}</value>
+										</property>
+										<property>
+											<name>db.auth.user</name>
+											<value>${db.auth.user}</value>
+										</property>
+									</expressionVars>	
+								</configuration>
+							</execution>
+						</executions>
+					</plugin>
+				</plugins>
+			</build>
+		</profile>
+		
+		<!-- Postgres -->
+		<!-- 
+			Docker Example:
+			$ docker run -p 5432:5432 -e POSTGRES_PASSWORD=postgres -e POSTGRES_USER=postgres -e POSTGRES_DB=postgres postgres
+			
+			Docker running locally natively:
+			$ mvn install -P cida-auth-liquibase-postgres -Ddb.auth.dbname=postgres -Ddb.auth.schemaname=public -Ddb.auth.user=postgres -Ddb.auth.pass=postgres -Ddb.auth.host=127.0.0.1
+			
+			Docker Machine with a machine named "dev":
+			$ mvn install -P cida-auth-liquibase-postgres -Ddb.auth.dbname=postgres -Ddb.auth.schemaname=public -Ddb.auth.user=postgres -Ddb.auth.pass=postgres -Ddb.auth.host=$(docker-machine env dev)
+		-->
+		<profile>
+			<id>cida-auth-liquibase-postgres</id>
+			<activation>
+				<activeByDefault>false</activeByDefault>
+				<property>
+					<name>cida-auth-liquibase-postgres</name>
+				</property>
+			</activation>
+			<properties>
+				<db.auth.schemaname>app_auth_server</db.auth.schemaname>
 			</properties>
 			<build>
 				<plugins>
@@ -112,13 +174,13 @@
 									<changeLogFile>${file.changelog}</changeLogFile>
 									<driver>org.postgresql.Driver</driver>
 									<schemas>${db.auth.schemaname}</schemas>
-									<url>jdbc:postgresql://127.0.0.1:5432/${db.auth.schemaname}</url>
+									<url>jdbc:postgresql://${db.auth.host}:5432/${db.auth.dbname}</url>
 									<username>${db.auth.user}</username>
 									<password>${db.auth.pass}</password>
+									<contexts>postgres</contexts>
 									<liquibase.logging>debug</liquibase.logging>
 									<verbose>true</verbose>
 									<promptOnNonLocalDatabase>false</promptOnNonLocalDatabase>
-									<contexts>test</contexts>
 									<expressionVars>
 										<property>
 											<name>db.auth.schemaname</name>
@@ -127,64 +189,6 @@
 										<property>
 											<name>db.auth.user</name>
 											<value>${db.auth.user}</value>
-										</property>
-										<property>
-											<name>runasusername</name>
-											<value>${db.auth.runasusername}</value>
-										</property>
-									</expressionVars>	
-								</configuration>
-							</execution>
-						</executions>
-					</plugin>
-				</plugins>
-			</build>
-		</profile>
-		
-		<!-- Bootstrap the local database with needed tables -->
-		<profile>
-			<id>cida-auth-liquibase</id>
-			<activation>
-				<activeByDefault>false</activeByDefault>
-				<property>
-					<name>cida-auth-liquibase</name>
-				</property>
-			</activation>
-			<properties>
-				<db.auth.schemaname>app_auth_server</db.auth.schemaname>
-			</properties>
-			<build>
-				<plugins>
-					<plugin>
-						<groupId>org.liquibase</groupId>
-						<artifactId>liquibase-maven-plugin</artifactId>
-						<executions>
-							<execution>
-								<phase>process-resources</phase>
-								<goals>
-									<goal>update</goal>
-								</goals>
-								<configuration>
-									<changeLogFile>${file.changelog}</changeLogFile>
-									<schemas>${db.auth.schemaname}</schemas>
-									<driver>oracle.jdbc.driver.OracleDriver</driver>
-									<type>oracle</type>
-									<url>${db.url}</url>
-									<username>${db.username}</username>
-									<password>${db.password}</password>
-									<contexts>oracle</contexts>
-									<expressionVars>
-										<property>
-											<name>db.auth.schemaname</name>
-											<value>${db.auth.schemaname}</value>
-										</property>
-										<property>
-											<name>db.auth.user</name>
-											<value>${db.auth.user}</value>
-										</property>
-										<property>
-											<name>runasusername</name>
-											<value>${db.auth.runasusername}</value>
 										</property>
 									</expressionVars>	
 								</configuration>
