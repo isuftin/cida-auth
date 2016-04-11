@@ -207,6 +207,10 @@
 											<name>db.auth.user</name>
 											<value>${db.auth.user}</value>
 										</property>
+										<property>
+ -											<name>runasusername</name>
+ -											<value>${db.auth.runasusername}</value>
+ -										</property>
 									</expressionVars>	
 								</configuration>
 							</execution>
