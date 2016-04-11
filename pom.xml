@@ -12,10 +12,10 @@
 		<google.api.version>1.21.0</google.api.version>
 		<jersey.version>2.22.1</jersey.version>
 		<syncope.version>1.2.6</syncope.version>
-		<h2.version>1.4.190</h2.version>
-		<version.liquibase-maven-plugin>3.4.1</version.liquibase-maven-plugin>
-		<version.maven.failsafe.plugin>2.19</version.maven.failsafe.plugin>
-		<version.maven.surefire.plugin>2.19</version.maven.surefire.plugin>
+		<h2.version>1.4.191</h2.version>
+		<version.liquibase-maven-plugin>3.4.2</version.liquibase-maven-plugin>
+		<version.maven.failsafe.plugin>2.19.1</version.maven.failsafe.plugin>
+		<version.maven.surefire.plugin>2.19.1</version.maven.surefire.plugin>
 	</properties>
 
 	<modules>
@@ -284,7 +284,7 @@
 				<plugin>
 					<groupId>org.apache.maven.plugins</groupId>
 					<artifactId>maven-compiler-plugin</artifactId>
-					<version>3.3</version>
+					<version>3.5.1</version>
 					<configuration>
 						<source>1.8</source>
 						<target>1.8</target>
@@ -298,7 +298,7 @@
 				<plugin>
 					<groupId>org.codehaus.mojo</groupId>
 					<artifactId>build-helper-maven-plugin</artifactId>
-					<version>1.9.1</version>
+					<version>1.10</version>
 				</plugin>
 				<plugin>
 					<groupId>org.liquibase</groupId>
