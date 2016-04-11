@@ -174,7 +174,7 @@
 			</activation>
 			<properties>
 				<db.auth.schemaname>app_auth_server</db.auth.schemaname>
-				<db.auth.port>1521</db.auth.port>
+				<db.auth.port>5432</db.auth.port>
 			</properties>
 			<build>
 				<plugins>
