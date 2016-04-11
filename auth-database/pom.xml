@@ -85,6 +85,16 @@
 	<profiles>
 		
 		<!-- Oracle -->
+		<!-- 
+			Docker Example using https://hub.docker.com/r/wnameless/oracle-xe-11g/ :
+			$ docker run -p 1521:1521 wnameless/oracle-xe-11g
+			
+			Docker running locally natively:
+			$ mvn install -P cida-auth-liquibase-oracle -Ddb.auth.schemaname= -Ddb.auth.dbname=xe -Ddb.auth.user=system -Ddb.auth.pass=oracle -Ddb.auth.runasusername=system -Ddb.auth.host=127.0.0.1
+			
+			Docker Machine with a machine named "dev":
+			$ mvn install -P cida-auth-liquibase-oracle -Ddb.auth.schemaname= -Ddb.auth.dbname=xe -Ddb.auth.user=system -Ddb.auth.pass=oracle -Ddb.auth.runasusername=system -Ddb.auth.host=$(docker-machine ip dev)
+		-->
 		<profile>
 			<id>cida-auth-liquibase-oracle</id>
 			<activation>
@@ -95,6 +105,8 @@
 			</activation>
 			<properties>
 				<db.auth.schemaname>app_auth_server</db.auth.schemaname>
+				<db.auth.port>1521</db.auth.port>
+				<db.auth.runasusername>${db.auth.user}</db.auth.runasusername>
 			</properties>
 			<build>
 				<plugins>
@@ -112,7 +124,7 @@
 									<driver>oracle.jdbc.driver.OracleDriver</driver>
 									<schemas>${db.auth.schemaname}</schemas>
 									<type>oracle</type>
-									<url>jdbc:oracle:thin@${db.auth.host}:1521:${db.auth.dbname}</url>
+									<url>jdbc:oracle:thin:@${db.auth.host}:${db.auth.port}:${db.auth.dbname}</url>
 									<username>${db.auth.user}</username>
 									<password>${db.auth.pass}</password>
 									<contexts>oracle</contexts>
@@ -128,6 +140,10 @@
 											<name>db.auth.user</name>
 											<value>${db.auth.user}</value>
 										</property>
+										<property>
+ -											<name>runasusername</name>
+ -											<value>${db.auth.runasusername}</value>
+ -										</property>
 									</expressionVars>	
 								</configuration>
 							</execution>
@@ -139,14 +155,14 @@
 		
 		<!-- Postgres -->
 		<!-- 
-			Docker Example:
+			Docker Example using https://hub.docker.com/_/postgres/ :
 			$ docker run -p 5432:5432 -e POSTGRES_PASSWORD=postgres -e POSTGRES_USER=postgres -e POSTGRES_DB=postgres postgres
 			
 			Docker running locally natively:
 			$ mvn install -P cida-auth-liquibase-postgres -Ddb.auth.dbname=postgres -Ddb.auth.schemaname=public -Ddb.auth.user=postgres -Ddb.auth.pass=postgres -Ddb.auth.host=127.0.0.1
 			
 			Docker Machine with a machine named "dev":
-			$ mvn install -P cida-auth-liquibase-postgres -Ddb.auth.dbname=postgres -Ddb.auth.schemaname=public -Ddb.auth.user=postgres -Ddb.auth.pass=postgres -Ddb.auth.host=$(docker-machine env dev)
+			$ mvn install -P cida-auth-liquibase-postgres -Ddb.auth.dbname=postgres -Ddb.auth.schemaname=public -Ddb.auth.user=postgres -Ddb.auth.pass=postgres -Ddb.auth.host=$(docker-machine ip dev)
 		-->
 		<profile>
 			<id>cida-auth-liquibase-postgres</id>
@@ -158,6 +174,7 @@
 			</activation>
 			<properties>
 				<db.auth.schemaname>app_auth_server</db.auth.schemaname>
+				<db.auth.port>5432</db.auth.port>
 			</properties>
 			<build>
 				<plugins>
@@ -174,7 +191,7 @@
 									<changeLogFile>${file.changelog}</changeLogFile>
 									<driver>org.postgresql.Driver</driver>
 									<schemas>${db.auth.schemaname}</schemas>
-									<url>jdbc:postgresql://${db.auth.host}:5432/${db.auth.dbname}</url>
+									<url>jdbc:postgresql://${db.auth.host}:${db.auth.port}/${db.auth.dbname}</url>
 									<username>${db.auth.user}</username>
 									<password>${db.auth.pass}</password>
 									<contexts>postgres</contexts>
@@ -190,6 +207,10 @@
 											<name>db.auth.user</name>
 											<value>${db.auth.user}</value>
 										</property>
+										<property>
+ -											<name>runasusername</name>
+ -											<value>${db.auth.runasusername}</value>
+ -										</property>
 									</expressionVars>	
 								</configuration>
 							</execution>
