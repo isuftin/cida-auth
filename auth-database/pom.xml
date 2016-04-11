@@ -4,7 +4,7 @@
 	<parent>
 		<groupId>gov.usgs.cida.auth</groupId>
 		<artifactId>auth-parent</artifactId>
-		<version>1.1.9-SNAPSHOT</version>
+		<version>1.1.8-SNAPSHOT</version>
 	</parent>
 	<artifactId>auth-database</artifactId>
 	<packaging>jar</packaging>
@@ -141,9 +141,9 @@
 											<value>${db.auth.user}</value>
 										</property>
 										<property>
- -											<name>runasusername</name>
- -											<value>${db.auth.runasusername}</value>
- -										</property>
+ 											<name>runasusername</name>
+ 											<value>${db.auth.runasusername}</value>
+ 										</property>
 									</expressionVars>	
 								</configuration>
 							</execution>
@@ -208,9 +208,9 @@
 											<value>${db.auth.user}</value>
 										</property>
 										<property>
- -											<name>runasusername</name>
- -											<value>${db.auth.runasusername}</value>
- -										</property>
+											<name>runasusername</name>
+											<value>${db.auth.runasusername}</value>
+										</property>
 									</expressionVars>	
 								</configuration>
 							</execution>
