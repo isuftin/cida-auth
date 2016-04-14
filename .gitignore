@@ -28,3 +28,5 @@ target/
 
 /auth-database/nbactions-cida-auth-liquibase-local.xml
 tcp/
+/auth-manager/auth-manager-core/src/main/webapp/META-INF/context.xml
+/auth-manager/auth-manager-console/src/main/webapp/META-INF/context.xml
