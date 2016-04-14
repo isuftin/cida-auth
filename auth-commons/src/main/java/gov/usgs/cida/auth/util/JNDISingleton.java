@@ -23,6 +23,6 @@ public class JNDISingleton {
                 LOG.warn("Error occured during initProps()", e);
             } 
         }
-        return new DynamicReadOnlyProperties(props);
+        return props;
     }
 }
