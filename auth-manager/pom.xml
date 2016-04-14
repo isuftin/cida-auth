@@ -18,7 +18,7 @@
 		<version>1.1.9-SNAPSHOT</version>
 	</parent>
 
-	<name>CIDA/Oracle build of Apache Syncope</name>
+	<name>CIDA build of Apache Syncope</name>
 	<artifactId>auth-manager</artifactId>
 	<packaging>pom</packaging>
 
