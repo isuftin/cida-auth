@@ -27,6 +27,7 @@ import org.slf4j.LoggerFactory;
 import com.google.gson.Gson;
 import com.google.gson.reflect.TypeToken;
 import javax.security.auth.login.LoginException;
+import javax.ws.rs.ForbiddenException;
 import javax.ws.rs.ProcessingException;
 
 /**
@@ -79,7 +80,7 @@ public class AuthClient implements IAuthClient {
 			result = target.
 					request(MediaType.APPLICATION_JSON_TYPE).
 					post(postEntity, AuthToken.class);
-		} catch (NotAuthorizedException ex) {
+		} catch (ForbiddenException|NotAuthorizedException ex) {
 			LOG.info("User {} could not authenticate. Error Code: {}, Reason: {}", username, ex.getResponse().getStatus(), ex.getResponse().getStatusInfo().getReasonPhrase());
 			throw new LoginException("Invalid login attempt for user " + username);
 		} catch (ProcessingException ex) {
