@@ -9,6 +9,7 @@ import java.util.Date;
 import java.util.List;
 import java.util.Map;
 import java.util.concurrent.ConcurrentHashMap;
+import javax.security.auth.login.LoginException;
 
 import org.apache.commons.lang3.StringUtils;
 import org.slf4j.Logger;
@@ -34,7 +35,7 @@ public class CachingAuthClient extends AuthClient {
 	/**
 	 * {@inheritDoc}
 	 */
-	public AuthToken getNewToken(String username, String password) {
+	public AuthToken getNewToken(String username, String password) throws LoginException {
 		AuthToken token = super.getNewToken(username, password);
 		if (token != null) {
 			tokenCache.put(token.getTokenId(), token);

@@ -5,6 +5,7 @@ import gov.usgs.cida.auth.model.AuthToken;
 import gov.usgs.cida.auth.utils.HttpTokenUtils;
 
 import java.util.List;
+import javax.security.auth.login.LoginException;
 
 import javax.servlet.http.HttpServletRequest;
 import javax.ws.rs.NotAuthorizedException;
@@ -50,7 +51,7 @@ public class AuthTokenService {
 				LOG.warn("Failed to authenticate " + username);
 				response = Response.status(Response.Status.UNAUTHORIZED).build();
 			}
-		} catch(NotAuthorizedException ex) {
+		} catch(LoginException ex) {
 			response = Response.status(Response.Status.UNAUTHORIZED).build();
 		}
 

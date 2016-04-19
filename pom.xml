@@ -15,7 +15,7 @@
 		<h2.version>1.4.191</h2.version>
 		<version.liquibase-maven-plugin>3.4.2</version.liquibase-maven-plugin>
 		<version.maven.failsafe.plugin>2.19.1</version.maven.failsafe.plugin>
-		<version.maven.surefire.plugin>2.19.1</version.maven.surefire.plugin>
+		<version.maven.surefire.plugin>2.18.1</version.maven.surefire.plugin>
 	</properties>
 
 	<modules>
