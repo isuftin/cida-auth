@@ -4,8 +4,11 @@ import gov.usgs.cida.auth.model.AuthToken;
 
 import java.net.URISyntaxException;
 import java.util.List;
+import javax.security.auth.login.LoginException;
 
 import javax.ws.rs.NotAuthorizedException;
+import javax.ws.rs.NotFoundException;
+import javax.ws.rs.ProcessingException;
 
 import static org.hamcrest.CoreMatchers.*;
 import static org.junit.Assert.*;
@@ -28,7 +31,7 @@ public class AuthClientTest extends BaseClientTest{
 	}
 
 	@Test
-	public void testGetNewToken() throws URISyntaxException {
+	public void testGetNewToken() throws URISyntaxException, LoginException {
 		System.out.println("getNewToken");
 		String username = "testuser";
 		String password = "testpassword";
@@ -51,8 +54,12 @@ public class AuthClientTest extends BaseClientTest{
 		assertThat(result.get(1), is(equalTo("AUTH_LEVEL_TWO")));
 	}
 
-	@Test
-	public void testGetNewTokenWithErrorCode() throws URISyntaxException {
+	/**
+	 * This request is unprocessable b/c the server cannot be reached,
+	 * resulting in a RuntimeException (ProcessingException)
+	 */
+	@Test(expected=NotFoundException.class)
+	public void testGetNewTokenWithErrorCode() throws URISyntaxException, LoginException {
 		System.out.println("testGetNewTokenGetting401");
 		String username = "testuser";
 		String password = "testpassword";

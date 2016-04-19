@@ -26,6 +26,8 @@ import org.slf4j.LoggerFactory;
 
 import com.google.gson.Gson;
 import com.google.gson.reflect.TypeToken;
+import javax.security.auth.login.LoginException;
+import javax.ws.rs.ProcessingException;
 
 /**
  * {@inheritDoc}
@@ -61,7 +63,7 @@ public class AuthClient implements IAuthClient {
 	 * {@inheritDoc}
 	 */
 	@Override
-	public AuthToken getNewToken(String username, String password) {
+	public AuthToken getNewToken(String username, String password) throws LoginException {
 		Client client = createNewClient();
 		AuthToken result = null;
 		Form form = new Form();
@@ -77,12 +79,16 @@ public class AuthClient implements IAuthClient {
 			result = target.
 					request(MediaType.APPLICATION_JSON_TYPE).
 					post(postEntity, AuthToken.class);
-		} catch (ClientErrorException ex) {
+		} catch (NotAuthorizedException ex) {
 			LOG.info("User {} could not authenticate. Error Code: {}, Reason: {}", username, ex.getResponse().getStatus(), ex.getResponse().getStatusInfo().getReasonPhrase());
-			if(ex.getResponse().getStatus() == Response.Status.FORBIDDEN.getStatusCode() || 
-					ex.getResponse().getStatus() == Response.Status.UNAUTHORIZED.getStatusCode()) {
-				throw new NotAuthorizedException(ex.getMessage());
-			}
+			throw new LoginException("Invalid login attempt for user " + username);
+		} catch (ProcessingException ex) {
+			LOG.error("User {} could not authenticate due to an internal processing exception.  " +
+					"Due to a Jersy bug, this may be due to a self-cert for the auth service.  " +
+					"If running on a self-signed dev server, be sure to set the development " +
+					"property to 'true' to allow self-signed certs.",
+					"  Reason: {}", username, ex.getLocalizedMessage());
+			throw ex;
 		} finally {
 			closeClientQuietly(client);
 		}
