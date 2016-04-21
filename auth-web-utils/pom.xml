@@ -18,10 +18,12 @@
 		<dependency>
 			<groupId>gov.usgs.cida.auth</groupId>
 			<artifactId>auth-commons</artifactId>
+			<version>${project.version}</version>
 		</dependency>
 		<dependency>
 			<groupId>gov.usgs.cida.auth</groupId>
 			<artifactId>auth-client</artifactId>
+			<version>${project.version}</version>
 		</dependency>
 		<dependency>
 			<groupId>javax.ws.rs</groupId>
