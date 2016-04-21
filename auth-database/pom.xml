@@ -4,7 +4,7 @@
 	<parent>
 		<groupId>gov.usgs.cida.auth</groupId>
 		<artifactId>auth-parent</artifactId>
-		<version>1.1.10-SNAPSHOT</version>
+		<version>1.2.0</version>
 	</parent>
 	<artifactId>auth-database</artifactId>
 	<packaging>jar</packaging>
