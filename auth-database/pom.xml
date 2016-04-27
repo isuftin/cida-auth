@@ -53,6 +53,7 @@
 			<groupId>com.oracle</groupId>
 			<artifactId>ojdbc6</artifactId>
 			<version>11.2.0.3-1</version>
+			<optional>true</optional>
 			<scope>provided</scope>
 		</dependency>
 		<dependency>
