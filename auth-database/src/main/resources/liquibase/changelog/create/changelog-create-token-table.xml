@@ -55,7 +55,7 @@
 		</rollback>
 	</changeSet>
 	
-	<changeSet author="${runasusername}" id="add-non-oracle-autonumber" context="test" dbms="h2,postgresql">
+	<changeSet author="${runasusername}" id="add-non-oracle-autonumber" dbms="h2,postgresql">
 		<addAutoIncrement 
 			columnDataType="BIGINT"
 			columnName="ID"
