@@ -11,8 +11,10 @@ import static org.junit.Assert.assertTrue;
 import gov.usgs.cida.auth.model.AuthToken;
 
 import java.net.URISyntaxException;
+import javax.security.auth.login.LoginException;
 
 import javax.ws.rs.NotAuthorizedException;
+import javax.ws.rs.NotFoundException;
 
 import org.junit.Before;
 import org.junit.Test;
@@ -31,9 +33,13 @@ public class CachingAuthClientTest extends AuthClientTest {
 		instance = new CachingAuthClient(authUrl);
 	}
 
-	@Test
+	/**
+	 * This request is unprocessable b/c the server cannot be reached,
+	 * resulting in a RuntimeException.
+	 */
+	@Test(expected=NotFoundException.class)
 	@Override
-	public void testGetNewToken() throws URISyntaxException {
+	public void testGetNewToken() throws URISyntaxException, LoginException {
 		super.testGetNewToken();
 		mockServer.reset(); //these stops the server from responding to requests
 		
@@ -49,14 +55,6 @@ public class CachingAuthClientTest extends AuthClientTest {
 		super.testGetRolesByToken();
 		mockServer.reset(); //these stops the server from responding to requests
 		super.testGetRolesByToken(); //tests should still pass
-	}
-
-	@Test
-	@Override
-	public void testGetNewTokenWithErrorCode() throws URISyntaxException {
-		super.testGetNewTokenWithErrorCode();
-		mockServer.reset(); //these stops the server from responding to requests
-		super.testGetNewTokenWithErrorCode(); //tests should still pass
 	}
 
 	@Test

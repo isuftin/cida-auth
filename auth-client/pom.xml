@@ -4,7 +4,7 @@
 	<parent>
 		<groupId>gov.usgs.cida.auth</groupId>
 		<artifactId>auth-parent</artifactId>
-		<version>1.1.9-SNAPSHOT</version>
+		<version>1.2.5-SNAPSHOT</version>
 	</parent>
 	<name>CIDA Auth Client</name>
 	<artifactId>auth-client</artifactId>
@@ -47,6 +47,7 @@
 		<dependency>
 			<groupId>gov.usgs.cida.auth</groupId>
 			<artifactId>auth-commons</artifactId>
+			<version>${project.version}</version>
 		</dependency>
 		<dependency>
 			<groupId>gov.usgs.cida</groupId>

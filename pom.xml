@@ -3,7 +3,7 @@
 	<modelVersion>4.0.0</modelVersion>
 	<groupId>gov.usgs.cida.auth</groupId>
 	<artifactId>auth-parent</artifactId>
-	<version>1.1.9-SNAPSHOT</version>
+	<version>1.2.5-SNAPSHOT</version>
 	<packaging>pom</packaging>
 	<name>CIDA Auth</name>
 
@@ -15,7 +15,7 @@
 		<h2.version>1.4.191</h2.version>
 		<version.liquibase-maven-plugin>3.4.2</version.liquibase-maven-plugin>
 		<version.maven.failsafe.plugin>2.19.1</version.maven.failsafe.plugin>
-		<version.maven.surefire.plugin>2.19.1</version.maven.surefire.plugin>
+		<version.maven.surefire.plugin>2.18.1</version.maven.surefire.plugin>
 	</properties>
 
 	<modules>
@@ -26,6 +26,7 @@
 		<module>auth-client</module>
 		<module>auth-web-utils</module>
 		<module>auth-manager</module>
+		<module>auth-client-springsecurity</module>
 	</modules>
 
 	<url>https://github.com/USGS-CIDA/cida-auth</url>
@@ -105,6 +106,7 @@
 				<groupId>javax.servlet</groupId>
 				<artifactId>javax.servlet-api</artifactId>
 				<version>3.1.0</version>
+				<scope>provided</scope>
 			</dependency>
 
 			<dependency>
@@ -181,28 +183,6 @@
 				<groupId>commons-io</groupId>
 				<artifactId>commons-io</artifactId>
 				<version>2.4</version>
-			</dependency>
-
-			<!-- inter-module deps -->
-			<dependency>
-				<groupId>${project.groupId}</groupId>
-				<artifactId>auth-database</artifactId>
-				<version>${project.version}</version>
-			</dependency>
-			<dependency>
-				<groupId>${project.groupId}</groupId>
-				<artifactId>auth-commons</artifactId>
-				<version>${project.version}</version>
-			</dependency>
-			<dependency>
-				<groupId>${project.groupId}</groupId>
-				<artifactId>auth-client</artifactId>
-				<version>${project.version}</version>
-			</dependency>
-			<dependency>
-				<groupId>${project.groupId}</groupId>
-				<artifactId>auth-service</artifactId>
-				<version>${project.version}</version>
 			</dependency>
 			
 			<!-- CIDA Deps -->

@@ -1,0 +1,79 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<beans:beans xmlns="http://www.springframework.org/schema/security"
+		xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+		xmlns:beans="http://www.springframework.org/schema/beans"
+		xmlns:jee="http://www.springframework.org/schema/jee"
+		xsi:schemaLocation="http://www.springframework.org/schema/beans http://www.springframework.org/schema/beans/spring-beans-3.2.xsd
+			http://www.springframework.org/schema/security http://www.springframework.org/schema/security/spring-security.xsd
+			http://www.springframework.org/schema/jee http://www.springframework.org/schema/jee/spring-jee.xsd"
+>
+	
+	<!--
+	A SAMPLE SPRING SECURITY CONFIGURATION FOR CIDA-AUTH SPRING SECURITY
+	-->
+	
+	<!--
+	NOTE:  In addition to this file, the web.xml also needs an entry for the
+	spring security filter.  That would look like this:
+	
+	<filter>
+		<filter-name>springSecurityFilterChain</filter-name>
+		<filter-class>org.springframework.web.filter.DelegatingFilterProxy</filter-class>
+	</filter>
+	<filter-mapping>
+		<filter-name>springSecurityFilterChain</filter-name>
+		<url-pattern>/*</url-pattern>
+		<dispatcher>ERROR</dispatcher>
+		<dispatcher>REQUEST</dispatcher>
+	</filter-mapping>
+	
+	-->
+
+	<!--
+	Reads the url of the CIDA-Auth service endpoint from a configured jndi
+	parameter (i.e., context.xml environment entry for tomcat named 'auth-url')
+	-->
+	<jee:jndi-lookup id="auth-url" jndi-name="java:comp/env/auth-url" />
+	
+	<!-- Create a shared instance of the AuthClient to use for authentication and provisioning -->
+	<beans:bean id="authClient" class="gov.usgs.cida.auth.client.AuthClient">
+		<beans:constructor-arg type="java.lang.String" ref="auth-url"/>
+	</beans:bean>
+	
+	<!-- This bean implements the Spring AuthenticationProvider interface and uses 'authClient' by autoWire  -->
+	<beans:bean id="authenticationProvider" class="gov.usgs.cida.auth.client.springsecurity.CidaAuthenticationProvider"/>
+
+	<!-- Tell spring to use our custom authenticationProvider -->
+	<authentication-manager>
+		<authentication-provider ref="authenticationProvider"/>
+	</authentication-manager>
+
+	<!-- Configure what pages are protected, login and logout mechanism -->
+	<http use-expressions="true">
+
+		<intercept-url pattern="/protectedPage.jsp" access="hasRole('MY_APP_ADMIN')" requires-channel="https" />
+		<intercept-url pattern="/service/**" access="hasRole('MY_APP_ADMIN')" requires-channel="https" />
+		<intercept-url pattern="/views/**" access="hasRole('MY_APP_ADMIN')" requires-channel="https" />
+		<intercept-url pattern="/lib/**" access="hasRole('MY_APP_ADMIN')" requires-channel="https" />
+		<intercept-url pattern="/js/**" access="hasRole('MY_APP_ADMIN')" requires-channel="https" />
+		
+		<!-- You don't need to implement a /logout page or service -
+		Spring will handle that based on the configured logout-url here.  -->
+		<logout
+			delete-cookies="JSESSIONID"
+			logout-url="/logout"
+			logout-success-url="/home.jsp"
+		/>
+
+		<!-- You don't need to implement a /login page or service -
+		Spring will handle that based on the configured login-processing-url here.  -->
+		<form-login
+			authentication-failure-url="/login.jsp?retry=true"
+			login-page="/login.jsp"
+			login-processing-url="/login"
+			default-target-url="/home.jsp"
+			password-parameter="password"
+			username-parameter="username"
+		/>
+	</http>
+</beans:beans>
