@@ -4,6 +4,7 @@ import java.io.IOException;
 import java.io.UnsupportedEncodingException;
 import java.net.URLEncoder;
 import java.util.Arrays;
+import java.util.List;
 import java.util.Map;
 import java.util.UUID;
 import java.util.concurrent.TimeUnit;
@@ -24,8 +25,11 @@ import com.google.common.cache.CacheBuilder;
 import com.google.gson.Gson;
 
 import gov.usgs.cida.auth.dao.AuthTokenDAO;
+import gov.usgs.cida.auth.dao.FederatedAuthDAO;
 import gov.usgs.cida.auth.dao.IAuthTokenDAO;
+import gov.usgs.cida.auth.dao.IFederatedAuthDAO;
 import gov.usgs.cida.auth.exception.NotAuthorizedException;
+import gov.usgs.cida.auth.exception.UntrustedRedirectException;
 import gov.usgs.cida.auth.model.AuthToken;
 import gov.usgs.cida.auth.model.User;
 import gov.usgs.cida.auth.util.ConfigurationLoader;
@@ -42,7 +46,6 @@ public class OAuthService {
 	private static final String JNDI_OATH_URL_PARAM_NAME = "auth.oauth.endpoint";
 	private static final String JNDI_CLIENT_ID_PARAM_NAME = "auth.oauth.client.id";
 	private static final String JNDI_CLIENT_SECRET_PARAM_NAME = "auth.oath.client.secret";
-	private static final String JNDI_REQUIRED_DOMAIN_PARAM_NAME = "auth.oauth.required.domain";
 
 	private static final String CIDA_AUTH_TEMPLATE_REPLACEMENT_STRING = "[cida_auth_token]";
 
@@ -53,13 +56,14 @@ public class OAuthService {
 	private String url;
 	private String clientId;
 	private String clientSecret;
-	private String requiredDomain;
 
 	private IAuthTokenDAO authTokenDao; 
+	private IFederatedAuthDAO federatedAuthDAO; 
 	
 	public OAuthService() {
 		authTokenDao = new AuthTokenDAO();
-		
+		federatedAuthDAO = new FederatedAuthDAO();
+				
 		DynamicReadOnlyProperties props = new DynamicReadOnlyProperties();
 		try {
 			props.addJNDIContexts();
@@ -70,10 +74,13 @@ public class OAuthService {
 		url = props.getProperty(JNDI_OATH_URL_PARAM_NAME);
 		clientId = props.getProperty(JNDI_CLIENT_ID_PARAM_NAME);
 		clientSecret = props.getProperty(JNDI_CLIENT_SECRET_PARAM_NAME);
-		requiredDomain = props.getProperty(JNDI_REQUIRED_DOMAIN_PARAM_NAME);
 	}
 
-	public String buildOauthTargetRequest(String successUrl, String redirectTemplate) throws UnsupportedEncodingException {
+	public String buildOauthTargetRequest(String successUrl, String redirectTemplate) throws UnsupportedEncodingException, UntrustedRedirectException {
+		if(!isAcceptedForwardUrl(redirectTemplate)) {
+			throw new UntrustedRedirectException();
+		}
+		
 		String state = UUID.randomUUID().toString();
 		inProgressState.asMap().put(state, new String[] { successUrl, redirectTemplate });
 
@@ -104,28 +111,24 @@ public class OAuthService {
 			String email = idToken.get("email");
 			String name = idToken.get("name");
 			
-			String username = email.split("@")[0];
-			String hostedDomain = email.split("@")[1];
+			String username = email;
 			
-			//TODO may want a more robust way to handle this, currently can only restrict to one domain
-			//if at all. A bit of a hack until we figure out what DOI's plans are for
-			//offering their own OAUTH provider
-			if(requiredDomain != null && !hostedDomain.endsWith(requiredDomain)) {
-				throw new NotAuthorizedException();
+			if(isAcceptedDomain(email)) {
+				User user = new User();
+				user.setUsername(username);
+				user.setGivenName(name);
+				user.setEmail(email);
+				user.setAuthenticated(true);
+				
+				//See comment on this method, roles are NOT restricted to user's domain.
+				CidaActiveDirectoryTokenService.loadRoles(user, AuthenticationRoles.OAUTH_AUTHENTICATED.toString(), authTokenDao);
+				
+				AuthToken token = authTokenDao.create(user, ConfigurationLoader.getTtlSeconds());
+				
+				redirectUrl = redirectUrl.replace(CIDA_AUTH_TEMPLATE_REPLACEMENT_STRING, token.getTokenId());
+			} else {
+				redirectUrl = redirectUrl.replace(CIDA_AUTH_TEMPLATE_REPLACEMENT_STRING, ""); //forward with no token
 			}
-			
-			User user = new User();
-			user.setUsername(username);
-			user.setGivenName(name);
-			user.setEmail(email);
-			user.setAuthenticated(true);
-			
-			//See comment on this method, roles are NOT restricted to user's domain.
-			CidaActiveDirectoryTokenService.loadRoles(user, AuthenticationRoles.OAUTH_AUTHENTICATED.toString(), authTokenDao);
-			
-			AuthToken token = authTokenDao.create(user, ConfigurationLoader.getTtlSeconds());
-			
-			redirectUrl = redirectUrl.replace(CIDA_AUTH_TEMPLATE_REPLACEMENT_STRING, token.getTokenId());
 		} catch (IOException e) {
 			throw new NotAuthorizedException();
 		}
@@ -146,5 +149,28 @@ public class OAuthService {
 		
 		return new Gson().fromJson(StringUtils.newStringUtf8(Base64.decodeBase64(base64EncodedClaims)), 
 				Map.class);
+	}
+	
+	private boolean isAcceptedDomain(String email) {
+		List<String> acceptedDomains = federatedAuthDAO.getAllAcceptedDomains();
+		
+		for(String d : acceptedDomains) {
+			if(email.toLowerCase().endsWith("@" + d.toLowerCase())) {
+				return true;
+			}
+		}
+		
+		return false;
+	}
+	
+	private boolean isAcceptedForwardUrl(String url) {
+		List<String> urls = federatedAuthDAO.getAllAcceptedForwardUrls();
+		
+		for(String u : urls) {
+			if(url.toLowerCase().startsWith(u.toLowerCase())) {
+				return true;
+			}
+		}
+		return false;
 	}
 }

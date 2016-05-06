@@ -9,5 +9,5 @@
 	<include file="create/changelog-create-token-table.xml" relativeToChangelogFile="true" />
 	<include file="populate/populate-tables-it.xml" relativeToChangelogFile="true" />
 	<include file="create/changelog-create-roles-table.xml" relativeToChangelogFile="true" />
-
+	<include file="create/changelog-create-federated-login-tables.xml" relativeToChangelogFile="true" />
 </databaseChangeLog> 

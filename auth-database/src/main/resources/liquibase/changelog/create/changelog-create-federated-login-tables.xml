@@ -1,0 +1,36 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<databaseChangeLog
+	xmlns="http://www.liquibase.org/xml/ns/dbchangelog"
+	xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+	xmlns:ext="http://www.liquibase.org/xml/ns/dbchangelog-ext"
+	xsi:schemaLocation="http://www.liquibase.org/xml/ns/dbchangelog http://www.liquibase.org/xml/ns/dbchangelog/dbchangelog-2.0.xsd
+	http://www.liquibase.org/xml/ns/dbchangelog-ext http://www.liquibase.org/xml/ns/dbchangelog/dbchangelog-ext.xsd">
+
+	<changeSet author="${runasusername}" id="create-accepted-user-domains">
+		<createTable 
+			remarks="Holds valid domains for OID and SAML logins"
+			tableName="ACCEPTED_USER_DOMAINS">
+			<column name="DOMAIN_NAME" type="java.sql.Types.VARCHAR(127)">
+				<constraints nullable="false" unique="false" />
+			</column>
+		</createTable>
+		
+		<rollback>
+			<dropTable tableName="ACCEPTED_USER_DOMAINS" />
+		</rollback>
+	</changeSet>
+
+	<changeSet author="${runasusername}" id="create-accepted-forward-urls">
+		<createTable 
+			remarks="Holds valid forward URLs for OID and SAML logins"
+			tableName="ACCEPTED_FORWARD_URLS">
+			<column name="URL" type="java.sql.Types.VARCHAR(127)">
+				<constraints nullable="false" unique="false" />
+			</column>
+		</createTable>
+		
+		<rollback>
+			<dropTable tableName="ACCEPTED_FORWARD_URLS" />
+		</rollback>
+	</changeSet>
+</databaseChangeLog>

@@ -1,6 +1,7 @@
 package gov.usgs.cida.auth.webservice.authentication;
 
 import gov.usgs.cida.auth.exception.NotAuthorizedException;
+import gov.usgs.cida.auth.exception.UntrustedRedirectException;
 import gov.usgs.cida.auth.model.AuthToken;
 import gov.usgs.cida.auth.service.ServicePaths;
 import gov.usgs.cida.auth.service.authentication.CidaActiveDirectoryTokenService;
@@ -62,7 +63,7 @@ public class AuthenticationWebervice {
 	@GET
 	@Path(ServicePaths.OAUTH + "/" + ServicePaths.OAUTH_BEGIN)
 	public Response redirectOauth(@QueryParam("successUrl") String successUrl,
-			@QueryParam("redirectTemplate") String redirectTemplate) throws NamingException, URISyntaxException, UnsupportedEncodingException {
+			@QueryParam("redirectTemplate") String redirectTemplate) throws NamingException, URISyntaxException, UnsupportedEncodingException, UntrustedRedirectException {
 		URI targetURIForRedirection = new URI(oAuthService.buildOauthTargetRequest(successUrl, redirectTemplate));
 		return Response.seeOther(targetURIForRedirection).build();
 	}
