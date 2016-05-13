@@ -49,7 +49,7 @@ public class OAuthService {
 
 	private static final String CIDA_AUTH_TEMPLATE_REPLACEMENT_STRING = "[cida_auth_token]";
 
-	private static final int DATA_TTL = 300000; //data only kept around for 5 minutes
+	private static final int DATA_TTL = 60000; //data only kept around for 1 minutes
 	private static final Cache<String, String[]> inProgressState = 
 			CacheBuilder.newBuilder().expireAfterWrite(DATA_TTL, TimeUnit.MILLISECONDS).build();
 

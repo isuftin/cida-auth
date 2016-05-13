@@ -8,10 +8,14 @@ import gov.usgs.cida.auth.service.authentication.CidaActiveDirectoryTokenService
 import gov.usgs.cida.auth.service.authentication.IAuthTokenService;
 import gov.usgs.cida.auth.service.authentication.ManagedAuthTokenService;
 import gov.usgs.cida.auth.service.authentication.OAuthService;
+import gov.usgs.cida.auth.service.authentication.SamlService;
 
+import java.io.IOException;
 import java.io.UnsupportedEncodingException;
 import java.net.URI;
 import java.net.URISyntaxException;
+import java.security.KeyStoreException;
+import java.security.cert.CertificateException;
 
 import javax.naming.NamingException;
 import javax.ws.rs.Consumes;
@@ -24,9 +28,13 @@ import javax.ws.rs.Produces;
 import javax.ws.rs.QueryParam;
 import javax.ws.rs.core.MediaType;
 import javax.ws.rs.core.Response;
+import javax.xml.parsers.ParserConfigurationException;
 
+import org.opensaml.xml.io.UnmarshallingException;
+import org.opensaml.xml.validation.ValidationException;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.xml.sax.SAXException;
 
 @Path("/")
 public class AuthenticationWebervice {
@@ -35,6 +43,7 @@ public class AuthenticationWebervice {
 	private IAuthTokenService cidaActiveDirectoryAuthTokenService = new CidaActiveDirectoryTokenService();
 	private IAuthTokenService managedAuthTokenService = new ManagedAuthTokenService();
 	private OAuthService oAuthService = new OAuthService();
+	private SamlService samlService = new SamlService();
 	
 	@POST
 	@Path(ServicePaths.AD + "/" + ServicePaths.TOKEN)
@@ -72,6 +81,22 @@ public class AuthenticationWebervice {
 	@Path(ServicePaths.OAUTH + "/" + ServicePaths.OAUTH_SUCCESS)
 	public Response acceptOauthResponse(@QueryParam("code") String code, @QueryParam("state") String state) throws NamingException, URISyntaxException, NotAuthorizedException {
 		URI targetURIForRedirection = new URI(oAuthService.authorize(code, state));
+		return Response.seeOther(targetURIForRedirection).build();
+	}
+	
+	@GET
+	@Path(ServicePaths.SAML + "/" + ServicePaths.SAML_BEGIN)
+	public Response redirectSaml(@QueryParam("successUrl") String successUrl,
+			@QueryParam("redirectTemplate") String redirectTemplate,
+			@QueryParam("serviceProviderId") String serviceProviderId) throws NamingException, URISyntaxException, UnsupportedEncodingException, UntrustedRedirectException {
+		URI targetURIForRedirection = new URI(samlService.buildSamlTargetRequest(successUrl, redirectTemplate, serviceProviderId));
+		return Response.seeOther(targetURIForRedirection).build();
+	}
+	
+	@POST
+	@Path(ServicePaths.SAML + "/" + ServicePaths.SAML_SUCCESS)
+	public Response acceptSamlResponse(@FormParam("SAMLResponse") final String samlResponse) throws NamingException, URISyntaxException, NotAuthorizedException, CertificateException, KeyStoreException, ParserConfigurationException, SAXException, IOException, UnmarshallingException, ValidationException, javax.security.cert.CertificateException {
+		URI targetURIForRedirection = new URI(samlService.authorize(samlResponse));
 		return Response.seeOther(targetURIForRedirection).build();
 	}
 
