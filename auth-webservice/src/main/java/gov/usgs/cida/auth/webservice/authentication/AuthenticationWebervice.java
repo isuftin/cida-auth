@@ -95,8 +95,8 @@ public class AuthenticationWebervice {
 	
 	@POST
 	@Path(ServicePaths.SAML + "/" + ServicePaths.SAML_SUCCESS)
-	public Response acceptSamlResponse(@FormParam("SAMLResponse") final String samlResponse) throws NamingException, URISyntaxException, NotAuthorizedException, CertificateException, KeyStoreException, ParserConfigurationException, SAXException, IOException, UnmarshallingException, ValidationException, javax.security.cert.CertificateException {
-		URI targetURIForRedirection = new URI(samlService.authorize(samlResponse));
+	public Response acceptSamlResponse(@FormParam("SAMLResponse") final String samlResponse, @FormParam("RelayState") final String relayState) throws NamingException, URISyntaxException, NotAuthorizedException, CertificateException, KeyStoreException, ParserConfigurationException, SAXException, IOException, UnmarshallingException, ValidationException, javax.security.cert.CertificateException {
+		URI targetURIForRedirection = new URI(samlService.authorize(samlResponse, relayState));
 		return Response.seeOther(targetURIForRedirection).build();
 	}
 

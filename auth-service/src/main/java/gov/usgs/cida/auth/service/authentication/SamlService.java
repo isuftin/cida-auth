@@ -4,7 +4,6 @@ import java.io.ByteArrayInputStream;
 import java.io.ByteArrayOutputStream;
 import java.io.IOException;
 import java.io.StringWriter;
-import java.io.UnsupportedEncodingException;
 import java.net.URLEncoder;
 import java.nio.charset.Charset;
 import java.security.KeyStoreException;
@@ -98,7 +97,7 @@ public class SamlService {
 	private static final String CIDA_AUTH_TEMPLATE_REPLACEMENT_STRING = "[cida_auth_token]";
 
 	private static final int DATA_TTL = 60000; //data only kept around for 1 minutes
-	private static final Cache<String, String[]> inProgressState = 
+	private static final Cache<String, String> inProgressState = 
 			CacheBuilder.newBuilder().expireAfterWrite(DATA_TTL, TimeUnit.MILLISECONDS).build();
 	
 	private static final String EMAIL_ATT_NAME = "EmailAddress";
@@ -157,7 +156,7 @@ public class SamlService {
 		}
 		
 		String state = UUID.randomUUID().toString();
-		inProgressState.asMap().put(state, new String[] { successUrl, redirectTemplate, serviceProviderId });
+		inProgressState.asMap().put(state, redirectTemplate);
 		
 		// Issuer object
 		IssuerBuilder issuerBuilder = new IssuerBuilder();
@@ -181,13 +180,13 @@ public class SamlService {
 		AuthnRequestBuilder authRequestBuilder = new AuthnRequestBuilder();
 		AuthnRequest authnRequest = authRequestBuilder.buildObject();
 		authnRequest.setID(serviceProviderId);
-		authnRequest.setDestination("https://localhost:8443/auth-webservice/auth/saml/success");
+		authnRequest.setDestination(url);
 		authnRequest.setVersion(SAMLVersion.VERSION_20);
 		authnRequest.setForceAuthn(false);
 		authnRequest.setIsPassive(false);
 		authnRequest.setIssueInstant(new DateTime());
-		authnRequest.setProtocolBinding(SAMLConstants.SAML2_REDIRECT_BINDING_URI);
-		authnRequest.setAssertionConsumerServiceURL(url);
+		authnRequest.setProtocolBinding(SAMLConstants.SAML2_POST_BINDING_URI);
+		authnRequest.setAssertionConsumerServiceURL(successUrl);
 		authnRequest.setProviderName(serviceProviderId);
 		authnRequest.setIssuer(issuer);
 		authnRequest.setRequestedAuthnContext(requestedAuthnContext);
@@ -199,9 +198,9 @@ public class SamlService {
 			org.w3c.dom.Element authDOM = marshaller.marshall(authnRequest);
 			StringWriter rspWrt = new StringWriter();
 			XMLHelper.writeNode(authDOM, rspWrt);
-			String encodedSamlRequest = deflateAndBase64Encode(rspWrt.toString());
-			requestUrl = url + "?SAMLRequest=" + URLEncoder.encode(encodedSamlRequest, "UTF-8") + "&RelayState=" + state;
-		} catch (MarshallingException | ConfigurationException | MessageEncodingException | UnsupportedEncodingException e) {
+			String encodedSamlRequest = samlEncode(rspWrt.toString());
+			requestUrl = url + "?SAMLRequest=" + encodedSamlRequest + "&RelayState=" + state;
+		} catch (MarshallingException | ConfigurationException | MessageEncodingException e) {
 			throw new RuntimeException("could not serizlize SAML request");
 		}
 		
@@ -209,15 +208,19 @@ public class SamlService {
 		return requestUrl;
 	}
 
-	public String authorize(String rawSamlResponseString) throws NotAuthorizedException {
-		//bootstrap the opensaml stuff
+	public String authorize(String rawSamlResponseString, String relayState) throws NotAuthorizedException {
+		//Build final redirect URL and confirm state parameter for anti-forgery protection
+		String redirectUrl = inProgressState.asMap().get(relayState);
+		if(redirectUrl == null) { //not valid unless this relayState ID has been registered here recently by buildSamlTargetRequest
+			throw new NotAuthorizedException();
+		}
+		
 		try {
+			//This will bring back the user information as well as validate signed assertions
 			Response samlResponse = getAuthorizedResponse(rawSamlResponseString);
 			
 			String email = getEmailAddress(samlResponse);
 			String username = email;
-			
-			//TODO get relay state and look up the redirect template
 			
 			if(isAcceptedDomain(email)) {
 				User user = new User();
@@ -230,16 +233,18 @@ public class SamlService {
 				
 				AuthToken token = authTokenDao.create(user, ConfigurationLoader.getTtlSeconds());
 				
-				//TODO set forward url
+				redirectUrl = redirectUrl.replace(CIDA_AUTH_TEMPLATE_REPLACEMENT_STRING, token.getTokenId());
 			} else {
-				//TODO set forward url with no token
+				redirectUrl = redirectUrl.replace(CIDA_AUTH_TEMPLATE_REPLACEMENT_STRING, ""); //forward with no token
 			}
-		} catch (ConfigurationException | SecurityException | CertificateException | KeyStoreException | ParserConfigurationException | SAXException | IOException | UnmarshallingException | ValidationException | javax.security.cert.CertificateException | MetadataProviderException e) {
-			e.printStackTrace();
+		} catch (ConfigurationException | SecurityException | CertificateException | KeyStoreException | 
+				ParserConfigurationException | SAXException | IOException | UnmarshallingException | 
+				ValidationException | javax.security.cert.CertificateException | MetadataProviderException e) {
+			LOG.error("Could not verify SAML trust relationship", e);
 			throw new NotAuthorizedException("Could not verify SAML trust relationship");
 		}
 
-		return "blah";
+		return redirectUrl;
 	}
 	
 	private boolean isAcceptedDomain(String email) {
@@ -265,7 +270,6 @@ public class SamlService {
 		return false;
 	}
 
-	//
 	private Response getAuthorizedResponse(String rawBase64EncodedSamlResponse) throws ConfigurationException, ParserConfigurationException, SAXException, IOException, UnmarshallingException, ValidationException, CertificateException, KeyStoreException, javax.security.cert.CertificateException, MetadataProviderException {
 		byte[] samlBytes = DatatypeConverter.parseBase64Binary(rawBase64EncodedSamlResponse);
 		String xmlString = new String(samlBytes, "UTF-8");
@@ -342,7 +346,14 @@ public class SamlService {
 		return x509Data.getX509Certificates().get(0);
 	}
 
-	private String deflateAndBase64Encode(String messageStr) throws MessageEncodingException {
+	/**
+	 * This will zip, base64 encode, then url encode the message.
+	 * 
+	 * @param messageStr
+	 * @return
+	 * @throws MessageEncodingException
+	 */
+	private static String samlEncode(String messageStr) throws MessageEncodingException {
 		try {
 			ByteArrayOutputStream bytesOut = new ByteArrayOutputStream();
 			Deflater deflater = new Deflater(Deflater.DEFLATED, true);
@@ -350,13 +361,15 @@ public class SamlService {
 			deflaterStream.write(messageStr.getBytes());
 			deflaterStream.finish();
 
-			return org.opensaml.xml.util.Base64.encodeBytes(bytesOut.toByteArray(), org.opensaml.xml.util.Base64.DONT_BREAK_LINES);
+			return URLEncoder.encode(
+					org.opensaml.xml.util.Base64.encodeBytes(bytesOut.toByteArray(), org.opensaml.xml.util.Base64.DONT_BREAK_LINES),
+					"UTF-8");
 		} catch (IOException e) {
 			throw new MessageEncodingException("Unable to DEFLATE and Base64 encode SAML message", e);
 		}
 	}
 	
-	public static X509Certificate getIdpSsoSigningCertificatedFromMetadata(String rawMetadataXml) throws ConfigurationException, 
+	protected static X509Certificate getIdpSsoSigningCertificatedFromMetadata(String rawMetadataXml) throws ConfigurationException, 
 		ParserConfigurationException, SAXException, IOException, UnmarshallingException, CertificateException, DOMException {
 		XMLObject metadata = unmarshall(rawMetadataXml);
 		
