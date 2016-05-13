@@ -86,6 +86,8 @@ import gov.usgs.cida.auth.model.User;
 import gov.usgs.cida.auth.util.ConfigurationLoader;
 import gov.usgs.cida.config.DynamicReadOnlyProperties;
 /**
+ * Coordinates SAML2.0 flow
+ * 
  * @author thongsav
  *
  */
@@ -150,6 +152,16 @@ public class SamlService {
 		trustedSamlMetadataUrl = props.getProperty(JNDI_SAML_METADATA_URL_PARAM_NAME);
 	}
 
+	/**
+	 * This builds a redirect URL with the proper SAML requst encoded into the query parameters to 
+	 * initiate a SAML2 flow.
+	 * 
+	 * @param successUrl url which will handle the authenticated user's redirect 
+	 * @param redirectTemplate a url template which will let us know where to forward the authenticated user back
+	 * @param serviceProviderId the service provider id identifying which SAML application we are using
+	 * @return
+	 * @throws UntrustedRedirectException
+	 */
 	public String buildSamlTargetRequest(String successUrl, String redirectTemplate, String serviceProviderId) throws UntrustedRedirectException {
 		if(!isAcceptedForwardUrl(redirectTemplate)) {
 			throw new UntrustedRedirectException();
@@ -208,6 +220,16 @@ public class SamlService {
 		return requestUrl;
 	}
 
+	/**
+	 * This is the latter half of the SAML2.0 POST binding flow. The SAML IDP will post to this
+	 * service with a response after the user has authenticated. This method validates the response
+	 * and gets the user information from the response.
+	 * 
+	 * @param rawSamlResponseString
+	 * @param relayState
+	 * @return
+	 * @throws NotAuthorizedException
+	 */
 	public String authorize(String rawSamlResponseString, String relayState) throws NotAuthorizedException {
 		//Build final redirect URL and confirm state parameter for anti-forgery protection
 		String redirectUrl = inProgressState.asMap().get(relayState);
@@ -247,6 +269,13 @@ public class SamlService {
 		return redirectUrl;
 	}
 	
+	/**
+	 * Verify that SAML user is from a trusted domain.
+	 * 
+	 * @param email
+	 * @return
+	 */
+	
 	private boolean isAcceptedDomain(String email) {
 		List<String> acceptedDomains = federatedAuthDAO.getAllAcceptedDomains();
 
@@ -259,6 +288,12 @@ public class SamlService {
 		return false;
 	}
 	
+	/**
+	 * Verify that the post-authentication URL is a trusted destination.
+	 * 
+	 * @param url
+	 * @return
+	 */
 	private boolean isAcceptedForwardUrl(String url) {
 		List<String> urls = federatedAuthDAO.getAllAcceptedForwardUrls();
 		
@@ -270,6 +305,22 @@ public class SamlService {
 		return false;
 	}
 
+	/**
+	 * This parses the raw SAML response and does signature validation.
+	 * 
+	 * @param rawBase64EncodedSamlResponse
+	 * @return
+	 * @throws ConfigurationException
+	 * @throws ParserConfigurationException
+	 * @throws SAXException
+	 * @throws IOException
+	 * @throws UnmarshallingException
+	 * @throws ValidationException
+	 * @throws CertificateException
+	 * @throws KeyStoreException
+	 * @throws javax.security.cert.CertificateException
+	 * @throws MetadataProviderException
+	 */
 	private Response getAuthorizedResponse(String rawBase64EncodedSamlResponse) throws ConfigurationException, ParserConfigurationException, SAXException, IOException, UnmarshallingException, ValidationException, CertificateException, KeyStoreException, javax.security.cert.CertificateException, MetadataProviderException {
 		byte[] samlBytes = DatatypeConverter.parseBase64Binary(rawBase64EncodedSamlResponse);
 		String xmlString = new String(samlBytes, "UTF-8");
@@ -294,13 +345,14 @@ public class SamlService {
 
 		Signature signature = response.getSignature();
 		if (signature != null) {
-			validateSignature(signature);
+			validateSignature(signature); //check if signed correctly
 			LOG.debug("Response signature successfully validated!");
 		}
 
 		for(Assertion assertion : response.getAssertions()) {
 			Signature assertionSignature = assertion.getSignature();
 			if (assertionSignature != null) {
+				//check if signed with our known and trusted cert
 				validateSignature(assertionSignature, getTrustedCertificate());
 				LOG.debug("Assertion signature successfully validated!");
 			}
@@ -323,6 +375,13 @@ public class SamlService {
 		return null;
 	}
 
+	/**
+	 * Ensures the signature is valid against a known and trusted certificate.
+	 * @param signature
+	 * @param certificate
+	 * @throws CertificateException
+	 * @throws ValidationException
+	 */
 	private void validateSignature(Signature signature, X509Certificate certificate) throws CertificateException, ValidationException {
 		BasicX509Credential credential = new BasicX509Credential();
 		credential.setEntityCertificate(certificate);
@@ -331,6 +390,13 @@ public class SamlService {
 		signatureValidator.validate(signature);
 	}
 
+	/**
+	 * Ensures the signature is valid.
+	 * 
+	 * @param signature
+	 * @throws CertificateException
+	 * @throws ValidationException
+	 */
 	private void validateSignature(Signature signature) throws CertificateException, ValidationException {
 		org.opensaml.xml.signature.X509Certificate openSamlCertificate = getCertificateFromSignature(signature);
 
@@ -339,6 +405,12 @@ public class SamlService {
 		validateSignature(signature, certificate);
 	}
 
+	/**
+	 * Retrieves certificate from signature for validation.
+	 * 
+	 * @param signature
+	 * @return
+	 */
 	private org.opensaml.xml.signature.X509Certificate getCertificateFromSignature(Signature signature) {
 		KeyInfo keyInfo = signature.getKeyInfo();
 		List<X509Data> x509Datas = keyInfo.getX509Datas();
@@ -369,6 +441,19 @@ public class SamlService {
 		}
 	}
 	
+	/**
+	 * Pulls the first signing certificate found in the SAML IDP metadata string
+	 * 
+	 * @param rawMetadataXml
+	 * @return
+	 * @throws ConfigurationException
+	 * @throws ParserConfigurationException
+	 * @throws SAXException
+	 * @throws IOException
+	 * @throws UnmarshallingException
+	 * @throws CertificateException
+	 * @throws DOMException
+	 */
 	protected static X509Certificate getIdpSsoSigningCertificatedFromMetadata(String rawMetadataXml) throws ConfigurationException, 
 		ParserConfigurationException, SAXException, IOException, UnmarshallingException, CertificateException, DOMException {
 		XMLObject metadata = unmarshall(rawMetadataXml);
@@ -390,17 +475,16 @@ public class SamlService {
 	}
 
 	/**
-	 * Constructing the SAML or XACML Objects from a String 
+	 * Constructs a SAML XMLObject from a raw string
 	 * 
-	 * @param xmlString Decoded SAML or XACML String 
-	 * @return SAML or XACML Object 
-	 * @throws ConfigurationException 
-	 * @throws ParserConfigurationException 
-	 * @throws IOException 
-	 * @throws SAXException 
-	 * @throws UnmarshallingException 
-	 * @throws EntitlementProxyException 
-	 */ 
+	 * @param xmlString
+	 * @return
+	 * @throws ConfigurationException
+	 * @throws ParserConfigurationException
+	 * @throws SAXException
+	 * @throws IOException
+	 * @throws UnmarshallingException
+	 */
 	private static XMLObject unmarshall(String xmlString) throws ConfigurationException, ParserConfigurationException, 
 		SAXException, IOException, UnmarshallingException { 
 

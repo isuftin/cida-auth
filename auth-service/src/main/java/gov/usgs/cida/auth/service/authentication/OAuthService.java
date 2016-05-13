@@ -37,6 +37,9 @@ import gov.usgs.cida.config.DynamicReadOnlyProperties;
 
 /**
  * https://developers.google.com/identity/protocols/OpenIDConnect?hl=en#exchangecode
+ * 
+ * Coordinates OpenID Connect (OIDC) flow
+ * 
  * @author thongsav
  *
  */
@@ -47,8 +50,14 @@ public class OAuthService {
 	private static final String JNDI_CLIENT_ID_PARAM_NAME = "auth.oauth.client.id";
 	private static final String JNDI_CLIENT_SECRET_PARAM_NAME = "auth.oath.client.secret";
 
+	/**
+	 * Used to redirect users to applications which piggy back on this service
+	 */
 	private static final String CIDA_AUTH_TEMPLATE_REPLACEMENT_STRING = "[cida_auth_token]";
 
+	/**
+	 * Holds information about in-progress OIDC flows
+	 */
 	private static final int DATA_TTL = 60000; //data only kept around for 1 minutes
 	private static final Cache<String, String[]> inProgressState = 
 			CacheBuilder.newBuilder().expireAfterWrite(DATA_TTL, TimeUnit.MILLISECONDS).build();
@@ -76,6 +85,15 @@ public class OAuthService {
 		clientSecret = props.getProperty(JNDI_CLIENT_SECRET_PARAM_NAME);
 	}
 
+	/**
+	 * Creates a URL which the user will be redirected. URL includes all information needed to initiate an OpenID Connect flow.
+	 * 
+	 * @param successUrl
+	 * @param redirectTemplate
+	 * @return
+	 * @throws UnsupportedEncodingException
+	 * @throws UntrustedRedirectException
+	 */
 	public String buildOauthTargetRequest(String successUrl, String redirectTemplate) throws UnsupportedEncodingException, UntrustedRedirectException {
 		if(!isAcceptedForwardUrl(redirectTemplate)) {
 			throw new UntrustedRedirectException();
@@ -94,6 +112,15 @@ public class OAuthService {
 		return fullUrl.toString();
 	}
 
+	/**
+	 * Users are expected to be forwarded here in the latter half of the OIDC flow.
+	 * The state is what ensures the user is coming from the trusted OIDC provider.
+	 * 
+	 * @param code
+	 * @param state
+	 * @return
+	 * @throws NotAuthorizedException
+	 */
 	public String authorize(String code, String state) throws NotAuthorizedException {
 		//Build final redirect URL and confirm state parameter for anti-forgery protection
 		String[] savedState = inProgressState.asMap().get(state);
@@ -136,6 +163,15 @@ public class OAuthService {
 		return redirectUrl;
 	}
 
+	/**
+	 * Using the code and state information, will call the OIDC provider to retrieve information about
+	 * the authenticated user.
+	 * 
+	 * @param code
+	 * @param successUrl
+	 * @return
+	 * @throws IOException
+	 */
 	@SuppressWarnings("unchecked")
 	private Map<String, String> getIdTokenAsMap(String code, String successUrl) throws IOException {
 		GoogleTokenResponse response =
@@ -151,6 +187,12 @@ public class OAuthService {
 				Map.class);
 	}
 	
+	/**
+	 * Verify that OIDC user is from a trusted domain.
+	 * 
+	 * @param email
+	 * @return
+	 */
 	private boolean isAcceptedDomain(String email) {
 		List<String> acceptedDomains = federatedAuthDAO.getAllAcceptedDomains();
 		
@@ -163,6 +205,12 @@ public class OAuthService {
 		return false;
 	}
 	
+	/**
+	 * Verify that the post-authentication URL is a trusted destination.
+	 * 
+	 * @param url
+	 * @return
+	 */
 	private boolean isAcceptedForwardUrl(String url) {
 		List<String> urls = federatedAuthDAO.getAllAcceptedForwardUrls();
 		
