@@ -10,6 +10,7 @@
 	<properties>
 		<project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
 		<google.api.version>1.21.0</google.api.version>
+		<opensaml.version>2.6.0</opensaml.version>
 		<jersey.version>2.22.1</jersey.version>
 		<syncope.version>1.1.8</syncope.version>
 		<h2.version>1.4.191</h2.version>
@@ -120,6 +121,11 @@
 				<groupId>javax.ws.rs</groupId>
 				<artifactId>javax.ws.rs-api</artifactId>
 				<version>2.0.1</version>
+			</dependency>
+			<dependency>
+				<groupId>org.glassfish.jersey.core</groupId>
+				<artifactId>jersey-client</artifactId>
+				<version>${jersey.version}</version>
 			</dependency>
 
 			<!-- Item/JSON -->
@@ -250,6 +256,14 @@
 				<artifactId>google-api-client</artifactId>
 				<version>${google.api.version}</version>
 			</dependency>
+
+			<!-- SAML -->
+			<dependency>
+				<groupId>org.opensaml</groupId>
+				<artifactId>opensaml</artifactId>
+				<version>${opensaml.version}</version>
+			</dependency>
+			
 			<dependency>
 				<groupId>com.google.guava</groupId>
 				<artifactId>guava</artifactId>

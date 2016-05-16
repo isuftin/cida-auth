@@ -15,4 +15,7 @@ public class ServicePaths {
 	public final static String OAUTH = "oauth";
 	public final static String OAUTH_BEGIN = "begin";
 	public final static String OAUTH_SUCCESS = "success";
+	public final static String SAML = "saml";
+	public final static String SAML_BEGIN = "begin";
+	public final static String SAML_SUCCESS = "success";
 }

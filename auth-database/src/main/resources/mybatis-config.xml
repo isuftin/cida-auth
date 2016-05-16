@@ -34,5 +34,6 @@
 	</environments>
 	<mappers>
 		 <mapper resource='gov/usgs/cida/mybatis/mappers/AuthTokenMapper.xml' />
+		 <mapper resource='gov/usgs/cida/mybatis/mappers/FederatedAuthMapper.xml' />
 	</mappers>
 </configuration>

@@ -1,0 +1,19 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper
+  PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+    "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="gov.usgs.cida.mybatis.mappers.FederatedAuthMapper">
+	<select id="getAllAcceptedDomains" resultType="string" useCache="false">
+		SELECT
+			DOMAIN_NAME
+		FROM 
+			ACCEPTED_USER_DOMAINS
+	</select>
+	
+	<select id="getAllAcceptedForwardUrls" resultType="string" useCache="false">
+		SELECT
+			URL
+		FROM 
+			ACCEPTED_FORWARD_URLS
+	</select>
+</mapper>

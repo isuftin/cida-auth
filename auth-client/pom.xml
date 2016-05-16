@@ -22,6 +22,10 @@
 			<artifactId>jersey-container-servlet-core</artifactId>
 			<scope>test</scope>
 		</dependency>
+		<dependency>
+			<groupId>org.glassfish.jersey.core</groupId>
+			<artifactId>jersey-client</artifactId>
+		</dependency>
 		
 		<!-- Downward libs can exclude this if that want to use a JAXB impl -->
 		<dependency>

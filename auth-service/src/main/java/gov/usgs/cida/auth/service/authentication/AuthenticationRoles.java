@@ -9,5 +9,6 @@ package gov.usgs.cida.auth.service.authentication;
 public enum AuthenticationRoles {
 	AD_AUTHENTICATED,
 	OAUTH_AUTHENTICATED,
+	SAML_AUTHENTICATED,
 	MANAGED_SERVICE_AUTHENTICATED
 }
