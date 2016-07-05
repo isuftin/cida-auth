@@ -4,6 +4,7 @@ import gov.usgs.cida.auth.client.IAuthClient;
 import gov.usgs.cida.auth.model.AuthToken;
 
 import java.util.List;
+import java.util.UUID;
 
 import javax.servlet.http.HttpServletRequest;
 
@@ -60,7 +61,7 @@ public class HttpTokenUtils {
 	 */
 	public static boolean isTokenAuthorized(HttpServletRequest httpRequest, IAuthClient client, List<String> additionalRoles) {
 		boolean authenticated = false;
-		String tokenId = HttpTokenUtils.getTokenFromRequest(httpRequest);
+		String tokenId = validateTokenFormat(HttpTokenUtils.getTokenFromRequest(httpRequest));
 		
 		authenticated = client.isValidToken(tokenId);
 
@@ -73,10 +74,19 @@ public class HttpTokenUtils {
 	}
 
 	public static void saveTokenToSession(HttpServletRequest httpRequest, String tokenId) {
-		httpRequest.getSession().setAttribute(AUTHORIZED_TOKEN_SESSION_ATTRIBUTE, tokenId);
+		httpRequest.getSession().setAttribute(AUTHORIZED_TOKEN_SESSION_ATTRIBUTE, validateTokenFormat(tokenId));
 	}
 	
 	public static void saveUsernameToSession(HttpServletRequest httpRequest, AuthToken token) {
 		httpRequest.getSession().setAttribute(AUTHORIZED_USER_SESSION_ATTRIBUTE, token.getUsername());
+	}
+
+	public static String validateTokenFormat(String rawTokenId) {
+		try {
+			UUID.fromString(rawTokenId);
+			return rawTokenId;
+		} catch (Exception ex) {
+			return null;
+		}
 	}
 }
