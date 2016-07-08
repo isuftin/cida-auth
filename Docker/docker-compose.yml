@@ -1,0 +1,22 @@
+---
+version: '2'
+
+networks:
+  cida-auth-net:
+
+services:
+  postgres:
+    image: cida-auth:1.2.5
+    build: ./auth-database
+    ports:
+      - "5432:5432"
+    networks:
+      cida-auth-net:
+        aliases:
+          - postgres
+    environment:
+      - POSTGRES_PASSWORD=postgres
+      - POSTGRES_USER=postgres
+      - POSTGRES_DB=cida_auth
+      - AUTH_VERSION=1.2.5
+    
