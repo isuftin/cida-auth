@@ -1,0 +1,5 @@
+CATALINA_OPTS="-server"
+CATALINA_OPTS="$CATALINA_OPTS -Dcom.sun.management.jmxremote=true"
+CATALINA_OPTS="$CATALINA_OPTS -Djava.security.egd=file:/dev/./urandom"
+CATALINA_OPTS="$CATALINA_OPTS -Dhttp_port=$auth_manager_core_http_port"
+CATALINA_OPTS="$CATALINA_OPTS -Dhttps_port=$auth_manager_core_https_port"
