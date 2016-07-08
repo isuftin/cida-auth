@@ -32,3 +32,4 @@ tcp/
 /auth-manager/auth-manager-console/src/main/webapp/META-INF/context.xml
 
 Docker/auth.env
+Docker/compose.local.env

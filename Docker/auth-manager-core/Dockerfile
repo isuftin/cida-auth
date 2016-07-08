@@ -6,7 +6,7 @@ ENV AUTH_VERSION ${AUTH_VERSION:-"1.2.5"}
 
 EXPOSE 8080
 
-RUN wget -O /usr/local/tomcat/webapps/auth-manager-core "http://cida.usgs.gov/maven/service/local/artifact/maven/redirect?r=cida-public-releases&g=gov.usgs.cida.auth&a=auth-manager-core&v=${AUTH_VERSION}&e=war"
+RUN wget -O /usr/local/tomcat/webapps/auth-manager-core.war "http://cida.usgs.gov/maven/service/local/artifact/maven/redirect?r=cida-public-releases&g=gov.usgs.cida.auth&a=auth-manager-core&v=${AUTH_VERSION}&e=war"
 
 RUN wget -O /usr/local/tomcat/webapps/probe.war "https://github.com/psi-probe/psi-probe/releases/download/3.0.0.M3/probe.war"
 

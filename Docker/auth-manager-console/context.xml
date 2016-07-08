@@ -2,7 +2,6 @@
 <Context>
     <WatchedResource>WEB-INF/web.xml</WatchedResource>
     <Manager pathname="" />
-    <Resource name="jdbc/cidaAuthDS" auth="Container" type="javax.sql.DataSource" username="postgres" password="postgres" driverClassName="org.postgresql.Driver" url="jdbc:postgresql://auth-database:5432/cida_auth" maxTotal="50" maxIdle="10" removeAbandonedOnBorrow="true" removeAbandonedTimeout="60" logAbandoned="true" testOnBorrow="true" defaultAutoCommit="true" validationQuery="SELECT 1" accessToUnderlyingConnectionAllowed="true" jdbcInterceptors="org.apache.tomcat.jdbc.pool.interceptor.ConnectionState;org.apache.tomcat.jdbc.pool.interceptor.StatementFinalizer" poolPreparedStatements="true" maxOpenPreparedStatements="400" />
     <Environment name="development" override="true" type="java.lang.String" value="${cida_auth_development}" />
     <Environment name="auth.ldap.url" override="true" type="java.lang.String" value="${cida_auth_ldap_url}" />
     <Environment name="auth.ldap.domain" override="true" type="java.lang.String" value="${cida_auth_ldap_domain}" />
