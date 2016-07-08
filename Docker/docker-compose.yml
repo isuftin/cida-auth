@@ -5,18 +5,26 @@ networks:
   cida-auth-net:
 
 services:
-  postgres:
-    image: cida-auth:1.2.5
+  auth-database:
+    image: auth-database:1.2.5
     build: ./auth-database
     ports:
       - "5432:5432"
     networks:
       cida-auth-net:
         aliases:
-          - postgres
-    environment:
-      - POSTGRES_PASSWORD=postgres
-      - POSTGRES_USER=postgres
-      - POSTGRES_DB=cida_auth
-      - AUTH_VERSION=1.2.5
+          - auth-database
+    env_file:
+      - "compose${AUTH_ENV_LOCAL}.env"
     
+  auth-manager-core:
+    image: auth-manager-core:1.2.5
+    build: ./auth-manager-core
+    ports:
+      - "8080:8080"
+    networks:
+      cida-auth-net:
+        aliases:
+          - auth-manager-core
+    env_file:
+      - "compose${AUTH_ENV_LOCAL}.env"
