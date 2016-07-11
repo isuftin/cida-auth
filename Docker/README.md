@@ -16,5 +16,7 @@ This will cause Docker Compose to pick up your `compose_local.env` file and use 
 
 The Docker Compose template includes an OpenLDAP server as well as a container that fills the server with a user. One issue you may run into is when you first run the seeding server, it will complain about permissions. This may be an issue with your host file system. To get around this, change the permissions for the `/auth-ldap` folder to 777 by issuing the following: `chmod -R 777 ./auth-ldap` from the directory that the docker-compose file is in.
 
+The user that's created by default when the LDAP server begins is named `test_user`. You can find more information about this user by reading the file `./auth-ldap/ldif_files/people.ldif`. The password for this user is `test`.
+
 If you do not need OpenLDAP support or plan on using your own LDAP server, either comment out the sections for OpenLDAP in docker-compose.yml (ldap-server and ldap-seed) or run compose without those two containers: `docker-compose up auth-database auth-manager-console auth-manager-core`
 

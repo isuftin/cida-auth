@@ -1,16 +1,17 @@
 dn: uid=test_user,dc=gs,dc=doi,dc=net
-objectClass: top
-objectClass: account
-objectClass: posixAccount
 objectClass: shadowAccount
+objectClass: posixAccount
+objectClass: account
+objectClass: top
 cn: test_user
-uid: test_user
-uidNumber: 16859
 gidNumber: 101
 homeDirectory: /home/test_user
-loginShell: /bin/bash
+uid: test_user
+uidNumber: 16859
 gecos: test_user
-userPassword: {crypt}x
+loginShell: /bin/bash
 shadowLastChange: 0
 shadowMax: 0
 shadowWarning: 0
+userPassword:: e3NoYX1xVXFQNWN5eG02WWNUQWh6MDVIcGg1Z3Z1OU09
+
