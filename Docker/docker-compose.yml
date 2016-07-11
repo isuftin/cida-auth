@@ -5,6 +5,36 @@ networks:
   cida-auth-net:
 
 services:
+  ldap-server:
+    image: osixia/openldap
+    container_name: openldap
+    hostname: ldap-cida-auth.org
+    ports:
+      - "389:389"
+    networks:
+      cida-auth-net:
+        aliases:
+          - ldap-server
+    volumes:
+      - /etc/ldap
+      - /var/lib/ldap
+    env_file:
+      - "compose${AUTH_ENV_LOCAL}.env"
+
+  ldap-seed:
+    image: osixia/openldap
+    volumes:
+      - ./auth-ldap/ldif_files:/ldif_files/
+    links:
+      - ldap-server
+    networks:
+      cida-auth-net:
+        aliases:
+          - ldap-server
+    entrypoint: sh -c '/ldif_files/addAll.sh'
+    depends_on: 
+      - ldap-server
+
   auth-database:
     image: auth-database:1.2.5
     build: ./auth-database
