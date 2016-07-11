@@ -1,0 +1,4 @@
+dn: cn=cida_auth_group,ou=groups,dc=tgs,dc=com
+objectClass: top
+objectClass: posixGroup
+gidNumber: 678
