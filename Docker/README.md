@@ -20,3 +20,4 @@ The user that's created by default when the LDAP server begins is named `test_us
 
 If you do not need OpenLDAP support or plan on using your own LDAP server, either comment out the sections for OpenLDAP in docker-compose.yml (ldap-server and ldap-seed) or run compose without those two containers: `docker-compose up auth-database auth-manager-console auth-manager-core`
 
+
