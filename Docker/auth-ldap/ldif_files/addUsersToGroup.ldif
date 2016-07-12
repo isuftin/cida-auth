@@ -1,0 +1,15 @@
+dn: cn=cida_auth_group,dc=gs,dc=doi,dc=net
+changetype: modify
+add: memberuid
+memberuid: tet_user
+
+dn: cn=cida_auth_group,dc=gs,dc=doi,dc=net
+changetype: modify
+add: memberuid
+memberuid: tet_user2
+
+dn: cn=cida_auth_group,dc=gs,dc=doi,dc=net
+changetype: modify
+add: memberuid
+memberuid: tet_user3
+
