@@ -3,10 +3,6 @@
     <WatchedResource>WEB-INF/web.xml</WatchedResource>
     <Manager pathname="" />
     <Environment name="development" override="true" type="java.lang.String" value="${cida_auth_development}" />
-    <Environment name="auth.ldap.url" override="true" type="java.lang.String" value="${cida_auth_ldap_url}" />
-    <Environment name="auth.ldap.domain" override="true" type="java.lang.String" value="${cida_auth_ldap_domain}" />
-    <Environment name="auth.ldap.bind.user.prefix" override="true" type="java.lang.String" value="${cida_auth_ldap_bind_user_prefix}" />
-    <Environment name="auth.ldap.bind.user.suffix" override="true" type="java.lang.String" value="${cida_auth_ldap_bind_user_suffix}" />
     <Environment name="auth.manager.password.algorithm" override="true" type="java.lang.String" value="${cida_auth_manager_password_algorithm}" />
     <Environment name="auth.manager.username" override="true" type="java.lang.String" value="${cida_auth_manager_username}" />
     <Environment name="auth.manager.password" override="true" type="java.lang.String" value="${cida_auth_manager_password}" />
@@ -14,6 +10,4 @@
     <Environment name="auth.manager.core.host" override="true" type="java.lang.String" value="${cida_auth_manager_core_host}" />
     <Environment name="auth.manager.core.port" override="true" type="java.lang.String" value="${cida_auth_manager_core_port}" />
     <Environment name="auth.manager.core.scheme" override="true" type="java.lang.String" value="${cida_auth_manager_core_scheme}" />
-    <Environment name="auth.http.basic" override="true" type="java.lang.String" value="${cida_auth_http_basic}" />
-    <Environment name="auth.crowd.url" override="true" type="java.lang.String" value="${cida_auth_crowd_url}" />
 </Context>
