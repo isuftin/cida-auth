@@ -17,7 +17,7 @@ ENV POSTGRES_USER postgres
 
 ENV POSTGRES_DB cida_auth
 
-ENV AUTH_VERSION ${AUTH_VERSION:-"1.2.5"}
+ENV AUTH_VERSION ${AUTH_VERSION:-"1.2.6"}
 
 ENV JAVA_HOME "/usr/lib/jvm/java-8-oracle"
 

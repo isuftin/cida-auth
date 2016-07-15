@@ -40,7 +40,7 @@ services:
       - ldap-server
 
   auth-database:
-    image: auth-database:1.2.5
+    image: auth-database:1.2.6
     build: ./auth-database
     ports:
       - "5432:5432"
@@ -52,7 +52,7 @@ services:
       - "compose${AUTH_ENV_LOCAL}.env"
     
   auth-manager-console:
-    image: auth-manager-console:1.2.5
+    image: auth-manager-console:1.2.6
     build: ./auth-manager-console
     ports:
       - "8080:8080"
@@ -67,7 +67,7 @@ services:
       - auth-manager-core
     
   auth-manager-core:
-    image: auth-manager-core:1.2.5
+    image: auth-manager-core:1.2.6
     build: ./auth-manager-core
     ports:
       - "8082:8080"

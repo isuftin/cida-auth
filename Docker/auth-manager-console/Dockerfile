@@ -2,7 +2,7 @@ FROM tomcat:8.0-jre8
 
 MAINTAINER Ivan Suftin <isuftin@usgs.gov>
 
-ENV AUTH_VERSION ${AUTH_VERSION:-"1.2.5"}
+ENV AUTH_VERSION ${AUTH_VERSION:-"1.2.6"}
 
 EXPOSE 8080
 
