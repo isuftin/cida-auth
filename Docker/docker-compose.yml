@@ -6,7 +6,7 @@ networks:
 
 services:
   ldap-server:
-    image: osixia/openldap
+    image: osixia/openldap:1.1.3
     container_name: openldap
     hostname: ldap-cida-auth.org
     ports:
@@ -21,8 +21,12 @@ services:
     env_file:
       - "compose${AUTH_ENV_LOCAL}.env"
 
+  # This container starts but waits for the LDAP server to come up
+  # before running its main command. Check Dockerfile for more info.
   ldap-seed:
-    image: osixia/openldap
+    image: auth-ldap-seed:1.1.3
+    build: ./auth-ldap
+    container_name: auth-ldap-seed
     volumes:
       - ./auth-ldap/ldif_files:/ldif_files/
     links:
@@ -31,7 +35,7 @@ services:
       cida-auth-net:
         aliases:
           - ldap-server
-    entrypoint: sh -c '/ldif_files/addAll.sh'
+    entrypoint: dockerize -wait tcp://ldap-server:389 sh -c '/ldif_files/addAll.sh'
     depends_on: 
       - ldap-server
 
@@ -72,6 +76,7 @@ services:
       cida-auth-net:
         aliases:
           - auth-manager-core
+    command: dockerize -wait tcp://auth-database:5432 catalina.sh run
     env_file:
       - "compose${AUTH_ENV_LOCAL}.env"
     depends_on:
