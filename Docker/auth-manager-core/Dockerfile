@@ -35,3 +35,17 @@ RUN rm -rf /usr/local/tomcat/bin/ROOT
 RUN rm -rf /usr/local/tomcat/bin/docs
 
 RUN rm -rf /usr/local/tomcat/bin/examples
+
+# Because this container needs to wait for the database to be up, install Dockerize
+# and control this container running its command based on the database server starting up.
+# This still may not be foolproof as liquibase will still need to be run on the database and while
+# that's happening, the 
+#
+# https://github.com/jwilder/dockerize
+# https://github.com/mefellows/dockerize-compose-demo
+
+ENV DOCKERIZE_VERSION "0.2.0"
+
+RUN wget https://github.com/jwilder/dockerize/releases/download/v${DOCKERIZE_VERSION}/dockerize-linux-amd64-v${DOCKERIZE_VERSION}.tar.gz
+
+RUN tar -C /usr/local/bin -xzvf dockerize-linux-amd64-v${DOCKERIZE_VERSION}.tar.gz
