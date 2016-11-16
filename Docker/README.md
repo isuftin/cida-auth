@@ -10,14 +10,20 @@ The file compose.env is a [Docker Compose environment file](https://docs.docker.
 $ export AUTH_ENV_LOCAL=".local"
 ```
 
-This will cause Docker Compose to pick up your `compose_local.env` file and use the values in there to drive the services.  These values typically include passwords, internal URLs, etc.
+This will cause Docker Compose to pick up your `compose_local.env` file and use the values in there to drive the services.  These values typically include passwords, internal URLs, etc. If any changes are made to any ldif files or to the `addAll.sh` file, you will need to rebuild the auth-ldap container.
 
 ### OpenLDAP
 
-The Docker Compose template includes an OpenLDAP server as well as a container that fills the server with a user. One issue you may run into is when you first run the seeding server, it will complain about permissions. This may be an issue with your host file system. To get around this, change the permissions for the `/auth-ldap` folder to 777 by issuing the following: `chmod -R 777 ./auth-ldap` from the directory that the docker-compose file is in.
+The Docker Compose template includes an OpenLDAP server as well as a container that fills the server with users. Check https://github.com/osixia/docker-openldap for more information. If you do not need OpenLDAP support or plan on using your own LDAP server, either comment out the sections for OpenLDAP in docker-compose.yml (ldap-server and ldap-seed) or run compose without those two containers.
 
-The user that's created by default when the LDAP server begins is named `test_user`. You can find more information about this user by reading the file `./auth-ldap/ldif_files/people.ldif`. The password for this user is `test`.
+TODO- Implement LDAPS. Currently, only insecure LDAP is working. I've not yet attempted to set up secure LDAPS
 
-If you do not need OpenLDAP support or plan on using your own LDAP server, either comment out the sections for OpenLDAP in docker-compose.yml (ldap-server and ldap-seed) or run compose without those two containers: `docker-compose up auth-database auth-manager-console auth-manager-core`
+#### LDAP Users
 
+The users are currently stored in the `auth-ldap/ldif_files/people.ldif` file. Feel free to change the user names/passwords to fit your testing.  The password for each user is 'test'. Feel free to change that as well by hashing a text value using SHA1 and entering into the people.ldif file.
 
+The username for the LDAP admin user is `admin`. The password for the LDAP admin user is `admin`. The password is set in the environments file you run your docker-compose against. The key for the value is `LDAP_ADMIN_PASSWORD`. 
+
+#### LDAP Groups
+
+You may or may not need groups for your LDAP testing, but the seed container will create a single group anyway and put all the users that are in people.ldif by default into that group. The group name is `cida_auth_group`. Feel free to change this if you need. The seed container also modifies the LDAP configuration using the `auth-ldap/ldif_files/addUsersToGroup.ldif` file. If you do modify user names, you should update the `addUsersToGroup.ldif` files to match. If you choose not to use groups, you can comment out the line in `addAll.sh` that begins with `ldapmodify`.
