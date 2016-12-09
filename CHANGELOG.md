@@ -6,3 +6,9 @@
 - Updated Postgres and Oracle Liquibase profile names so neither are specific to local or dev/qa/prod tiers
 - Tested using OracleXE Docker https://hub.docker.com/r/wnameless/oracle-xe-11g/
 - Tested using Portgres Docker https://hub.docker.com/_/postgres/
+- Moved Docker configuration to https://github.com/USGS-CIDA/docker-cida-auth
+- Created DockerHub container registry at:
+	- https://hub.docker.com/r/usgs/auth-database/
+	- https://hub.docker.com/r/usgs/auth-manager-console/
+	- https://hub.docker.com/r/usgs/auth-manager-core/
+	- https://hub.docker.com/r/usgs/auth-ldap-seed/
