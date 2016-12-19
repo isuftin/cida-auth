@@ -8,8 +8,6 @@ import javax.ws.rs.ext.Provider;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import gov.usgs.cida.auth.webservice.authentication.AuthenticationWebervice;
-
 /**
  * Handlers and reports ExpiredTokenException. See
  * {@link gov.usgs.cida.auth.exception.ExpiredTokenException}
