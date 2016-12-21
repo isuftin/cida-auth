@@ -282,7 +282,7 @@ public class SamlService {
 		if(atIndex > 0) {
 			username = email.substring(0, email.indexOf(atIndex));
 		}
-		return email;
+		return username;
 	}
 	
 	/**
