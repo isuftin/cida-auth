@@ -242,7 +242,7 @@ public class SamlService {
 			Response samlResponse = getAuthorizedResponse(rawSamlResponseString);
 			
 			String email = getEmailAddress(samlResponse);
-			String username = email;
+			String username = usernameFromEmail(email); //TODO use full email for username instead
 			
 			if(isAcceptedDomain(email)) {
 				User user = new User();
@@ -267,6 +267,22 @@ public class SamlService {
 		}
 
 		return redirectUrl;
+	}
+	
+	/**
+	 * This is temporary. All users are assumed to be on one domain.
+	 * 
+	 * TODO remove this, and have all users of CIDA Auth use the full email as username.
+	 * @param email
+	 * @return
+	 */
+	private String usernameFromEmail(String email) {
+		String username = email;
+		int atIndex = username.indexOf("@");
+		if(atIndex > 0) {
+			username = email.substring(0, email.indexOf(atIndex));
+		}
+		return username;
 	}
 	
 	/**
