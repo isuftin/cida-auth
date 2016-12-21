@@ -280,7 +280,7 @@ public class SamlService {
 		String username = email;
 		int atIndex = username.indexOf("@");
 		if(atIndex > 0) {
-			username = email.substring(0, email.indexOf(atIndex));
+			username = username.substring(0, atIndex);
 		}
 		return username;
 	}
