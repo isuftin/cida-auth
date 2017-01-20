@@ -36,7 +36,7 @@
 
 	<organization>
 		<name>Center for Integrated Data Analytics</name>
-		<url>http://cida.usgs.gov</url>
+		<url>https://cida.usgs.gov</url>
 	</organization>
 
 	<developers>
@@ -45,7 +45,7 @@
 			<email>thongsav@usgs.gov</email>
 			<id>thongsav</id>
 			<organization>Center for Integrated Data Analytics</organization>
-			<organizationUrl>http://cida.usgs.gov</organizationUrl>
+			<organizationUrl>https://cida.usgs.gov</organizationUrl>
 			<timezone>-6</timezone>
 		</developer>
 		<developer>
@@ -53,7 +53,7 @@
 			<email>isuftin@usgs.gov</email>
 			<id>isuftin</id>
 			<organization>Center for Integrated Data Analytics</organization>
-			<organizationUrl>http://cida.usgs.gov</organizationUrl>
+			<organizationUrl>https://cida.usgs.gov</organizationUrl>
 			<timezone>-6</timezone>
 		</developer>
 	</developers>
@@ -61,7 +61,7 @@
 	<licenses>
 		<license>
 			<name>Public Domain</name>
-			<url>http://water.usgs.gov/software/help/notice/</url>
+			<url>https://water.usgs.gov/software/help/notice/</url>
 			<comments>
 				See the url or the 'LICENSE' file for details
 			</comments>
@@ -79,12 +79,12 @@
 		<repository>
 			<id>nexus</id>
 			<name>CIDA Public Nexus</name>
-			<url>http://cida.usgs.gov/maven/cida-public/</url>
+			<url>https://cida.usgs.gov/maven/cida-public/</url>
 		</repository>
 		<repository>
 			<id>cida-thirdparty</id>
 			<name>CIDA Public Nexus Third Party</name>
-			<url>http://cida.usgs.gov/maven/cida-public-thirdparty/</url>
+			<url>https://cida.usgs.gov/maven/cida-public-thirdparty/</url>
 		</repository>
 	</repositories>
 
@@ -185,14 +185,14 @@
 				<artifactId>commons-io</artifactId>
 				<version>2.4</version>
 			</dependency>
-			
+
 			<!-- CIDA Deps -->
 			<dependency>
 				<groupId>gov.usgs.cida</groupId>
 				<artifactId>dynamicProperties</artifactId>
 				<version>1.0.2</version>
 			</dependency>
-			
+
 			<!-- Apache Syncope -->
 			<dependency>
 				<groupId>org.apache.syncope</groupId>
@@ -242,7 +242,7 @@
 				<type>war</type>
 				<scope>test</scope>
 			</dependency>
-			
+
 			<!-- Liquibase -->
 			<dependency>
 				<groupId>org.liquibase</groupId>
@@ -263,7 +263,7 @@
 				<artifactId>opensaml</artifactId>
 				<version>${opensaml.version}</version>
 			</dependency>
-			
+
 			<dependency>
 				<groupId>com.google.guava</groupId>
 				<artifactId>guava</artifactId>
